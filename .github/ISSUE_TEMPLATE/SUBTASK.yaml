@@ -1,0 +1,21 @@
+name: {{ entity }} Subtask
+description: Add a new {{ entity }} Subtask.
+title: "[SUBTASK]: "
+description: Add a new {{ entity }} Subtask.
+labels: ["subtask", "backlog"]
+assignees:
+  - {{ github_username }}
+projects: []
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this form to create a new {{ entity }} Subtask Entry
+  - type: textarea
+    id: notes
+    attributes:
+      label: Subtask Notes
+      description: Describe the subtask
+      placeholder: Describe the subtask
+    validations:
+      required: false

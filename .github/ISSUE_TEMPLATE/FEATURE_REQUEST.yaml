@@ -1,0 +1,52 @@
+name: {{ entity }} Feature Request
+title: "[FEATURE]: "
+description: Request a new feature.
+labels: ["feature", "backlog"]
+assignees:
+  - {{ github_username }}
+projects: []
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this form to create a new product feature request
+  - type: input
+    id: customer_name
+    attributes:
+      label: Customer Name
+      description: Name of the customer requesting the feature
+      placeholder: Customer name
+    validations:
+      required: true
+  - type: textarea
+    id: description
+    attributes:
+      label: Describe the feature
+      description: Feature description
+      placeholder: Describe the feature and the problem it solves
+    validations:
+      required: false
+  - type: textarea
+    id: solution
+    attributes:
+      label: Do you have a suggested solution? (optional)
+      description: Propose the feature solution (optional)
+      placeholder: Propose the feature solution (optional)
+    validations:
+      required: false
+  - type: textarea
+    id: workarounds
+    attributes:
+      label: Does the feature have existing workarounds?
+      description: Describe workarounds
+      placeholder: Describe current workarounds that exist
+    validations:
+      required: false
+  - type: textarea
+    id: context
+    attributes:
+      label: Additional context for the product team (optional)
+      description: Additional context for the product team (optional)
+      placeholder: Add context for the product team (optional)
+    validations:
+      required: false

@@ -1,0 +1,81 @@
+name: {{ entity }} Bug Report
+description: File a {{ entity }} bug report.
+title: "[BUG]: "
+labels: ["bug", "backlog"]
+projects: []
+assignees:
+  - {{ github_user }}
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to fill out this bug report!
+  - type: input
+    id: contact
+    attributes:
+      label: Contact Details
+      description: How can we get in touch with you if we need more info?
+      placeholder: you@example.com
+    validations:
+      required: false
+  - type: textarea
+    id: bug-description
+    attributes:
+      label: What happened?
+      description: What happened?
+      placeholder: Tell us where it hurts
+    validations:
+      required: true
+  - type: textarea
+    id: bug-expectation
+    attributes:
+      label: What did you expect to happen?
+      description: What did you expect to happen?
+      placeholder: Tell us what should have happened
+    validations:
+      required: true
+  - type: textarea
+    id: bug-reproduction
+    attributes:
+      label: Steps to reproduce the issue
+      description: Tell us how to reproduce the issue
+      placeholder: Tell us how to see what you saw
+    validations:
+      required: true
+  - type: dropdown
+    id: product
+    attributes:
+      label: Product
+      description: What type of prduct are you using?
+      options:
+        - Data Product
+        - AI Product
+      default: 0
+    validations:
+      required: true
+  - type: dropdown
+    id: browsers
+    attributes:
+      label: What browsers are you seeing the problem on?
+      multiple: true
+      options:
+        - Firefox
+        - Chrome
+        - Safari
+        - Microsoft Edge
+        - Brave
+        - All of the above
+  - type: textarea
+    id: logs
+    attributes:
+      label: Relevant log output
+      description: Please copy and paste any relevant log output. This will be automatically formatted into code, so no need for backticks.
+      render: shell
+  - type: checkboxes
+    id: terms
+    attributes:
+      label: Code of Conduct
+      description: By submitting this issue, you agree to follow our [Code of Conduct (coming soon)](https://{{ github_username }}.github.io/conduct). 
+      options:
+        - label: I agree to follow this project's Code of Conduct
+          required: true

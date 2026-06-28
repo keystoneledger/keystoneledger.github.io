@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: {{ entity }} Discussion Thread
+    url:  https://github.com/{{ github_username }}/{{ github_username }}.github.io/discussions/new/choose
+    about: Use this template to open a new {{ entity }} discussion thread

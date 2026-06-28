@@ -1,0 +1,16 @@
+---
+layout: default
+---
+
+<div id="post">
+    <div class='title'>
+        {{ page.title }}
+    </div>
+    <div class='date'>
+        {{ page.date | date_to_string }}
+    </div> 
+    <div id='body'>
+        {{ content }}
+    </div>
+</div>
+

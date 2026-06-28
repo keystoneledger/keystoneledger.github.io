@@ -1,0 +1,324 @@
+
+body {
+    font-family: "proxima-nova", sans-serif;
+    text-align: center;
+    font-size: 100%;
+    font-weight: 100;
+}
+
+/*
+ * **************************************************************** WRAPPER
+*/
+
+.wrapper{
+    background-color: #fff;
+    border: 1px solid #f0f3f7;
+    -webkit-transition: -webkit-transform .25s cubic-bezier(.215,.61,.355,1),-webkit-box-shadow .25s cubic-bezier(.215,.61,.355,1);
+    transition: -webkit-transform .25s cubic-bezier(.215,.61,.355,1),-webkit-box-shadow .25s cubic-bezier(.215,.61,.355,1);
+    transition: transform .25s cubic-bezier(.215,.61,.355,1),box-shadow .25s cubic-bezier(.215,.61,.355,1);
+    transition: transform .25s cubic-bezier(.215,.61,.355,1),box-shadow .25s cubic-bezier(.215,.61,.355,1),-webkit-transform .25s cubic-bezier(.215,.61,.355,1),-webkit-box-shadow .25s cubic-bezier(.215,.61,.355,1);
+    padding:  30px;
+
+    filter: drop-shadow(0 0.2rem 0.25rem rgba(0, 0, 0, 0.2));
+
+    max-width: 90%;
+
+    margin-top:  5%;
+    margin-left: auto;
+    margin-right: auto;
+    padding-top:  2%;
+
+    border-radius:  0.25em;
+
+    background-image: url("../img/ux/swatch_ur.png");
+    background-position: top right;
+    background-repeat: no-repeat;
+}
+
+/*
+ * **************************************************************** BORDERS
+*/
+
+.bottom-border {border-bottom: 1px solid #a8dade}
+.top-border {border-top: 1px solid #a8dade;}
+
+/*
+ * **************************************************************** HEADER
+*/
+
+.header {
+    margin: 15px;
+    margin-bottom: 40px;
+}
+
+.header .feature-img {
+    height: 200px;
+}
+
+.header .top-left {}
+.header .top-center {}
+.header .top-center .pfp {margin:15px;}
+.header .top-center .title {font-size : 2.5em;}
+.header .top-center .subtitle {font-size : 1.5em;}
+
+.header .top-right {
+    display: inline-table;
+    width: 100%;
+    vertical-align: middle;
+}
+
+.header .top-right p {
+    float: right;
+    text-align: right;
+    width: 90%;
+}
+
+/*
+ * **************************************************************** CONTENT
+*/
+
+.content {
+    margin-left: 20px;
+    margin-right: 20px;
+    margin-top: 10px;
+}
+.content .middle-left {}
+.content .middle-center {}
+.content .middle-right {}
+
+/*
+ * **************************************************************** SUBSECTION
+*/
+
+.subsection {
+    margin: 15px;
+    text-align: left;
+}
+
+.subsection div.title {
+    font-size : 1.5em;
+    padding: 15px;
+    padding-left: 55px;
+    border-bottom: 1px solid #a8dade;
+    background-repeat: no-repeat;
+    background-position: left center;
+}
+
+.subsection .body {
+    margin-top: 20px;
+    margin-bottom: 10px;
+    padding: 10px;
+}
+
+/*
+ * **************************************************************** LISTS
+*/
+
+ul.checklist li {
+    list-style: none;
+    padding: 10px;
+    padding-left: 30px;
+    margin-left: -30px;
+    background-image: url("../img/icons/checkbox.png");
+    background-repeat: no-repeat;
+    background-position: left center;
+    background-size: 20px;
+}
+
+ul.arrowlist li {
+    list-style: none;
+    padding: 10px;
+    padding-left: 30px;
+    margin-left: -30px;
+    background-image: url("../img/icons/arrow_rt.png");
+    background-repeat: no-repeat;
+    background-position: left center;
+    background-size: 20px;
+}
+
+/*
+ * **************************************************************** EXPLOITS
+*/
+
+table.exploits {width: 100%}
+table.exploits td.logo {
+    text-align: center;
+    border-bottom: 1px solid #a8dade;
+}
+
+table.exploits td.logo img.nimble {width: 30px;}
+
+table.exploits td.firm {
+    text-align: left;
+    padding-left: 25px;
+    border-bottom: 1px solid #a8dade;
+    font-weight: bold;
+}
+
+table.exploits td.title {
+    font-size: 1em;
+    padding : 15px;
+    border-bottom: 1px solid #a8dade;
+    font-weight: bold;
+}
+
+table.exploits td.insight {padding: 20px;}
+
+
+/*
+ * **************************************************************** SPOTLIGHT
+*/
+
+table.spotlight {
+    width: 100%;
+    margin-top: 20px;
+    border-top: 1px solid #a8dade;
+}
+
+table.spotlight td {
+    padding: 10px;
+}
+table.spotlight td.logo {
+    width: 80px;
+    padding: 20px;
+}
+table.spotlight td.name {font-weight: bold;}
+table.spotlight td.explain {
+    padding-left: 30px;
+}
+
+table.spotlight td.logo img.python {width: 30px;}
+table.spotlight td.logo img.auth0 {width: 30px;}
+table.spotlight td.logo img.aws {width: 40px;}
+table.spotlight td.logo img.docker {width: 45px;}
+table.spotlight td.logo img.nimble {width: 30px;}
+
+
+/*
+ * **************************************************************** BUTTONS
+*/
+
+
+* {box-sizing: border-box;}
+
+*:focus,
+*:active {
+    outline: none !important;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.button-wrapper {
+    display: inline-flex;
+    list-style: none;
+}
+
+.button-wrapper.top {
+    margin-top: 100px;
+}
+
+.button-wrapper.bottom {
+    margin-top: 25px;
+}
+
+.button-wrapper img.icon-img {
+    width: 20px;
+}
+
+.button-wrapper .icon {
+    position: relative;
+    background: #ffffff;
+    border-radius: 50%;
+    padding: 15px;
+    margin: 10px;
+    border: 1px solid #a8dade;
+    width: 60px;
+    height: 60px;
+    font-size: 18px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    box-shadow: 0 5px 5px rgba(0, 0, 0, 0.1);
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+.button-wrapper .tooltip {
+    position: absolute;
+    top: 0;
+    font-size: 14px;
+    background: #ffffff;
+    color: #303030;
+    padding: 5px 8px;
+    border-radius: 5px;
+    box-shadow: 0 5px 5px rgba(0, 0, 0, 0.1);
+    opacity: 0;
+    pointer-events: none;
+    transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    text-align: center;
+    border: 2px solid #fff;
+    width: 150px;
+    background: #fff;
+}
+
+.button-wrapper .tooltip::before {
+    position: absolute;
+    content: "";
+    height: 8px;
+    width: 8px;
+    background: #ffffff;
+    bottom: -3px;
+    left: 50%;
+    transform: translate(-50%) rotate(45deg);
+    transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+.button-wrapper .icon:hover {border: 2px solid #fff;}
+
+.button-wrapper .icon:hover .tooltip {
+    top: -45px;
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+}
+
+.button-wrapper .icon:hover span,
+.button-wrapper .icon:hover .tooltip {
+    text-shadow: 0px -1px 0px rgba(0, 0, 0, 0.1);
+}
+
+.button-wrapper .contact:hover {
+    background: #f1fbf0;
+    color: #303030;
+}
+
+
+.button-wrapper .contact:hover .tooltip::before {
+    background: #f1fbf0;
+    color: #303030;
+}
+
+.button-wrapper .contact:hover .tooltip {
+    background: #f1fbf0;
+    color: #303030;
+    border: 2px solid #f1fbf0;
+}
+
+
+/*
+ * **************************************************************** WRAP IT
+*/
+
+.wrap-it-up {
+    text-align: center;
+    font-weight: bold;
+}
+
+/*
+ * **************************************************************** FOOTER
+*/
+
+.footer {}
+.footer .bottom-left {}
+.footer .bottom-center {}
+.footer .bottom-right {}
