@@ -1,9 +1,68 @@
+:root {
+    --primary-bg-color: #f6f8fb;
+    --primary-bg-grey: #eeeeee;
+    --primary-bg-lt: #f6f8fb;
+    --primary-text-color: #111827;
+    --title-text-color: #1565C0;
+    --muted-text-color: #434343;
+    --card-bg-color: #ffffff;
+    --card-text-color: #111827;
+    --common-border: #e5e7eb;
+    --common-shadow: 0 1px 2px rgba(0,0,0,0.04);
+    --common-shadow-hover: 0 6px 18px rgba(0,0,0,0.08);
+    --common-radius: 12px;
+}
 
 body {
     font-family: "proxima-nova", sans-serif;
     text-align: center;
     font-size: 100%;
     font-weight: 100;
+}
+
+h1 {
+    font-size: 2rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    margin-bottom: 0.25rem;
+}
+
+h2 {
+    font-size: 1.75rem;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    margin-bottom: 0.25rem;
+}
+
+h3 {
+    font-size: 1.5rem;
+    font-weight: 500;
+    letter-spacing: -0.02em;
+    margin-bottom: 0.25rem;
+}
+
+h4 {
+    font-size: 1.25rem;
+    font-weight: 400;
+    letter-spacing: -0.02em;
+    margin-bottom: 0.25rem;
+}
+
+/*
+ * ****************************************************** GENERICS
+*/
+
+.label {
+    font-size: 0.75rem;
+    color: var(--muted-text-color);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.value {
+    font-size: 1.4rem;
+    font-weight: 700;
+    margin-top: 0.25rem;
 }
 
 /*
@@ -87,6 +146,22 @@ body {
 .content .middle-right {}
 
 /*
+ * ****************************************************** FOOTER LAYOUT
+*/
+
+.footer {
+    min-height: 100px;
+    background-image: url("../img/branding/powered_by_nimble.png");
+    background-size:   225px;
+    background-repeat: no-repeat;
+    background-position: right bottom;
+}
+.footer .bottom-left {}
+.footer .bottom-center {}
+.footer .bottom-right {}
+
+
+/*
  * **************************************************************** SUBSECTION
 */
 
@@ -109,6 +184,34 @@ body {
     margin-bottom: 10px;
     padding: 10px;
 }
+
+/*
+ * ****************************************************** POST LAYOUT
+*/
+
+.post {}
+
+h1.post-title {
+    font-size: 1.5rem;
+    text-align: left;
+    color: var(--title-text-color);
+    padding-top: 15px;
+    padding-bottom: 5px;
+    padding-left: 20px;
+}
+
+h3.post-date {
+    font-size: 1rem;
+    text-align: left;
+    color: var(--muted-text-color);
+    padding-top: 5px;
+    padding-bottom: 15px;
+    padding-left: 20px;
+}
+
+.post .date {}
+.post .body {}
+
 
 /*
  * **************************************************************** LISTS
@@ -135,64 +238,6 @@ ul.arrowlist li {
     background-position: left center;
     background-size: 20px;
 }
-
-/*
- * **************************************************************** EXPLOITS
-*/
-
-table.exploits {width: 100%}
-table.exploits td.logo {
-    text-align: center;
-    border-bottom: 1px solid #a8dade;
-}
-
-table.exploits td.logo img.nimble {width: 30px;}
-
-table.exploits td.firm {
-    text-align: left;
-    padding-left: 25px;
-    border-bottom: 1px solid #a8dade;
-    font-weight: bold;
-}
-
-table.exploits td.title {
-    font-size: 1em;
-    padding : 15px;
-    border-bottom: 1px solid #a8dade;
-    font-weight: bold;
-}
-
-table.exploits td.insight {padding: 20px;}
-
-
-/*
- * **************************************************************** SPOTLIGHT
-*/
-
-table.spotlight {
-    width: 100%;
-    margin-top: 20px;
-    border-top: 1px solid #a8dade;
-}
-
-table.spotlight td {
-    padding: 10px;
-}
-table.spotlight td.logo {
-    width: 80px;
-    padding: 20px;
-}
-table.spotlight td.name {font-weight: bold;}
-table.spotlight td.explain {
-    padding-left: 30px;
-}
-
-table.spotlight td.logo img.python {width: 30px;}
-table.spotlight td.logo img.auth0 {width: 30px;}
-table.spotlight td.logo img.aws {width: 40px;}
-table.spotlight td.logo img.docker {width: 45px;}
-table.spotlight td.logo img.nimble {width: 30px;}
-
 
 /*
  * **************************************************************** BUTTONS
@@ -306,6 +351,120 @@ table.spotlight td.logo img.nimble {width: 30px;}
 
 
 /*
+ * ****************************************************** CONTENT CONTAINERS
+*/
+
+.container.main {
+    padding: 1.5rem 1rem;
+}
+
+.report-row {}
+.report-col-12 {}
+.report-col-9 {}
+.report-col-3 {}
+.text-container {}
+.lead {}
+
+.sidebar {}
+.sidebar-body {}
+.sidebar-table {
+    width: 95%;
+    margin-top: 35px;
+    margin-bottom: 15px;
+}
+
+/*
+ * ****************************************************** CARDS
+*/
+
+.card-row {}
+.card-col-3 {}
+
+.card {
+    color: var(--card-text-color);
+    background: var(--card-bg-color);
+    border: 1px solid var(--common-border);
+    border-radius: var(--common-radius);
+    box-shadow: var(--common-shadow);
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+    padding: 5px;
+    width: 95%;
+    margin-bottom: 5px;
+    margin-top: 5px;
+}
+
+.card-header {
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: var(--card-text-color);
+    background: transparent;
+    border-bottom: 1px solid var(--common-border);
+}
+
+.card-body {}
+
+/*
+ * ****************************************************** YEAR ROWS
+*/
+
+.year-row {
+    margin-top: 30px;
+    margin-bottom: 30px;
+    padding: 15px;
+    text-align: left;
+}
+
+h2.year-title {
+    color: var(--title-text-color);
+    padding-top: 15px;
+    padding-bottom: 15px;
+}
+
+h4.year-subtitle {
+    padding-top: 5px;
+    padding-bottom: 5px;
+    color: var(--muted-text-color);
+    font-weight: 400;
+}
+
+.year-description {
+    padding-top: 5px;
+    padding-bottom: 5px;
+}
+
+.year-date {
+    background-image: url("../img/icons/calendar.png");
+    background-size: 20px;
+    background-repeat: no-repeat;
+    background-position: 0 -2px;
+    margin-top: 15px;
+    margin-bottom: 15px;
+    padding-left: 25px;
+}
+
+table.year-table {
+    width: 100%;
+    margin-top: 15px;
+    margin-bottom: 15px;
+}
+
+table.year-table td.year-label {
+    font-size: 85%;
+    font-weight: bold;
+    border-bottom: 1px solid var(--common-border);
+}
+
+table.year-table td.year-name {
+    padding-bottom: 25px;
+}
+
+.year-metrics {
+    padding-top: 15px;
+    padding-bottom: 15px;
+}
+
+
+/*
  * **************************************************************** WRAP IT
 */
 
@@ -314,11 +473,361 @@ table.spotlight td.logo img.nimble {width: 30px;}
     font-weight: bold;
 }
 
+
 /*
- * **************************************************************** FOOTER
+ * ====================================================================
+ * Keystone Ledger Lens additions below.
+ * Everything in this section is new for the PA Treasury Checkbook
+ * report and follows the color/spacing/radius tokens defined at the
+ * top of this file (--title-text-color, --muted-text-color,
+ * --common-border, --common-radius, --common-shadow, etc.) rather than
+ * introducing a second, competing visual language.
+ * ====================================================================
 */
 
-.footer {}
-.footer .bottom-left {}
-.footer .bottom-center {}
-.footer .bottom-right {}
+/*
+ * ------------------------------------------------------------- LINKS
+*/
+
+.pal-link {
+    color: var(--title-text-color);
+    cursor: pointer;
+    text-decoration: none;
+    border-bottom: 1px dashed transparent;
+    transition: border-bottom-color 0.15s ease, color 0.15s ease;
+}
+
+.pal-link:hover,
+.pal-link:focus-visible {
+    border-bottom-color: var(--title-text-color);
+}
+
+.pal-link:focus-visible {
+    outline: 2px solid var(--title-text-color);
+    outline-offset: 2px;
+    border-radius: 2px;
+}
+
+.pal-hint {
+    color: var(--muted-text-color);
+    font-size: 0.85rem;
+}
+
+/*
+ * --------------------------------------------------------- KPI EXTRAS
+*/
+
+.pal-subvalue {
+    font-size: 0.8rem;
+    color: var(--muted-text-color);
+    margin-top: 0.15rem;
+}
+
+.pal-positive { color: #1d7a4c; }
+.pal-negative { color: #b3261e; }
+
+.pal-asof {
+    font-size: 0.9rem;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.pal-amount-cell {
+    font-variant-numeric: tabular-nums;
+    text-align: right;
+    white-space: nowrap;
+}
+
+/*
+ * ------------------------------------------------------ REPORT DATE PANEL
+*/
+
+.card-report-date {
+    background: linear-gradient(135deg, #ffffff 0%, var(--primary-bg-lt) 100%);
+}
+
+.pal-report-date-heading {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--card-text-color);
+    margin-bottom: 0.75rem;
+}
+
+.pal-report-date-stats {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+    justify-content: center;
+}
+
+.pal-stat {
+    min-width: 120px;
+}
+
+.pal-stat-payee {
+    font-size: 1.1rem;
+    word-break: break-word;
+}
+
+/*
+ * ------------------------------------------------------------- CHARTS
+*/
+
+.pal-chart-card {
+    background: var(--card-bg-color);
+    border: 1px solid var(--common-border);
+    border-radius: var(--common-radius);
+    box-shadow: var(--common-shadow);
+    padding: 1rem;
+    margin-top: 0.5rem;
+    margin-bottom: 1rem;
+    height: 300px;
+    position: relative;
+}
+
+/*
+ * --------------------------------------------------- PRIOR YEARS TABLE
+*/
+
+.pal-prior-years-table {
+    margin-top: 0.5rem;
+}
+
+.pal-prior-years-table th {
+    font-size: 0.75rem;
+    color: var(--muted-text-color);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    text-align: left;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--common-border);
+}
+
+.pal-prior-years-table td {
+    padding: 0.5rem 0.5rem 0.5rem 0;
+    border-bottom: 1px solid var(--common-border);
+}
+
+/*
+ * ----------------------------------------------------- SIDEBAR TABLES
+*/
+
+.sidebar-table table.pal-table td {
+    font-size: 0.85rem;
+    vertical-align: top;
+}
+
+.sidebar-table table.pal-table td:first-child {
+    word-break: break-word;
+    max-width: 140px;
+}
+
+/*
+ * --------------------------------------------------------------- MODAL
+*/
+
+.pal-modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(17, 24, 39, 0.55);
+    z-index: 1000;
+    padding: 2rem 1rem;
+    overflow-y: auto;
+}
+
+.pal-modal-overlay.pal-open {
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+}
+
+body.pal-modal-active {
+    overflow: hidden;
+}
+
+.pal-modal {
+    background: var(--card-bg-color);
+    border-radius: var(--common-radius);
+    box-shadow: var(--common-shadow-hover);
+    width: 100%;
+    max-width: 880px;
+    margin-top: 2rem;
+    overflow: hidden;
+}
+
+.pal-modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid var(--common-border);
+}
+
+.pal-modal-title {
+    margin: 0;
+    color: var(--title-text-color);
+    font-size: 1.25rem;
+}
+
+.pal-modal-close {
+    background: none;
+    border: none;
+    font-size: 1.75rem;
+    line-height: 1;
+    color: var(--muted-text-color);
+    cursor: pointer;
+    padding: 0 0.25rem;
+}
+
+.pal-modal-close:hover,
+.pal-modal-close:focus-visible {
+    color: var(--card-text-color);
+}
+
+.pal-modal-body {
+    padding: 1.25rem 1.5rem 1.5rem;
+    max-height: 75vh;
+    overflow-y: auto;
+}
+
+.pal-modal-chart-wrap {
+    position: relative;
+    height: 240px;
+    margin-bottom: 1.25rem;
+}
+
+.pal-modal-table-wrap {
+    text-align: left;
+}
+
+/*
+ * ----------------------------------------------- SORTABLE / PAGED TABLE
+*/
+
+table.pal-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+table.pal-table th,
+table.pal-table td {
+    padding: 0.5rem 0.6rem;
+    text-align: left;
+    border-bottom: 1px solid var(--common-border);
+    font-size: 0.9rem;
+}
+
+table.pal-table thead th {
+    font-size: 0.75rem;
+    color: var(--muted-text-color);
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    white-space: nowrap;
+}
+
+th.pal-sortable {
+    cursor: pointer;
+    user-select: none;
+}
+
+th.pal-sortable:hover {
+    color: var(--title-text-color);
+}
+
+th.pal-sortable::after {
+    content: "\2195";
+    display: inline-block;
+    margin-left: 0.3rem;
+    opacity: 0.35;
+    font-size: 0.75rem;
+}
+
+th.pal-sort-asc::after {
+    content: "\2191";
+    opacity: 1;
+}
+
+th.pal-sort-desc::after {
+    content: "\2193";
+    opacity: 1;
+}
+
+td.pal-empty {
+    text-align: center;
+    color: var(--muted-text-color);
+    padding: 2rem 0;
+}
+
+.pal-pagination {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+    margin-top: 1rem;
+}
+
+.pal-pagination button {
+    border: 1px solid var(--common-border);
+    background: var(--card-bg-color);
+    color: var(--card-text-color);
+    border-radius: 6px;
+    padding: 0.3rem 0.65rem;
+    font-size: 0.85rem;
+    cursor: pointer;
+}
+
+.pal-pagination button:hover:not(:disabled) {
+    border-color: var(--title-text-color);
+    color: var(--title-text-color);
+}
+
+.pal-pagination button:disabled {
+    opacity: 0.4;
+    cursor: default;
+}
+
+.pal-pagination button.pal-page-active {
+    background: var(--title-text-color);
+    border-color: var(--title-text-color);
+    color: #fff;
+}
+
+.pal-page-summary {
+    margin-left: auto;
+    font-size: 0.8rem;
+    color: var(--muted-text-color);
+    white-space: nowrap;
+}
+
+/*
+ * -------------------------------------------------- RESPONSIVE / MOBILE
+*/
+
+@media (max-width: 768px) {
+    .pal-report-date-stats {
+        gap: 1rem;
+        justify-content: flex-start;
+    }
+
+    .pal-modal {
+        margin-top: 0.5rem;
+    }
+
+    .pal-page-summary {
+        margin-left: 0;
+        width: 100%;
+        order: 99;
+    }
+}
+
+/*
+ * -------------------------------------------------- REDUCED MOTION
+*/
+
+@media (prefers-reduced-motion: reduce) {
+    .card,
+    .pal-link {
+        transition: none;
+    }
+}
