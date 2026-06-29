@@ -90,7 +90,7 @@ A paginated, searchable list of all expense descriptions in the dataset, sorted 
 
 ## Questions and feedback
 
-This project is open source. If you notice an error, have a question about the data, or want to suggest an improvement, please open an issue in this repository.
+This project is open source. If you notice an error, have a question about the data, or want to suggest an improvement, [please open an issue](https://github.com/keystoneledger/keystoneledger.github.io/issues/) in this repository.
 
 For questions about the underlying data itself — what payments are included, why a specific transaction appears or doesn't — the authoritative source is the Pennsylvania Treasury:
 [patreasury.gov/openbookpa/checkbook.php](https://www.patreasury.gov/openbookpa/checkbook.php)
