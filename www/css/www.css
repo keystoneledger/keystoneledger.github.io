@@ -351,6 +351,24 @@ ul.arrowlist li {
 }
 
 
+.button-wrapper .readme:hover {
+    background: #f1fbf0;
+    color: #303030;
+}
+
+
+.button-wrapper .readme:hover .tooltip::before {
+    background: #f1fbf0;
+    color: #303030;
+}
+
+.button-wrapper .readme:hover .tooltip {
+    background: #f1fbf0;
+    color: #303030;
+    border: 2px solid #f1fbf0;
+}
+
+
 /*
  * ****************************************************** CONTENT CONTAINERS
 */
