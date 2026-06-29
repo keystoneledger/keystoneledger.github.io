@@ -312,7 +312,7 @@ tags:
                                                         <tr class="pal-pie-legend-row"
                                                             onmouseenter="PALedger.highlightPieSlice('pal-pie-payees-chart', {{ loop.index0 }})"
                                                             onmouseleave="PALedger.clearPieHighlight('pal-pie-payees-chart')"
-                                                            onclick="PALedger.openName('{{ name | replace("'", "\\'") }}', '{{ months_in_year(data.by_name.get(name, {}).get('months', {}), current_year_key) }}')">
+                                                            onclick="PALedger.openName('{{ name | replace("'", "\\'") }}', '{{ months_in_year(data.by_name.get(name, {}).get('months', {}), current_year_key) }}', '{{ current_year_key }}')">
                                                             <td><span class="pal-swatch" style="background-color: {{ chart_palette[loop.index0 % chart_palette|length] }};"></span></td>
                                                             <td>{{ name }}</td>
                                                             <td class="pal-amount-cell">{{ usd(amt) }}</td>
@@ -344,7 +344,7 @@ tags:
                                                         <tr class="pal-pie-legend-row"
                                                             onmouseenter="PALedger.highlightPieSlice('pal-pie-accounts-chart', {{ loop.index0 }})"
                                                             onmouseleave="PALedger.clearPieHighlight('pal-pie-accounts-chart')"
-                                                            onclick="PALedger.openAcct('{{ alt }}', '{{ months_in_year(data.by_acct.get(alt, {}).get('months', {}), current_year_key) }}')">
+                                                            onclick="PALedger.openAcct('{{ alt }}', '{{ months_in_year(data.by_acct.get(alt, {}).get('months', {}), current_year_key) }}', '{{ current_year_key }}')">
                                                             <td><span class="pal-swatch" style="background-color: {{ chart_palette[loop.index0 % chart_palette|length] }};"></span></td>
                                                             <td>{{ alt }}</td>
                                                             <td class="pal-amount-cell">{{ usd(amt) }}</td>

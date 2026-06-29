@@ -490,9 +490,19 @@
    *  L3 summary.json) known to have at least one record for this payee.
    *  Passed as a plain comma-joined string rather than a JSON array
    *  literal because embedding a tojson'd array directly inside an HTML
-   *  onclick="" attribute collides with the attribute's own quoting. */
-  async function openName(rawName, monthKeysCsv) {
-    openModal(rawName);
+   *  onclick="" attribute collides with the attribute's own quoting.
+   *
+   *  yearLabel is optional. When the caller already knows the records
+   *  are scoped to a single year (e.g. the pie-chart legend rows, which
+   *  pass only that year's month keys), pass the year so the modal
+   *  title/chart label can say "VENDOR A -- 2026" instead of just
+   *  "VENDOR A" -- without it, the title would look identical whether
+   *  showing all-history (the sidebar's Top Payees) or just one year
+   *  (the pie legend), even though the underlying data scope differs.
+   *  Omit it (or pass null/undefined) for all-history call sites. */
+  async function openName(rawName, monthKeysCsv, yearLabel) {
+    const title = yearLabel ? `${rawName} \u2014 ${yearLabel}` : rawName;
+    openModal(title);
     setModalChart(null);
     renderTable([], standardColumns());
 
@@ -506,7 +516,7 @@
       data: {
         labels: series.map(([k]) => k),
         datasets: [{
-          label: `${rawName} -- spend over time`,
+          label: `${title} -- spend over time`,
           data: series.map(([, v]) => v),
           borderColor: "#16365b",
           backgroundColor: "rgba(22,54,91,0.08)",
@@ -523,9 +533,11 @@
 
   /** Account code click: line chart of spend over time + table of all
    *  its records. monthKeysCsv: see openName's note on why this is a
-   *  comma-joined string rather than an array. */
-  async function openAcct(alt, monthKeysCsv) {
-    openModal(`Account ${alt}`);
+   *  comma-joined string rather than an array. yearLabel: see openName's
+   *  note -- same optional year-qualification, for the same reason. */
+  async function openAcct(alt, monthKeysCsv, yearLabel) {
+    const title = yearLabel ? `Account ${alt} \u2014 ${yearLabel}` : `Account ${alt}`;
+    openModal(title);
     setModalChart(null);
     renderTable([], standardColumns());
 
@@ -539,7 +551,7 @@
       data: {
         labels: series.map(([k]) => k),
         datasets: [{
-          label: `Account ${alt} -- spend over time`,
+          label: `${title} -- spend over time`,
           data: series.map(([, v]) => v),
           borderColor: "#2f7da0",
           backgroundColor: "rgba(47,125,160,0.08)",
