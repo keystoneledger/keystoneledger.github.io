@@ -15,4 +15,4 @@ defaults:
       logo_url: https://avatars.githubusercontent.com/u/297656775
       style_css: /www/css/www.css
       site_js: /www/js/dashboard.js
-      brandig_ico: /www/img/branding/brand.ico
+      branding_ico: /www/img/branding/brand.ico
