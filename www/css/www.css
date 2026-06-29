@@ -77,14 +77,19 @@ h4 {
     transition: transform .25s cubic-bezier(.215,.61,.355,1),box-shadow .25s cubic-bezier(.215,.61,.355,1);
     transition: transform .25s cubic-bezier(.215,.61,.355,1),box-shadow .25s cubic-bezier(.215,.61,.355,1),-webkit-transform .25s cubic-bezier(.215,.61,.355,1),-webkit-box-shadow .25s cubic-bezier(.215,.61,.355,1);
     padding:  30px;
+
     filter: drop-shadow(0 0.2rem 0.25rem rgba(0, 0, 0, 0.2));
+
     max-width: 90%;
+
     margin-top:  5%;
     margin-bottom: 5%;
     margin-left: auto;
     margin-right: auto;
     padding-top:  2%;
+
     border-radius:  0.25em;
+
     background-image: url("../img/ux/swatch_ur.png");
     background-position: top right;
     background-repeat: no-repeat;
@@ -374,6 +379,10 @@ ul.arrowlist li {
 */
 
 .card-row {}
+
+.kpi-row {
+    min-height: 140px;
+}
 .card-col-3 {}
 
 .card {
@@ -971,6 +980,35 @@ td.pal-empty {
     position: relative;
     height: 220px;
     margin-top: 0.5rem;
+}
+
+.pal-pie-legend-row {
+    cursor: pointer;
+}
+
+.pal-pie-legend-row:hover {
+    background-color: var(--primary-bg-lt);
+}
+
+/*
+ * ----------------------------------------------------- HORIZONTAL BARS
+ * Used by the 4th column of Prior Years and the 3rd column of ACH /
+ * Grant Disbursements by Year -- each <td class="pal-bar-col"> contains
+ * one .pal-hbar div whose inline width (set per-row by the template,
+ * scaled to that table's own max value) turns the column into a simple
+ * horizontal bar chart.
+*/
+
+.pal-bar-col {
+    width: 30%;
+    min-width: 120px;
+}
+
+.pal-hbar {
+    height: 14px;
+    background: linear-gradient(90deg, #2f7da0, #16365b);
+    border-radius: 3px;
+    min-width: 2px;
 }
 
 /*

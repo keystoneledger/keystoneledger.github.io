@@ -554,6 +554,41 @@
     renderTable(records, standardColumns());
   }
 
+  /** Description click: line chart of spend over time + table of all
+   *  its records. monthKeysCsv: see openName's note on why this is a
+   *  comma-joined string rather than an array. Reads from
+   *  DATA/L1/BY_DESCRIPTION/, added to parse_pa_checkbook.py alongside
+   *  BY_NAME/BY_ACCT specifically to support this drill-down. */
+  async function openDescription(description, monthKeysCsv) {
+    openModal(description);
+    setModalChart(null);
+    renderTable([], standardColumns());
+
+    const monthKeys = (monthKeysCsv || "").split(",").filter(Boolean);
+    const basePath = `${DATA_ROOT}/BY_DESCRIPTION/${sanitizeForPath(description)}`;
+    const records = await fetchAllMonths(basePath, monthKeys);
+    const series = sumByYearMonth(records);
+
+    setModalChart({
+      type: "line",
+      data: {
+        labels: series.map(([k]) => k),
+        datasets: [{
+          label: `${description} -- spend over time`,
+          data: series.map(([, v]) => v),
+          borderColor: "#6b8e23",
+          backgroundColor: "rgba(107,142,35,0.08)",
+          fill: true,
+          tension: 0.25,
+          pointRadius: 3,
+        }],
+      },
+      options: baseChartOptions("Spend over time"),
+    });
+
+    renderTable(records, standardColumns());
+  }
+
   function baseChartOptions(titleText) {
     return {
       responsive: true,
@@ -602,15 +637,23 @@
     });
   }
 
+  // Registry of created pie/doughnut chart instances, keyed by canvas id,
+  // so highlightPieSlice()/clearPieHighlight() (called from the legend
+  // table's onmouseenter/onmouseleave) can reach the right Chart.js
+  // instance later without re-querying or re-creating it.
+  const pieChartRegistry = {};
+
   /** Renders a top-N doughnut/pie chart from pre-aggregated {label, amount}
    *  entries embedded by the template (current-year top payees/accounts).
    *  Used by both new 2nd-summary pie-chart cards -- same rendering logic,
-   *  different data and canvas id. */
+   *  different data and canvas id. No legend (legend: false) since the
+   *  adjacent HTML table in the template already serves as the legend --
+   *  a second, separate Chart.js-drawn legend would just duplicate it. */
   function renderPieChart(canvasId, entries) {
     const canvas = document.getElementById(canvasId);
     if (!canvas || !entries || entries.length === 0) return;
 
-    new Chart(canvas.getContext("2d"), {
+    const chart = new Chart(canvas.getContext("2d"), {
       type: "doughnut",
       data: {
         labels: entries.map((e) => e.label),
@@ -623,10 +666,34 @@
         responsive: true,
         maintainAspectRatio: false,
         plugins: {
-          legend: { position: "bottom", labels: { boxWidth: 10, font: { size: 10 } } },
+          legend: { display: false },
         },
       },
     });
+
+    pieChartRegistry[canvasId] = chart;
+  }
+
+  /** Highlights one slice of a previously-rendered pie/doughnut chart,
+   *  called from the legend table row's onmouseenter. Uses Chart.js's
+   *  setActiveElements, which drives the same visual hover state
+   *  (offset/highlight) the chart would show on a real mouseover of that
+   *  slice -- this just triggers it programmatically from the table
+   *  row instead. */
+  function highlightPieSlice(canvasId, sliceIndex) {
+    const chart = pieChartRegistry[canvasId];
+    if (!chart) return;
+    chart.setActiveElements([{ datasetIndex: 0, index: sliceIndex }]);
+    chart.update();
+  }
+
+  /** Clears any active-element highlight on a chart, called from the
+   *  legend table row's onmouseleave. */
+  function clearPieHighlight(canvasId) {
+    const chart = pieChartRegistry[canvasId];
+    if (!chart) return;
+    chart.setActiveElements([]);
+    chart.update();
   }
 
   // --------------------------------------------------------------------
@@ -769,5 +836,8 @@
     openMonth,
     openName,
     openAcct,
+    openDescription,
+    highlightPieSlice,
+    clearPieHighlight,
   };
 })();

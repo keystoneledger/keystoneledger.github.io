@@ -1,6 +1,15 @@
 {%- macro usd(amount) -%}
     ${{ "{:,.2f}".format(amount | float) }}
 {%- endmacro -%}
+{%- macro months_in_year(months_dict, year_key) -%}
+    {%- set result = [] -%}
+    {%- for mk in months_dict.keys() -%}
+        {%- if mk[0:4] == year_key -%}
+            {%- set _ = result.append(mk) -%}
+        {%- endif -%}
+    {%- endfor -%}
+    {{- result | join(",") -}}
+{%- endmacro -%}
 {%- macro sanitize_tag(raw) -%}
     {%- set v = raw | trim -%}
     {%- set v = v | replace(" ", "_") -%}
@@ -300,7 +309,10 @@ tags:
                                                     </thead>
                                                     <tbody>
                                                         {% for name, amt in current_year_top_payees %}
-                                                        <tr>
+                                                        <tr class="pal-pie-legend-row"
+                                                            onmouseenter="PALedger.highlightPieSlice('pal-pie-payees-chart', {{ loop.index0 }})"
+                                                            onmouseleave="PALedger.clearPieHighlight('pal-pie-payees-chart')"
+                                                            onclick="PALedger.openName('{{ name | replace("'", "\\'") }}', '{{ months_in_year(data.by_name.get(name, {}).get('months', {}), current_year_key) }}')">
                                                             <td><span class="pal-swatch" style="background-color: {{ chart_palette[loop.index0 % chart_palette|length] }};"></span></td>
                                                             <td>{{ name }}</td>
                                                             <td class="pal-amount-cell">{{ usd(amt) }}</td>
@@ -329,7 +341,10 @@ tags:
                                                     </thead>
                                                     <tbody>
                                                         {% for alt, amt in current_year_top_accounts %}
-                                                        <tr>
+                                                        <tr class="pal-pie-legend-row"
+                                                            onmouseenter="PALedger.highlightPieSlice('pal-pie-accounts-chart', {{ loop.index0 }})"
+                                                            onmouseleave="PALedger.clearPieHighlight('pal-pie-accounts-chart')"
+                                                            onclick="PALedger.openAcct('{{ alt }}', '{{ months_in_year(data.by_acct.get(alt, {}).get('months', {}), current_year_key) }}')">
                                                             <td><span class="pal-swatch" style="background-color: {{ chart_palette[loop.index0 % chart_palette|length] }};"></span></td>
                                                             <td>{{ alt }}</td>
                                                             <td class="pal-amount-cell">{{ usd(amt) }}</td>
@@ -405,13 +420,13 @@ tags:
                 <div class="col-md-9 report-col-9">
 
                     <!-- ITEM ROW 1: this year, full treatment --
-                         trailing-365-day chart + current month table -->
+                         trailing-365-day chart -->
                     <div class="row year-row pal-current-year-row" id="year-{{ report_year }}">
                         <div class="col-md-12">
                             <div class="year-post">
                                 <h2 class="year-title">
                                     <span class="pal-link" onclick="PALedger.openYear({{ report_year }})">
-                                        {{ report_year }}
+                                        Fiscal Year {{ report_year }}
                                     </span>
                                 </h2>
                                 <h4 class="year-subtitle">
@@ -424,11 +439,6 @@ tags:
                                         <canvas id="pal-trailing365-chart" height="260"></canvas>
                                     </div>
                                 </div>
-
-                                <div class="year-metrics">
-                                    <h6>{{ report_date_label }} &mdash; Monthly Detail</h6>
-                                    <p class="pal-hint">Click any payee, account, or the month heading above for full transaction detail.</p>
-                                </div>
                             </div>
                         </div>
                     </div>
@@ -439,17 +449,26 @@ tags:
                         <div class="col-md-12">
                             <div class="year-post">
                                 <h2 class="year-title">Prior Years</h2>
+                                {%- set prior_year_amounts = [] -%}
+                                {%- for year_key, year_data in data.by_year.items() -%}
+                                    {%- if year_key != current_year_key -%}
+                                        {%- set _ = prior_year_amounts.append(year_data.amount | float) -%}
+                                    {%- endif -%}
+                                {%- endfor -%}
+                                {%- set prior_years_max = (prior_year_amounts | max) if prior_year_amounts else 0 -%}
                                 <table class="pal-table pal-prior-years-table">
                                     <thead>
                                         <tr>
                                             <th>Year</th>
                                             <th>Total Spend</th>
                                             <th>Year over Year</th>
+                                            <th class="pal-bar-col">&nbsp;</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         {% for year_key, year_data in data.by_year.items() | sort(reverse=true) %}
                                             {% if year_key != current_year_key %}
+                                                {%- set bar_pct = ((year_data.amount | float) / prior_years_max * 100) if prior_years_max > 0 else 0 -%}
                                                 <tr>
                                                     <td>
                                                         <span class="pal-link" onclick="PALedger.openYear({{ year_key }})">
@@ -463,6 +482,9 @@ tags:
                                                         {% else %}
                                                             N/A
                                                         {% endif %}
+                                                    </td>
+                                                    <td class="pal-bar-col">
+                                                        <div class="pal-hbar" style="width: {{ "%.1f"|format(bar_pct) }}%;"></div>
                                                     </td>
                                                 </tr>
                                             {% endif %}
@@ -493,6 +515,7 @@ tags:
                         {%- set _ = ach_year_months[yk].append(mk) -%}
                     {%- endfor -%}
                     {%- set ach_years_sorted = ach_year_totals.items() | list | sort(reverse=true) -%}
+                    {%- set ach_years_max = (ach_year_totals.values() | list | max) if ach_year_totals else 0 -%}
                     <div class="row year-row pal-ach-row" id="ach-disbursements">
                         <div class="col-md-12">
                             <div class="year-post">
@@ -507,10 +530,12 @@ tags:
                                         <tr>
                                             <th>Year</th>
                                             <th>Total Disbursed</th>
+                                            <th class="pal-bar-col">&nbsp;</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         {% for year_key, amount in ach_years_sorted %}
+                                            {%- set bar_pct = (amount / ach_years_max * 100) if ach_years_max > 0 else 0 -%}
                                             <tr>
                                                 <td>
                                                     <span class="pal-link"
@@ -519,6 +544,9 @@ tags:
                                                     </span>
                                                 </td>
                                                 <td class="pal-amount-cell">{{ usd(amount) }}</td>
+                                                <td class="pal-bar-col">
+                                                    <div class="pal-hbar" style="width: {{ "%.1f"|format(bar_pct) }}%;"></div>
+                                                </td>
                                             </tr>
                                         {% endfor %}
                                     </tbody>
@@ -555,7 +583,12 @@ tags:
                                     <tbody>
                                         {% for description, entry, _amt in all_descriptions %}
                                             <tr class="pal-pager-row">
-                                                <td>{{ description }}</td>
+                                                <td>
+                                                    <span class="pal-link"
+                                                          onclick="PALedger.openDescription('{{ description | replace("'", "\\'") }}', '{{ entry.months.keys() | join(',') }}')">
+                                                        {{ description }}
+                                                    </span>
+                                                </td>
                                                 <td class="pal-amount-cell">{{ usd(entry.amount) }}</td>
                                             </tr>
                                         {% endfor %}
