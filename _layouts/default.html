@@ -1,46 +1,14 @@
 <!doctype html>
 <html lang="en">
-    <head>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-        <meta name="description" content="Keystone Ledger Lens">
-        <meta name="author" content="Ghostwriter Cloud">
-        <link rel="icon" href="./www/img/branding/brand.ico">
-        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css">
-        <link rel="stylsheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css">
-        <link rel="stylesheet" href="./www/css/www.css">
-        <title>{{ page.title }}</title>
-    </head>
+    {% include html_head.html %}
     <body>
         <div class="container-fluid wrapper">
-            <div class="row header">
-                <div class="col-md-4 top-left">
-                    <a href="https://www.linkedin.com/company/nimble-sa/" target="_blank">
-                        <ul class="button-wrapper top">
-                            <li class="icon contact">
-                                <span class="tooltip">Contact</span>
-                                <span>
-                                    <img src="./www/img/logos/linkedin.png" class="icon-img">
-                                </span>
-                            </li>
-                        </ul>
-                    </a>
-                </div>
-                <div class="col-md-4 top-center">
-                    <div class="feature">
-                        <div class="pfp"><img src="{{ page.logo_url }}" class="feature-img"></div>
-                        <div class="title">{{ page.entity }}</div>
-                        <div class="subtitle">{{ page.subtitle }}</div>
-                    </div>
-                </div>
-                <div class="col-md-4 top-right">
-                    <p>{{ page.quip }}</p>
-                </div>
-            </div>
+            {% include site_header.html %}
             <div class="content">
                 {{ content }}
             </div>
+            {% include site_footer.html %}
         </div>
     </body>
-    <script src="./www/js/dashboard.js"></script>
+    <script src="{{ page.site_js }}"></script>
 </html>

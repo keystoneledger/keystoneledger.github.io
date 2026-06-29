@@ -1,2 +1,18 @@
 permalink: /:year/:month/:day/:title.html
 highlighter: rouge
+
+defaults:
+  -
+    scope:
+      path: ""
+    values:
+      entity: Keystone Ledger Lens
+      site_author: Keystone Ledger Lense
+      site_description: Keystone Ledger Lense
+      title: Keystone Ledger Lense
+      subtitle: Revealing Budgetary Magic Tricks
+      quip: Fact-checking Pennsylvania's multi-billion-dollar creative writing project.
+      logo_url: https://avatars.githubusercontent.com/u/297656775
+      style_css: /www/css/www.css
+      site_js: /www/js/dashboard.js
+      brandig_ico: /www/img/branding/brand.ico
