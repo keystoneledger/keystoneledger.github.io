@@ -546,6 +546,15 @@ table.year-table td.year-name {
     background: linear-gradient(135deg, #ffffff 0%, var(--primary-bg-lt) 100%);
 }
 
+/* Forces the card to actually use the full width of its column, rather
+   than the generic .card rule's width:95% -- needed once the redundant
+   nested .container was removed from this row (see template comment),
+   since that container's own auto-centering had been masking the
+   95%-vs-100% gap on one side. */
+.pal-card-full-width {
+    width: 100%;
+}
+
 .pal-report-date-heading {
     font-size: 1.1rem;
     font-weight: 600;
@@ -841,10 +850,11 @@ td.pal-empty {
 */
 
 /*
- * ------------------------------------------------------- 4-COLUMN GRID
+ * ------------------------------------------------------- 4 & 8 COLUMN GRID
  * The existing grid only defined 3/9/12-column helpers (card-col-3,
  * report-col-9, report-col-12). The 2nd summary row now needs a
- * 3-across layout (combined card + 2 pie charts) at 1/3 width each.
+ * 66%/33% split: card-col-8 (pie charts, stacked) + card-col-4
+ * (combined info card).
 */
 
 .card-col-4 {
@@ -854,8 +864,16 @@ td.pal-empty {
     padding-left: 8px;
 }
 
+.card-col-8 {
+    flex: 0 0 66.6667%;
+    max-width: 66.6667%;
+    padding-right: 8px;
+    padding-left: 8px;
+}
+
 @media (max-width: 900px) {
-    .card-col-4 {
+    .card-col-4,
+    .card-col-8 {
         flex: 0 0 100%;
         max-width: 100%;
     }
@@ -906,18 +924,57 @@ td.pal-empty {
 
 /*
  * --------------------------------------------------------- PIE CARDS
+ * Each pie card (.pal-pie-card) is split into two halves via a nested
+ * .row: a legend table on the left (.pal-pie-legend-col) and the titled
+ * chart on the right (.pal-pie-chart-col). The .pal-swatch color dots in
+ * the legend MUST visually match the chart's slice colors -- both sides
+ * draw from the same palette (chart_palette in the template, exactly
+ * mirroring CHART_PALETTE in dashboard.js -- see the template comment
+ * for why that's duplicated rather than shared).
 */
+
+.pal-pie-card {
+    margin-bottom: 16px;
+}
+
+.pal-pie-card-row {
+    align-items: center;
+}
+
+.pal-pie-legend-col {
+    border-right: 1px solid var(--common-border);
+}
+
+@media (max-width: 700px) {
+    .pal-pie-legend-col {
+        border-right: none;
+        border-bottom: 1px solid var(--common-border);
+        margin-bottom: 1rem;
+        padding-bottom: 1rem;
+    }
+}
+
+.pal-pie-legend-table th,
+.pal-pie-legend-table td {
+    font-size: 0.82rem;
+    padding: 0.35rem 0.5rem;
+}
+
+.pal-swatch {
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    border-radius: 3px;
+}
+
+.pal-pie-chart-col .label {
+    text-align: center;
+}
 
 .pal-pie-card-wrap {
     position: relative;
     height: 220px;
     margin-top: 0.5rem;
-}
-
-.card-pie-payees .card-body,
-.card-pie-accounts .card-body {
-    display: flex;
-    flex-direction: column;
 }
 
 /*

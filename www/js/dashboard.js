@@ -630,6 +630,75 @@
   }
 
   // --------------------------------------------------------------------
+  // Common Descriptions pager (inline, not a modal) -- a simple
+  // standalone show/hide pager over rows already rendered into the page
+  // by the template (every description, not just a top-N cutoff). No
+  // fetch, no sorting -- the rows are pre-sorted server-side; this just
+  // shows 10 at a time and provides Prev/Next + page-number controls,
+  // reusing the same .pal-pagination button markup/classes as the modal
+  // pager for visual consistency, but as a much smaller standalone
+  // implementation (no sort-by-column, no fetch).
+  // --------------------------------------------------------------------
+
+  function initDescriptionsPager(tableId, paginationId, pageSize) {
+    const table = document.getElementById(tableId);
+    const paginationEl = document.getElementById(paginationId);
+    if (!table || !paginationEl) return;
+
+    const rows = Array.from(table.querySelectorAll("tbody tr.pal-pager-row"));
+    if (rows.length === 0) return;
+
+    let currentPage = 1;
+    const totalPages = Math.max(1, Math.ceil(rows.length / pageSize));
+
+    function renderPage() {
+      const start = (currentPage - 1) * pageSize;
+      const end = start + pageSize;
+      rows.forEach((row, i) => {
+        row.style.display = (i >= start && i < end) ? "" : "none";
+      });
+      renderPagination();
+    }
+
+    function renderPagination() {
+      paginationEl.innerHTML = "";
+
+      const makeBtn = (label, page, disabled, active) => {
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.textContent = label;
+        btn.disabled = !!disabled;
+        if (active) btn.className = "pal-page-active";
+        btn.addEventListener("click", () => {
+          currentPage = page;
+          renderPage();
+        });
+        return btn;
+      };
+
+      paginationEl.appendChild(makeBtn("\u2039 Prev", currentPage - 1, currentPage === 1));
+
+      const maxButtons = 7;
+      let startPage = Math.max(1, currentPage - 3);
+      let endPage = Math.min(totalPages, startPage + maxButtons - 1);
+      startPage = Math.max(1, endPage - maxButtons + 1);
+
+      for (let p = startPage; p <= endPage; p++) {
+        paginationEl.appendChild(makeBtn(String(p), p, false, p === currentPage));
+      }
+
+      paginationEl.appendChild(makeBtn("Next \u203a", currentPage + 1, currentPage === totalPages));
+
+      const summary = document.createElement("span");
+      summary.className = "pal-page-summary";
+      summary.textContent = `${rows.length.toLocaleString()} description${rows.length === 1 ? "" : "s"}`;
+      paginationEl.appendChild(summary);
+    }
+
+    renderPage();
+  }
+
+  // --------------------------------------------------------------------
   // Init
   // --------------------------------------------------------------------
 
@@ -648,33 +717,47 @@
       console.warn("PALedger: Chart.js font default setup failed", err);
     }
 
-    if (!window.Chart) {
+    const chartJsAvailable = !!window.Chart;
+    if (!chartJsAvailable) {
       console.warn("PALedger: Chart.js did not load; charts skipped.");
-      return;
     }
 
-    try {
-      if (cfg.trailing365 && cfg.trailing365Canvas) {
-        renderTrailing365Chart(cfg.trailing365Canvas, cfg.trailing365);
+    if (chartJsAvailable) {
+      try {
+        if (cfg.trailing365 && cfg.trailing365Canvas) {
+          renderTrailing365Chart(cfg.trailing365Canvas, cfg.trailing365);
+        }
+      } catch (err) {
+        console.warn("PALedger: trailing-365 chart failed to render", err);
       }
-    } catch (err) {
-      console.warn("PALedger: trailing-365 chart failed to render", err);
+
+      try {
+        if (cfg.piePayees && cfg.piePayeesCanvas) {
+          renderPieChart(cfg.piePayeesCanvas, cfg.piePayees);
+        }
+      } catch (err) {
+        console.warn("PALedger: top-payees pie chart failed to render", err);
+      }
+
+      try {
+        if (cfg.pieAccounts && cfg.pieAccountsCanvas) {
+          renderPieChart(cfg.pieAccountsCanvas, cfg.pieAccounts);
+        }
+      } catch (err) {
+        console.warn("PALedger: top-accounts pie chart failed to render", err);
+      }
     }
 
+    // Independent of Chart.js entirely -- the descriptions pager is
+    // plain DOM show/hide, so it must run regardless of whether Chart.js
+    // loaded. Previously this whole block sat after an `if (!window.Chart)
+    // return;` guard, which meant a CDN/ad-blocker failure would have
+    // silently skipped the pager too -- moved out of that branch so it's
+    // unconditional.
     try {
-      if (cfg.piePayees && cfg.piePayeesCanvas) {
-        renderPieChart(cfg.piePayeesCanvas, cfg.piePayees);
-      }
+      initDescriptionsPager("pal-descriptions-table", "pal-descriptions-pagination", 10);
     } catch (err) {
-      console.warn("PALedger: top-payees pie chart failed to render", err);
-    }
-
-    try {
-      if (cfg.pieAccounts && cfg.pieAccountsCanvas) {
-        renderPieChart(cfg.pieAccountsCanvas, cfg.pieAccounts);
-      }
-    } catch (err) {
-      console.warn("PALedger: top-accounts pie chart failed to render", err);
+      console.warn("PALedger: descriptions pager failed to initialize", err);
     }
   }
 
