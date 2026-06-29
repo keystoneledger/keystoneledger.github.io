@@ -1,0 +1,676 @@
+---
+layout: post
+title: PA Treasury Checkbook -- Daily Report
+tags:
+  - M&T_BANK
+  - COMMONWEALTH_OF_PENNSYLVANIA
+  - TREASURY_SIB
+  - WIR_PAYEE
+  - WELLS_FARGO_BANKS
+  - CITY_OF_PHILADELPHIA_CITIES_OF_THE_FIRST_CLASS
+  - Philadelphia_School_District
+  - ALLEGHENY_REGIONAL_ASSET_DISTRICT
+  - BNY_MELLON
+  - PNC_BANK
+  - 6500001
+  - 6602000
+  - 6500000
+  - 6500010
+  - 6300000
+  - 6343200
+  - 6343118
+  - 6343120
+  - 6371011
+  - 6343111
+---
+
+<div class="post pal-report">
+    <div class="row report-row">
+        <div class="col-md-12 report-col-12">
+            <h1 class='post-title'>
+                PA Treasury Checkbook -- Daily Report
+            </h1>
+            <h3 class='post-date'>
+                Report Date: June 29, 2026
+            </h3>
+        </div>
+    </div>
+
+    <div id='body'>
+        <div class="container main">
+
+            <!-- ================================================== -->
+            <!-- REPORT DATE PANEL -- auto-loads via JS using the    -->
+            <!-- report month derived from data.generated_at, the   -->
+            <!-- same drill-down data source used everywhere else.  -->
+            <!-- ================================================== -->
+            <div class="row report-row">
+                <div class="col-md-12 report-col-12">
+                    <div class="container kpi-row">
+                        <div class="row card-row">
+                            <div class="col-md-12">
+                                <div class="card card-report-date" id="pal-report-date-panel">
+                                    <div class="card-body pal-report-date-body">
+                                        <div class="pal-report-date-heading">
+                                            This Month So Far &mdash;
+                                            <span class="pal-link"
+                                                  onclick="PALedger.openMonth(2026, 6)">
+                                                June 29, 2026
+                                            </span>
+                                        </div>
+                                        <div class="pal-report-date-stats">
+                                            <div class="pal-stat">
+                                                <div class="label">Total Spend</div>
+                                                <div class="value" data-pal-field="total">&hellip;</div>
+                                            </div>
+                                            <div class="pal-stat">
+                                                <div class="label">Payments</div>
+                                                <div class="value" data-pal-field="count">&hellip;</div>
+                                            </div>
+                                            <div class="pal-stat">
+                                                <div class="label">Top Payee</div>
+                                                <div class="value pal-stat-payee" data-pal-field="top-payee">&hellip;</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- END REPORT DATE PANEL -->
+
+
+            <!-- ================================================== -->
+            <!-- TOP SUMMARY: current year KPIs                     -->
+            <!-- ================================================== -->
+            <div class="row report-row">
+                <div class="col-md-12 report-col-12">
+                    <div class="container kpi-row">
+                        <div class="row card-row">
+
+                            <div class="col-md-3 card-col-3">
+                                <div class="card card-year-total">
+                                    <div class="card-body">
+                                        <div class="label">2026 Total Spend</div>
+                                        <div class="value">
+                                            <span class="pal-link" onclick="PALedger.openYear(2026)">
+                                                $1207995063.14
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-3 card-col-3">
+                                <div class="card card-yoy">
+                                    <div class="card-body">
+                                        <div class="label">Year over Year</div>
+                                        <div class="value pal-negative">
+                                            
+                                                -77.3%
+                                            
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-3 card-col-3">
+                                <div class="card card-records">
+                                    <div class="card-body">
+                                        <div class="label">Total Records (All Years)</div>
+                                        <div class="value">28,650</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-3 card-col-3">
+                                <div class="card card-grand-total">
+                                    <div class="card-body">
+                                        <div class="label">Grand Total (All Years)</div>
+                                        <div class="value">$29339930413.67</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- END TOP SUMMARY -->
+
+
+            <!-- ================================================== -->
+            <!-- 2nd SUMMARY: ACH/Grant vs Direct Vendor split       -->
+            <!-- ================================================== -->
+            
+            
+            
+            
+            
+            <div class="row report-row">
+                <div class="col-md-12 report-col-12">
+                    <div class="container kpi-row">
+                        <div class="row card-row">
+
+                            <div class="col-md-3 card-col-3">
+                                <div class="card card-direct">
+                                    <div class="card-body">
+                                        <div class="label">Direct Vendor Payments</div>
+                                        <div class="value">$29321480261.71</div>
+                                        <div class="pal-subvalue">99.9% of total</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-3 card-col-3">
+                                <div class="card card-ach">
+                                    <div class="card-body">
+                                        <div class="label">ACH / Grant Disbursements</div>
+                                        <div class="value">$18450151.96</div>
+                                        <div class="pal-subvalue">0.1% of total</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-3 card-col-3">
+                                <div class="card card-unknown">
+                                    <div class="card-body">
+                                        <div class="label">Unparsed-Date Records</div>
+                                        <div class="value">$0.00</div>
+                                        <div class="pal-subvalue">0 records</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-3 card-col-3">
+                                <div class="card card-asof">
+                                    <div class="card-body">
+                                        <div class="label">Data As Of</div>
+                                        <div class="value pal-asof">2026-06-29T15:05:05Z</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- END 2nd SUMMARY -->
+
+
+            <!-- ================================================== -->
+            <!-- MAIN CONTENT (66%) / SIDEBAR (33%)                  -->
+            <!-- ================================================== -->
+            <div class="row report-row">
+
+                <!-- MAIN CONTENT 66% width -->
+                <div class="col-md-9 report-col-9">
+
+                    <!-- ITEM ROW 1: this year, full treatment --
+                         trailing-365-day chart + current month table -->
+                    <div class="row year-row pal-current-year-row" id="year-2026">
+                        <div class="col-md-12">
+                            <div class="year-post">
+                                <h2 class="year-title">
+                                    <span class="pal-link" onclick="PALedger.openYear(2026)">
+                                        2026
+                                    </span>
+                                </h2>
+                                <h4 class="year-subtitle">
+                                    $1207995063.14 through June 29, 2026
+                                </h4>
+
+                                <div class="year-description">
+                                    <h6>Spend Trend &mdash; Trailing 12 Months</h6>
+                                    <div class="pal-chart-card">
+                                        <canvas id="pal-trailing365-chart" height="260"></canvas>
+                                    </div>
+                                </div>
+
+                                <div class="year-metrics">
+                                    <h6>June 29, 2026 &mdash; Monthly Detail</h6>
+                                    <p class="pal-hint">Click any payee, account, or the month heading above for full transaction detail.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- END ITEM ROW 1 -->
+
+                    <!-- ITEM ROW 2: prior years, condensed -->
+                    <div class="row year-row pal-prior-years-row" id="prior-years">
+                        <div class="col-md-12">
+                            <div class="year-post">
+                                <h2 class="year-title">Prior Years</h2>
+                                <table class="pal-table pal-prior-years-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Year</th>
+                                            <th>Total Spend</th>
+                                            <th>Year over Year</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        
+                                            
+                                        
+                                            
+                                                <tr>
+                                                    <td>
+                                                        <span class="pal-link" onclick="PALedger.openYear(2025)">
+                                                            2025
+                                                        </span>
+                                                    </td>
+                                                    <td class="pal-amount-cell">$5324717480.38</td>
+                                                    <td class="pal-positive">
+                                                        
+                                                            +50.2%
+                                                        
+                                                    </td>
+                                                </tr>
+                                            
+                                        
+                                            
+                                                <tr>
+                                                    <td>
+                                                        <span class="pal-link" onclick="PALedger.openYear(2024)">
+                                                            2024
+                                                        </span>
+                                                    </td>
+                                                    <td class="pal-amount-cell">$3545293650.47</td>
+                                                    <td class="pal-negative">
+                                                        
+                                                            -2.0%
+                                                        
+                                                    </td>
+                                                </tr>
+                                            
+                                        
+                                            
+                                                <tr>
+                                                    <td>
+                                                        <span class="pal-link" onclick="PALedger.openYear(2023)">
+                                                            2023
+                                                        </span>
+                                                    </td>
+                                                    <td class="pal-amount-cell">$3618075065.83</td>
+                                                    <td class="pal-positive">
+                                                        
+                                                            +12.7%
+                                                        
+                                                    </td>
+                                                </tr>
+                                            
+                                        
+                                            
+                                                <tr>
+                                                    <td>
+                                                        <span class="pal-link" onclick="PALedger.openYear(2022)">
+                                                            2022
+                                                        </span>
+                                                    </td>
+                                                    <td class="pal-amount-cell">$3209731441.98</td>
+                                                    <td class="pal-negative">
+                                                        
+                                                            -17.5%
+                                                        
+                                                    </td>
+                                                </tr>
+                                            
+                                        
+                                            
+                                                <tr>
+                                                    <td>
+                                                        <span class="pal-link" onclick="PALedger.openYear(2021)">
+                                                            2021
+                                                        </span>
+                                                    </td>
+                                                    <td class="pal-amount-cell">$3891758025.62</td>
+                                                    <td class="pal-negative">
+                                                        
+                                                            -43.1%
+                                                        
+                                                    </td>
+                                                </tr>
+                                            
+                                        
+                                            
+                                                <tr>
+                                                    <td>
+                                                        <span class="pal-link" onclick="PALedger.openYear(2020)">
+                                                            2020
+                                                        </span>
+                                                    </td>
+                                                    <td class="pal-amount-cell">$6840141874.36</td>
+                                                    <td class="pal-positive">
+                                                        
+                                                            +301.8%
+                                                        
+                                                    </td>
+                                                </tr>
+                                            
+                                        
+                                            
+                                                <tr>
+                                                    <td>
+                                                        <span class="pal-link" onclick="PALedger.openYear(2019)">
+                                                            2019
+                                                        </span>
+                                                    </td>
+                                                    <td class="pal-amount-cell">$1702209129.16</td>
+                                                    <td class="pal-positive">
+                                                        
+                                                            +19604438.3%
+                                                        
+                                                    </td>
+                                                </tr>
+                                            
+                                        
+                                            
+                                                <tr>
+                                                    <td>
+                                                        <span class="pal-link" onclick="PALedger.openYear(2018)">
+                                                            2018
+                                                        </span>
+                                                    </td>
+                                                    <td class="pal-amount-cell">$8682.73</td>
+                                                    <td class="">
+                                                        
+                                                            N/A
+                                                        
+                                                    </td>
+                                                </tr>
+                                            
+                                        
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- END ITEM ROW 2 -->
+
+                </div>
+                <!-- END MAIN CONTENT 66% WIDE -->
+
+                <!-- SIDEBAR CONTENT 33% WIDE -->
+                <div class="col-md-3 report-col-3">
+
+                    <div class="sidebar-table">
+                        <div class="label">Top Payees</div>
+                        <table class="table table-hover pal-table">
+                            <thead>
+                                <tr><th>Payee</th><th>Total</th></tr>
+                            </thead>
+                            <tbody>
+                                
+                                <tr>
+                                    <td>
+                                        <span class="pal-link"
+                                              onclick="PALedger.openName('M&T BANK', '2019-09,2019-10,2019-12,2020-01,2020-02,2020-03,2020-06,2020-07,2020-08,2020-09,2020-12,2021-01,2021-02,2021-03,2021-04,2021-06,2021-07,2021-08,2021-09,2021-10,2021-11,2021-12,2022-01,2022-02,2022-03,2022-04,2022-05,2022-06,2022-07,2022-08,2022-09,2022-10,2022-11,2022-12,2023-01,2023-02,2023-03,2023-04,2023-05,2023-06,2023-07,2023-08,2023-09,2023-10,2023-11,2023-12,2024-01,2024-02,2024-03,2024-04,2024-05,2024-06,2024-07,2024-08,2024-09,2024-10,2024-11,2024-12,2025-01,2025-02,2025-03,2025-04,2025-05,2025-06,2025-07,2025-08,2025-09,2025-10,2025-11,2025-12,2026-01,2026-02,2026-03,2026-04,2026-05,2026-06')">
+                                            M&T BANK
+                                        </span>
+                                    </td>
+                                    <td class="pal-amount-cell">$6811551866.49</td>
+                                </tr>
+                                
+                                <tr>
+                                    <td>
+                                        <span class="pal-link"
+                                              onclick="PALedger.openName('COMMONWEALTH OF PENNSYLVANIA', '2019-07,2019-11,2019-12,2020-01,2020-02,2020-03,2020-04,2020-06,2020-12,2021-02,2021-03,2021-05,2021-06,2021-08,2021-09,2021-10,2021-11,2021-12,2022-02,2022-06,2022-09,2023-02,2023-06,2023-07,2023-10,2023-12,2024-06,2024-12,2025-06,2025-09,2025-12,2026-06')">
+                                            COMMONWEALTH OF PENNSYLVANIA
+                                        </span>
+                                    </td>
+                                    <td class="pal-amount-cell">$5567734385.94</td>
+                                </tr>
+                                
+                                <tr>
+                                    <td>
+                                        <span class="pal-link"
+                                              onclick="PALedger.openName('TREASURY SIB', '2021-05,2023-12,2024-10,2025-06,2026-01')">
+                                            TREASURY SIB
+                                        </span>
+                                    </td>
+                                    <td class="pal-amount-cell">$3027975822.00</td>
+                                </tr>
+                                
+                                <tr>
+                                    <td>
+                                        <span class="pal-link"
+                                              onclick="PALedger.openName('WIR PAYEE', '2020-11,2021-11,2022-02,2022-03,2022-04,2022-05,2022-06,2022-08,2022-09,2022-10,2022-12,2023-02,2023-03,2023-04,2023-05,2023-06,2023-08,2023-09,2023-10,2023-12,2024-01,2024-02,2024-03,2024-04,2024-06,2024-07,2024-09,2024-10,2024-12,2025-01,2025-02,2025-03,2025-06,2025-07,2025-08,2026-02')">
+                                            WIR PAYEE
+                                        </span>
+                                    </td>
+                                    <td class="pal-amount-cell">$2892810728.28</td>
+                                </tr>
+                                
+                                <tr>
+                                    <td>
+                                        <span class="pal-link"
+                                              onclick="PALedger.openName('WELLS FARGO BANKS', '2019-09,2019-10,2019-11,2019-12,2020-01,2020-02,2020-03,2020-04,2020-05,2020-06,2020-07,2020-08,2020-09,2020-10,2020-11,2020-12,2021-01,2021-02,2021-03,2021-04,2021-05,2021-06,2021-07,2021-08,2021-09,2021-10,2021-11,2021-12,2022-01,2022-02,2022-03,2022-04,2022-05,2022-06,2022-07,2022-08,2022-09,2022-10,2022-11,2022-12,2023-01,2023-02,2023-03,2023-04,2023-05,2023-06,2023-07,2023-08,2023-09,2023-10,2023-11,2023-12,2024-01,2024-02,2024-03,2024-04,2024-05,2024-06,2024-07,2024-08,2024-09,2024-10,2024-11,2024-12,2025-01,2025-02,2025-03,2025-04,2025-05,2025-06,2025-07,2025-08,2025-09,2025-10,2025-11,2025-12,2026-01,2026-02,2026-03,2026-04,2026-05')">
+                                            WELLS FARGO BANKS
+                                        </span>
+                                    </td>
+                                    <td class="pal-amount-cell">$2685756346.55</td>
+                                </tr>
+                                
+                                <tr>
+                                    <td>
+                                        <span class="pal-link"
+                                              onclick="PALedger.openName('CITY OF PHILADELPHIA CITIES OF THE FIRST CLASS', '2019-10,2019-11,2019-12,2020-01,2020-02,2020-03,2020-04,2020-05,2020-06,2020-07,2020-08,2020-09,2020-10,2020-11,2020-12,2021-01,2021-02,2021-03,2021-04,2021-05,2021-06,2021-07,2021-08,2021-09,2021-10,2021-11,2021-12,2022-01,2022-02,2022-03,2022-04,2022-05,2022-06,2022-07,2022-08,2022-09,2022-10,2022-11,2022-12,2023-01,2023-02,2023-03,2023-04,2023-05,2023-06,2023-07,2023-08,2023-09,2023-10,2023-11,2023-12,2024-01,2024-02,2024-03,2024-04,2024-05,2024-06,2024-07,2024-08,2024-09,2024-10,2024-11,2024-12,2025-01,2025-02,2025-03,2025-04,2025-05,2025-06,2025-07,2025-08,2025-09,2025-10,2025-11,2025-12,2026-01,2026-02,2026-03,2026-04,2026-05,2026-06')">
+                                            CITY OF PHILADELPHIA CITIES OF THE FIRST CLASS
+                                        </span>
+                                    </td>
+                                    <td class="pal-amount-cell">$1883424500.28</td>
+                                </tr>
+                                
+                                <tr>
+                                    <td>
+                                        <span class="pal-link"
+                                              onclick="PALedger.openName('Philadelphia School District', '2019-10,2019-11,2019-12,2020-01,2020-02,2020-03,2020-04,2020-05,2020-06,2020-07,2020-08,2020-09,2020-10,2020-11,2020-12,2021-01,2021-02,2021-03,2021-04,2021-05,2021-06,2021-07,2021-08,2021-09,2021-10,2021-11,2021-12,2022-01,2022-02,2022-03,2022-04,2022-05,2022-06,2022-07,2022-08,2022-09,2022-10,2022-11,2022-12,2023-01,2023-02,2023-03,2023-04,2023-05,2023-06,2023-07,2023-08,2023-09,2023-10,2023-11,2023-12,2024-01,2024-02,2024-03,2024-04,2024-05,2024-06,2024-07,2024-08,2024-09,2024-10,2024-11,2024-12,2025-01,2025-02,2025-03,2025-04,2025-05,2025-06,2025-07,2025-08,2025-09,2025-10,2025-11,2025-12,2026-01,2026-02,2026-03,2026-04,2026-05,2026-06')">
+                                            Philadelphia School District
+                                        </span>
+                                    </td>
+                                    <td class="pal-amount-cell">$1180520055.09</td>
+                                </tr>
+                                
+                                <tr>
+                                    <td>
+                                        <span class="pal-link"
+                                              onclick="PALedger.openName('ALLEGHENY REGIONAL ASSET DISTRICT', '2019-10,2019-11,2019-12,2020-01,2020-02,2020-03,2020-04,2020-05,2020-06,2020-07,2020-08,2020-09,2020-10,2020-11,2020-12,2021-01,2021-02,2021-03,2021-04,2021-05,2021-06,2021-07,2021-08,2021-09,2021-10,2021-11,2021-12,2022-01,2022-02,2022-03,2022-04,2022-05,2022-06,2022-07,2022-08,2022-09,2022-10,2022-11,2022-12,2023-01,2023-02,2023-03,2023-04,2023-05,2023-06,2023-07,2023-08,2023-09,2023-10,2023-11,2023-12,2024-01,2024-02,2024-03,2024-04,2024-05,2024-06,2024-07,2024-08,2024-09,2024-10,2024-11,2024-12,2025-01,2025-02,2025-03,2025-04,2025-05,2025-06,2025-07,2025-08,2025-09,2025-10,2025-11,2025-12,2026-01,2026-02,2026-03,2026-04,2026-05,2026-06')">
+                                            ALLEGHENY REGIONAL ASSET DISTRICT
+                                        </span>
+                                    </td>
+                                    <td class="pal-amount-cell">$829420523.59</td>
+                                </tr>
+                                
+                                <tr>
+                                    <td>
+                                        <span class="pal-link"
+                                              onclick="PALedger.openName('BNY MELLON', '2019-10,2019-11,2019-12,2020-01,2020-02,2020-03,2020-04,2020-05,2020-06,2020-07,2020-08,2020-09,2020-10,2020-11,2020-12,2021-01,2021-02,2021-03,2021-04,2021-05,2021-06,2021-07,2021-08,2021-09,2021-10,2021-11,2021-12,2022-01,2022-02,2022-03,2022-04,2022-05,2022-06,2022-07,2022-08,2022-09,2022-10,2022-11,2022-12,2023-01,2023-02,2023-03,2023-04,2023-05,2023-06,2023-07,2023-08,2023-09,2023-10,2023-11,2023-12,2024-01,2024-02,2024-03,2024-04,2024-05,2024-06,2024-07,2024-08,2024-09,2024-10,2024-11,2024-12,2025-01,2025-02,2025-03,2025-04,2025-05,2025-06,2025-07,2025-08,2025-09,2025-10,2025-11,2025-12,2026-01,2026-02,2026-03,2026-04,2026-05,2026-06')">
+                                            BNY MELLON
+                                        </span>
+                                    </td>
+                                    <td class="pal-amount-cell">$810608696.38</td>
+                                </tr>
+                                
+                                <tr>
+                                    <td>
+                                        <span class="pal-link"
+                                              onclick="PALedger.openName('PNC BANK', '2019-09,2019-10,2019-11,2019-12,2020-01,2020-02,2020-03,2020-04,2020-05,2020-06,2020-07,2020-08,2020-09,2020-10,2020-11,2020-12,2021-01,2021-02,2021-03,2021-04,2021-05,2021-06,2021-07,2021-08,2021-09,2021-10,2021-11,2021-12,2022-01,2022-02,2022-03,2022-04,2022-05,2022-06,2022-07,2022-08,2022-09,2022-10,2022-11,2022-12,2023-01,2023-02,2023-03,2023-04,2023-05,2023-06,2023-07,2023-08,2023-09,2023-10,2023-11,2023-12,2024-01,2024-02,2024-03,2024-04,2024-05,2024-06,2024-07,2024-08,2024-09,2024-10,2024-11,2024-12,2025-01,2025-02,2025-03,2025-04,2025-05,2025-06,2025-07,2025-08,2025-09,2025-10,2025-11,2025-12,2026-01,2026-02,2026-03,2026-04,2026-05')">
+                                            PNC BANK
+                                        </span>
+                                    </td>
+                                    <td class="pal-amount-cell">$804601887.95</td>
+                                </tr>
+                                
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="sidebar-table">
+                        <div class="label">Top Account Codes</div>
+                        <table class="table table-hover pal-table">
+                            <thead>
+                                <tr><th>Account</th><th>Total</th></tr>
+                            </thead>
+                            <tbody>
+                                
+                                <tr>
+                                    <td>
+                                        <span class="pal-link"
+                                              onclick="PALedger.openAcct('6500001', '2019-10,2019-11,2019-12,2020-01,2020-02,2020-03,2020-04,2020-05,2020-06,2020-07,2020-09,2020-10,2020-11,2020-12,2021-01,2021-02,2021-03,2021-04,2021-05,2021-06,2021-07,2021-08,2021-09,2021-10,2021-11,2022-01,2022-02,2022-03,2022-04,2022-05,2022-06,2022-07,2022-08,2022-09,2022-10,2022-12,2023-01,2023-02,2023-03,2023-04,2023-05,2023-06,2023-07,2023-08,2023-09,2023-10,2023-12,2024-01,2024-02,2024-03,2024-04,2024-05,2024-06,2024-07,2024-08,2024-09,2024-12,2025-01,2025-02,2025-03,2025-04,2025-05,2025-07,2025-08,2025-09,2025-12,2026-01,2026-02,2026-04,2026-05')">
+                                            6500001
+                                        </span>
+                                    </td>
+                                    <td class="pal-amount-cell">$18251198658.13</td>
+                                </tr>
+                                
+                                <tr>
+                                    <td>
+                                        <span class="pal-link"
+                                              onclick="PALedger.openAcct('6602000', '2019-10,2019-11,2019-12,2020-01,2020-02,2020-03,2020-04,2020-05,2020-06,2020-07,2020-08,2020-09,2020-10,2020-11,2020-12,2021-01,2021-02,2021-03,2021-04,2021-05,2021-06,2021-07,2021-08,2021-09,2021-10,2021-11,2021-12,2022-01,2022-02,2022-03,2022-04,2022-05,2022-06,2022-07,2022-08,2022-09,2022-10,2022-11,2022-12,2023-01,2023-02,2023-03,2023-04,2023-05,2023-06,2023-07,2023-08,2023-09,2023-10,2023-11,2023-12,2024-01,2024-02,2024-03,2024-04,2024-05,2024-06,2024-07,2024-08,2024-09,2024-10,2024-11,2024-12,2025-01,2025-02,2025-03,2025-04,2025-05,2025-06,2025-07,2025-08,2025-09,2025-10,2025-11,2025-12,2026-01,2026-02,2026-03,2026-04,2026-05,2026-06')">
+                                            6602000
+                                        </span>
+                                    </td>
+                                    <td class="pal-amount-cell">$4749341788.28</td>
+                                </tr>
+                                
+                                <tr>
+                                    <td>
+                                        <span class="pal-link"
+                                              onclick="PALedger.openAcct('6500000', '2019-05,2019-09,2019-10,2019-11,2019-12,2020-01,2020-02,2020-04,2020-05,2020-06,2020-07,2020-08,2020-09,2020-10,2020-11,2020-12,2021-01,2021-02,2021-04,2021-05,2021-06,2021-07,2021-08,2021-10,2021-11,2021-12,2022-02,2022-04,2022-05,2022-06,2022-08,2022-09,2022-10,2022-12,2023-02,2023-03,2023-04,2023-05,2023-06,2023-07,2023-08,2023-12,2024-01,2024-02,2024-04,2024-07,2024-09,2024-10,2025-01,2025-03,2025-06,2025-07,2025-08,2025-10,2025-12,2026-01,2026-05,2026-06')">
+                                            6500000
+                                        </span>
+                                    </td>
+                                    <td class="pal-amount-cell">$3028026822.00</td>
+                                </tr>
+                                
+                                <tr>
+                                    <td>
+                                        <span class="pal-link"
+                                              onclick="PALedger.openAcct('6500010', '2019-09,2019-10,2019-11,2019-12,2020-01,2020-02,2020-03,2020-04,2020-05,2020-06,2020-07,2020-08,2020-09,2020-11,2020-12,2021-01,2021-02,2021-03,2021-04,2021-05,2021-06,2021-07,2021-08,2021-09,2021-10,2021-11,2021-12,2022-01,2022-02,2022-03,2022-04,2022-06,2022-07,2022-08,2022-09,2022-10,2022-11,2022-12,2023-01,2023-02,2023-03,2023-04,2023-06,2023-07,2023-08,2023-09,2023-10,2023-11,2023-12,2024-01,2024-02,2024-03,2024-06,2024-07,2024-08,2024-09,2024-10,2024-11,2024-12,2025-01,2025-02,2025-03,2025-06,2025-07,2025-08,2025-10,2025-11,2026-01,2026-02,2026-03,2026-06')">
+                                            6500010
+                                        </span>
+                                    </td>
+                                    <td class="pal-amount-cell">$2198474762.08</td>
+                                </tr>
+                                
+                                <tr>
+                                    <td>
+                                        <span class="pal-link"
+                                              onclick="PALedger.openAcct('6300000', '2019-09,2019-10,2019-11,2019-12,2020-01,2020-02,2020-03,2020-04,2020-05,2020-06,2020-07,2020-08,2020-09,2020-10,2020-11,2020-12,2021-01,2021-02,2021-03,2021-04,2021-05,2021-06,2021-07,2021-08,2021-09,2021-10,2021-11,2021-12,2022-01,2022-02,2022-03,2022-04,2022-05,2022-06,2022-07,2022-08,2022-09,2022-10,2022-11,2022-12,2023-01,2023-02,2023-03,2023-04,2023-05,2023-06,2023-07,2023-08,2023-09,2023-10,2023-11,2023-12,2024-01,2024-02,2024-03,2024-04,2024-05,2024-06,2024-07,2024-08,2024-09,2024-10,2024-11,2024-12,2025-01,2025-02,2025-03,2025-04,2025-05,2025-06,2025-07,2025-08,2025-09,2025-10,2025-11,2025-12,2026-01,2026-02,2026-03,2026-04,2026-05,2026-06')">
+                                            6300000
+                                        </span>
+                                    </td>
+                                    <td class="pal-amount-cell">$907728346.79</td>
+                                </tr>
+                                
+                                <tr>
+                                    <td>
+                                        <span class="pal-link"
+                                              onclick="PALedger.openAcct('6343200', '2019-08,2019-09,2019-10,2019-11,2019-12,2020-01,2020-02,2020-03,2020-04,2020-05,2020-06,2020-07,2020-08,2020-09,2020-10,2020-11,2020-12,2021-01,2021-02,2021-03,2021-04,2021-05,2021-06,2021-07,2021-08,2021-09,2021-10,2021-11,2021-12,2022-01,2022-02,2022-03,2022-04,2022-05,2022-06,2022-07,2022-08,2022-09,2022-10,2022-11,2022-12,2023-01,2023-02,2023-03,2023-04,2023-05,2023-06,2023-07,2023-08,2023-09,2023-10,2023-11,2023-12,2024-01,2024-02,2024-03,2024-04,2024-05,2024-06,2024-07,2024-08,2024-09,2024-10,2024-11,2025-01,2025-02,2025-03,2025-04,2025-05,2025-06,2025-07,2025-08,2025-09,2025-10,2025-11,2025-12,2026-01,2026-02,2026-03,2026-04,2026-05,2026-06')">
+                                            6343200
+                                        </span>
+                                    </td>
+                                    <td class="pal-amount-cell">$36400610.10</td>
+                                </tr>
+                                
+                                <tr>
+                                    <td>
+                                        <span class="pal-link"
+                                              onclick="PALedger.openAcct('6343118', '2019-01,2019-07,2019-08,2019-09,2019-10,2019-11,2019-12,2020-01,2020-02,2020-03,2020-04,2020-05,2020-06,2020-07,2020-08,2020-09,2020-10,2020-11,2020-12,2021-01,2021-02,2021-03,2021-04,2021-05,2021-06,2021-07,2021-08,2021-09,2021-10,2021-11,2021-12,2022-01,2022-02,2022-03,2022-04,2022-05,2022-06,2022-07,2022-08,2022-09,2022-10,2022-11,2022-12,2023-01,2023-02,2023-03,2023-04,2023-05,2023-06,2023-07,2023-08,2023-09,2023-10,2023-11,2023-12,2024-01,2024-02,2024-03,2024-04,2024-05,2024-06,2024-07,2024-08,2024-09,2024-10,2024-11,2024-12,2025-01,2025-02,2025-03,2025-04,2025-05,2025-06,2025-07,2025-08,2025-09,2025-10,2025-11,2025-12,2026-01,2026-02,2026-03,2026-04,2026-05,2026-06')">
+                                            6343118
+                                        </span>
+                                    </td>
+                                    <td class="pal-amount-cell">$24552443.25</td>
+                                </tr>
+                                
+                                <tr>
+                                    <td>
+                                        <span class="pal-link"
+                                              onclick="PALedger.openAcct('6343120', '2019-03,2019-04,2019-06,2019-07,2019-08,2019-09,2019-10,2019-11,2019-12,2020-01,2020-02,2020-03,2020-04,2020-05,2020-06,2020-07,2020-08,2020-09,2020-10,2020-11,2020-12,2021-02,2021-03,2021-04,2021-05,2021-06,2021-07,2021-08,2021-09,2021-10,2021-11,2021-12,2022-01,2022-02,2022-03,2022-04,2022-05,2022-06,2022-07,2022-08,2022-09,2022-10,2022-11,2022-12,2023-01,2023-02,2023-03,2023-04,2023-05,2023-06,2023-07,2023-08,2023-09,2023-10,2023-11,2023-12,2024-01,2024-02,2024-03,2024-04,2024-05,2024-06,2024-07,2024-08,2024-09,2024-10,2024-11,2024-12,2025-01,2025-02,2025-03,2025-04,2025-05,2025-07,2025-08,2025-09,2025-10,2025-11,2025-12,2026-01,2026-02,2026-03,2026-04,2026-05')">
+                                            6343120
+                                        </span>
+                                    </td>
+                                    <td class="pal-amount-cell">$23824747.48</td>
+                                </tr>
+                                
+                                <tr>
+                                    <td>
+                                        <span class="pal-link"
+                                              onclick="PALedger.openAcct('6371011', '2019-09,2019-10,2019-12,2020-01,2020-02,2020-03,2020-04,2020-05,2020-06,2020-07,2020-08,2020-09,2020-10,2020-11,2020-12,2021-01,2021-02,2021-03,2021-04,2021-05,2021-06,2021-07,2021-08,2021-09,2021-10,2021-11,2021-12,2022-01,2022-02,2022-03,2022-04,2022-05,2022-06,2022-07,2022-08,2022-09,2022-10,2022-11,2022-12,2023-01,2023-02,2023-03,2023-04,2023-05,2023-06,2023-08,2023-09,2023-10,2023-11,2023-12,2024-01,2024-02,2024-03,2024-04,2024-05,2024-06,2024-07,2024-08,2024-09,2024-10,2024-11,2024-12,2025-01,2025-02,2025-03,2025-04,2025-05,2025-06,2025-07,2025-08,2025-09,2025-10,2025-11,2025-12,2026-01,2026-02,2026-03,2026-04,2026-05,2026-06')">
+                                            6371011
+                                        </span>
+                                    </td>
+                                    <td class="pal-amount-cell">$17348196.10</td>
+                                </tr>
+                                
+                                <tr>
+                                    <td>
+                                        <span class="pal-link"
+                                              onclick="PALedger.openAcct('6343111', '2019-09,2019-10,2019-11,2019-12,2020-01,2020-02,2020-03,2020-04,2020-05,2020-06,2020-07,2020-08,2020-09,2020-10,2020-11,2020-12,2021-01,2021-02,2021-03,2021-04,2021-05,2021-06,2021-07,2021-08,2021-09,2021-10,2021-11,2021-12,2022-01,2022-02,2022-03,2022-04,2022-05,2022-06,2022-07,2022-08,2022-09,2022-10,2022-11,2022-12,2023-01,2023-02,2023-03,2023-04,2023-05,2023-06,2023-07,2023-08,2023-09,2023-10,2023-11,2023-12,2024-01,2024-02,2024-03,2024-04,2024-05,2024-06,2024-07,2024-08,2024-09,2024-10,2024-11,2024-12,2025-01,2025-02,2025-03,2025-04,2025-05,2025-06,2025-07,2025-08,2025-09,2025-10,2025-11,2025-12,2026-01,2026-02,2026-03,2026-04,2026-05,2026-06')">
+                                            6343111
+                                        </span>
+                                    </td>
+                                    <td class="pal-amount-cell">$15047032.79</td>
+                                </tr>
+                                
+                            </tbody>
+                        </table>
+                    </div>
+
+                </div>
+                <!-- END SIDEBAR CONTENT 33% WIDE -->
+
+            </div>
+            <!-- END MAIN CONTENT LAYOUT 66% / 33% WIDE -->
+
+        </div>
+    </div>
+</div>
+
+<!-- ====================================================================
+     Chart.js (CDN) + dashboard JS. The dashboard JS expects
+     window.PALedgerData to be set BEFORE it runs, since init() reads it
+     on DOMContentLoaded. Every value here is derived above from `data`
+     alone -- trailing_12 and the report year/month are not separate
+     inputs, they're computed in this template from data.by_year and
+     data.generated_at.
+     ==================================================================== -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<script>
+  window.PALedgerData = {
+    reportYear: 2026,
+    reportMonth: 6,
+    trailing365Canvas: "pal-trailing365-chart",
+    trailing365: [
+      
+        { month: "2025-07", amount: 1380208442.81 },
+      
+        { month: "2025-08", amount: 709877775.64 },
+      
+        { month: "2025-09", amount: 368457000.99 },
+      
+        { month: "2025-10", amount: 87012892.69 },
+      
+        { month: "2025-11", amount: 75076633.20 },
+      
+        { month: "2025-12", amount: 259478768.29 },
+      
+        { month: "2026-01", amount: 290916424.50 },
+      
+        { month: "2026-02", amount: 437512422.08 },
+      
+        { month: "2026-03", amount: 219937297.82 },
+      
+        { month: "2026-04", amount: 84409300.03 },
+      
+        { month: "2026-05", amount: 100025922.11 },
+      
+        { month: "2026-06", amount: 75193696.60 }
+      
+    ]
+  };
+</script>
+<script src="/js/dashboard.js"></script>
