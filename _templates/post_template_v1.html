@@ -78,6 +78,48 @@
 {%- set top_accounts = acct_triples | sort(attribute="2", reverse=true) -%}
 {%- set top_n = 10 -%}
 
+{#- Current-year-only top 10 payees/accounts, for the two pie-chart cards.
+    by_name/by_acct only store per-month amounts with no year grouping,
+    so sum each entry's months whose key starts with the current report
+    year before ranking -- a separate pass from the all-years top_payees/
+    top_accounts above, which rank by lifetime total instead.
+
+    NOTE: uses namespace() for the running total, not a plain {% set %}
+    inside the inner for loop -- Jinja2 does not let a plain {% set %}
+    reassignment inside a for-loop persist across iterations (each
+    iteration gets its own scope), so a naive accumulator silently stays
+    at its initial value the entire time. namespace() is the documented
+    way to get a real mutable accumulator across loop iterations. -#}
+{%- set current_year_payee_totals = [] -%}
+{%- for name, entry in data.by_name.items() -%}
+    {%- set ns = namespace(total=0.0) -%}
+    {%- for mk, amt in entry.months.items() -%}
+        {%- if mk.startswith(current_year_key) -%}
+            {%- set ns.total = ns.total + (amt | float) -%}
+        {%- endif -%}
+    {%- endfor -%}
+    {%- if ns.total > 0 -%}
+        {%- set _ = current_year_payee_totals.append((name, ns.total)) -%}
+    {%- endif -%}
+{%- endfor -%}
+{%- set current_year_top_payees = current_year_payee_totals | sort(attribute="1", reverse=true) -%}
+{%- set current_year_top_payees = current_year_top_payees[:top_n] -%}
+
+{%- set current_year_acct_totals = [] -%}
+{%- for alt, entry in data.by_acct.items() -%}
+    {%- set ns = namespace(total=0.0) -%}
+    {%- for mk, amt in entry.months.items() -%}
+        {%- if mk.startswith(current_year_key) -%}
+            {%- set ns.total = ns.total + (amt | float) -%}
+        {%- endif -%}
+    {%- endfor -%}
+    {%- if ns.total > 0 -%}
+        {%- set _ = current_year_acct_totals.append((alt, ns.total)) -%}
+    {%- endif -%}
+{%- endfor -%}
+{%- set current_year_top_accounts = current_year_acct_totals | sort(attribute="1", reverse=true) -%}
+{%- set current_year_top_accounts = current_year_top_accounts[:top_n] -%}
+
 {#- Trailing 12 months: flatten data.by_year[*].months across year
     boundaries, keep entries at or before the report month, take the
     last 12 chronologically (month keys "YYYY-MM" sort correctly as
@@ -120,38 +162,66 @@ tags:
         <div class="container main">
 
             <!-- ================================================== -->
-            <!-- REPORT DATE PANEL -- auto-loads via JS using the    -->
-            <!-- report month derived from data.generated_at, the   -->
-            <!-- same drill-down data source used everywhere else.  -->
+            <!-- ROLLING 30 DAYS -- reads data.rolling_30_days       -->
+            <!-- directly (precomputed in report_pa_checkbook.py     -->
+            <!-- from day-precise L0 invoice dates, since L1/L2's    -->
+            <!-- month-bucketed structures can't express a 30-day    -->
+            <!-- window that spans a month boundary). No JS fetch    -->
+            <!-- needed for this panel -- it's fully server-rendered. -->
             <!-- ================================================== -->
+            {%- set rolling = data.rolling_30_days -%}
+            {%- set rolling_top_payee = rolling.top_payees[0] if rolling.top_payees else none -%}
             <div class="row report-row">
                 <div class="col-md-12 report-col-12">
                     <div class="container kpi-row">
                         <div class="row card-row">
                             <div class="col-md-12">
-                                <div class="card card-report-date" id="pal-report-date-panel">
+                                <div class="card card-report-date" id="pal-rolling-30-panel">
                                     <div class="card-body pal-report-date-body">
                                         <div class="pal-report-date-heading">
-                                            This Month So Far &mdash;
+                                            Rolling 30 Days &mdash;
                                             <span class="pal-link"
                                                   onclick="PALedger.openMonth({{ report_year }}, {{ report_month }})">
-                                                {{ report_date_label }}
+                                                through {{ report_date_label }}
                                             </span>
                                         </div>
                                         <div class="pal-report-date-stats">
                                             <div class="pal-stat">
                                                 <div class="label">Total Spend</div>
-                                                <div class="value" data-pal-field="total">&hellip;</div>
+                                                <div class="value pal-blue-amount">${{ rolling.amount }}</div>
                                             </div>
                                             <div class="pal-stat">
                                                 <div class="label">Payments</div>
-                                                <div class="value" data-pal-field="count">&hellip;</div>
+                                                <div class="value">{{ "{:,}".format(rolling.count) }}</div>
                                             </div>
                                             <div class="pal-stat">
                                                 <div class="label">Top Payee</div>
-                                                <div class="value pal-stat-payee" data-pal-field="top-payee">&hellip;</div>
+                                                <div class="value pal-stat-payee">
+                                                    {{ rolling_top_payee[0] if rolling_top_payee else "\u2014" }}
+                                                </div>
                                             </div>
                                         </div>
+
+                                        {% if rolling.top_payees %}
+                                        <table class="pal-table pal-rolling-30-table">
+                                            <thead>
+                                                <tr><th>Payee</th><th>Total (30 Days)</th></tr>
+                                            </thead>
+                                            <tbody>
+                                                {% for name, amount in rolling.top_payees %}
+                                                <tr>
+                                                    <td>
+                                                        <span class="pal-link"
+                                                              onclick="PALedger.openName('{{ name | replace("'", "\\'") }}', '{{ data.by_name.get(name, {}).get('months', {}).keys() | join(',') }}')">
+                                                            {{ name }}
+                                                        </span>
+                                                    </td>
+                                                    <td class="pal-amount-cell">${{ amount }}</td>
+                                                </tr>
+                                                {% endfor %}
+                                            </tbody>
+                                        </table>
+                                        {% endif %}
                                     </div>
                                 </div>
                             </div>
@@ -159,11 +229,15 @@ tags:
                     </div>
                 </div>
             </div>
-            <!-- END REPORT DATE PANEL -->
+            <!-- END ROLLING 30 DAYS -->
 
 
             <!-- ================================================== -->
-            <!-- TOP SUMMARY: current year KPIs                     -->
+            <!-- TOP SUMMARY: Year-over-Year + combined info card    -->
+            <!-- The standalone "Total Spend" card was removed -- the -->
+            <!-- current-year total is already shown, blue and       -->
+            <!-- prominent, in the subtitle line above the trend      -->
+            <!-- chart below (see .pal-blue-amount there).            -->
             <!-- ================================================== -->
             <div class="row report-row">
                 <div class="col-md-12 report-col-12">
@@ -171,22 +245,9 @@ tags:
                         <div class="row card-row">
 
                             <div class="col-md-3 card-col-3">
-                                <div class="card card-year-total">
-                                    <div class="card-body">
-                                        <div class="label">{{ report_year }} Total Spend</div>
-                                        <div class="value">
-                                            <span class="pal-link" onclick="PALedger.openYear({{ report_year }})">
-                                                ${{ current_year.amount if current_year else "0.00" }}
-                                            </span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="col-md-3 card-col-3">
                                 <div class="card card-yoy">
                                     <div class="card-body">
-                                        <div class="label">Year over Year</div>
+                                        <div class="label">{{ report_year }} Year over Year</div>
                                         <div class="value {{ 'pal-positive' if current_year and current_year.yoy_change_pct is defined and current_year.yoy_change_pct >= 0 else 'pal-negative' }}">
                                             {% if current_year and current_year.yoy_change_pct is defined %}
                                                 {{ "%+.1f"|format(current_year.yoy_change_pct) }}%
@@ -194,24 +255,6 @@ tags:
                                                 N/A
                                             {% endif %}
                                         </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="col-md-3 card-col-3">
-                                <div class="card card-records">
-                                    <div class="card-body">
-                                        <div class="label">Total Records (All Years)</div>
-                                        <div class="value">{{ "{:,}".format(data.total_records) }}</div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="col-md-3 card-col-3">
-                                <div class="card card-grand-total">
-                                    <div class="card-body">
-                                        <div class="label">Grand Total (All Years)</div>
-                                        <div class="value">${{ data.grand_total }}</div>
                                     </div>
                                 </div>
                             </div>
@@ -224,7 +267,10 @@ tags:
 
 
             <!-- ================================================== -->
-            <!-- 2nd SUMMARY: ACH/Grant vs Direct Vendor split       -->
+            <!-- 2nd SUMMARY: one combined info card (Grand Total,   -->
+            <!-- Data As Of, Total Records, Direct Vendor, ACH/Grant, -->
+            <!-- Unparsed-Date -- stacked vertically with light       -->
+            <!-- dividers) plus two current-year pie-chart cards.     -->
             <!-- ================================================== -->
             {% set ach_amount = data.ach_payee.amount | float %}
             {% set grand_amount = data.grand_total | float %}
@@ -236,41 +282,63 @@ tags:
                     <div class="container kpi-row">
                         <div class="row card-row">
 
-                            <div class="col-md-3 card-col-3">
-                                <div class="card card-direct">
-                                    <div class="card-body">
-                                        <div class="label">Direct Vendor Payments</div>
-                                        <div class="value">${{ "%.2f"|format(direct_amount) }}</div>
-                                        <div class="pal-subvalue">{{ "%.1f"|format(direct_share) }}% of total</div>
+                            <div class="col-md-4 card-col-4">
+                                <div class="card card-combined-info">
+                                    <div class="card-body pal-stacked-card">
+                                        <div class="pal-stacked-item">
+                                            <div class="label">Grand Total (All Years)</div>
+                                            <div class="value">${{ data.grand_total }}</div>
+                                        </div>
+                                        <div class="pal-stacked-divider"></div>
+                                        <div class="pal-stacked-item">
+                                            <div class="label">Total Records</div>
+                                            <div class="value">{{ "{:,}".format(data.total_records) }}</div>
+                                        </div>
+                                        <div class="pal-stacked-divider"></div>
+                                        <div class="pal-stacked-item">
+                                            <div class="label">Direct Vendor Payments</div>
+                                            <div class="value">${{ "%.2f"|format(direct_amount) }}</div>
+                                            <div class="pal-subvalue">{{ "%.1f"|format(direct_share) }}% of total</div>
+                                        </div>
+                                        <div class="pal-stacked-divider"></div>
+                                        <div class="pal-stacked-item">
+                                            <div class="label">ACH / Grant Disbursements</div>
+                                            <div class="value">${{ data.ach_payee.amount }}</div>
+                                            <div class="pal-subvalue">{{ "%.1f"|format(ach_share) }}% of total</div>
+                                        </div>
+                                        <div class="pal-stacked-divider"></div>
+                                        <div class="pal-stacked-item">
+                                            <div class="label">Unparsed-Date Records</div>
+                                            <div class="value">${{ data.unknown_period.amount }}</div>
+                                            <div class="pal-subvalue">{{ data.unknown_period.count }} record{{ "" if data.unknown_period.count == 1 else "s" }}</div>
+                                        </div>
+                                        <div class="pal-stacked-divider"></div>
+                                        <div class="pal-stacked-item">
+                                            <div class="label">Data As Of</div>
+                                            <div class="value pal-asof">{{ data.generated_at }}</div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
 
-                            <div class="col-md-3 card-col-3">
-                                <div class="card card-ach">
+                            <div class="col-md-4 card-col-4">
+                                <div class="card card-pie-payees">
                                     <div class="card-body">
-                                        <div class="label">ACH / Grant Disbursements</div>
-                                        <div class="value">${{ data.ach_payee.amount }}</div>
-                                        <div class="pal-subvalue">{{ "%.1f"|format(ach_share) }}% of total</div>
+                                        <div class="label">Top Payees &mdash; {{ report_year }}</div>
+                                        <div class="pal-pie-card-wrap">
+                                            <canvas id="pal-pie-payees-chart"></canvas>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
 
-                            <div class="col-md-3 card-col-3">
-                                <div class="card card-unknown">
+                            <div class="col-md-4 card-col-4">
+                                <div class="card card-pie-accounts">
                                     <div class="card-body">
-                                        <div class="label">Unparsed-Date Records</div>
-                                        <div class="value">${{ data.unknown_period.amount }}</div>
-                                        <div class="pal-subvalue">{{ data.unknown_period.count }} record{{ "" if data.unknown_period.count == 1 else "s" }}</div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="col-md-3 card-col-3">
-                                <div class="card card-asof">
-                                    <div class="card-body">
-                                        <div class="label">Data As Of</div>
-                                        <div class="value pal-asof">{{ data.generated_at }}</div>
+                                        <div class="label">Top Accounts &mdash; {{ report_year }}</div>
+                                        <div class="pal-pie-card-wrap">
+                                            <canvas id="pal-pie-accounts-chart"></canvas>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -301,7 +369,7 @@ tags:
                                     </span>
                                 </h2>
                                 <h4 class="year-subtitle">
-                                    ${{ current_year.amount if current_year else "0.00" }} through {{ report_date_label }}
+                                    <span class="pal-blue-amount">${{ current_year.amount if current_year else "0.00" }}</span> through {{ report_date_label }}
                                 </h4>
 
                                 <div class="year-description">
@@ -360,6 +428,71 @@ tags:
                     </div>
                     <!-- END ITEM ROW 2 -->
 
+                    <!-- ITEM ROW 3: ACH / Grant Disbursements by month,
+                         same look/feel as Prior Years above -->
+                    {%- set ach_months = data.ach_payee.months.items() | list | sort(reverse=true) -%}
+                    <div class="row year-row pal-ach-row" id="ach-disbursements">
+                        <div class="col-md-12">
+                            <div class="year-post">
+                                <h2 class="year-title">ACH / Grant Disbursements by Month</h2>
+                                <p class="pal-hint">
+                                    "ACH PAYEE" is a placeholder covering many distinct small grant
+                                    recipients in the source data, not a single entity -- shown here
+                                    by month rather than ranked as a vendor.
+                                </p>
+                                <table class="pal-table pal-prior-years-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Month</th>
+                                            <th>Total Disbursed</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for month_key, amount in ach_months %}
+                                            <tr>
+                                                <td>{{ month_key }}</td>
+                                                <td class="pal-amount-cell">${{ amount }}</td>
+                                            </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- END ITEM ROW 3 -->
+
+                    <!-- ITEM ROW 4: most common Descriptions, all-years,
+                         same look/feel as Prior Years / ACH above -->
+                    {%- set description_triples = [] -%}
+                    {%- for description, entry in data.by_description.items() -%}
+                        {%- set _ = description_triples.append((description, entry, entry.amount | float)) -%}
+                    {%- endfor -%}
+                    {%- set top_descriptions = description_triples | sort(attribute="2", reverse=true) -%}
+                    <div class="row year-row pal-descriptions-row" id="common-descriptions">
+                        <div class="col-md-12">
+                            <div class="year-post">
+                                <h2 class="year-title">Most Common Descriptions (All Years)</h2>
+                                <table class="pal-table pal-prior-years-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Description</th>
+                                            <th>Total Spend</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for description, entry, _amt in top_descriptions[:top_n] %}
+                                            <tr>
+                                                <td>{{ description }}</td>
+                                                <td class="pal-amount-cell">${{ entry.amount }}</td>
+                                            </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- END ITEM ROW 4 -->
+
                 </div>
                 <!-- END MAIN CONTENT 66% WIDE -->
 
@@ -367,7 +500,7 @@ tags:
                 <div class="col-md-3 report-col-3">
 
                     <div class="sidebar-table">
-                        <div class="label">Top Payees</div>
+                        <div class="label">Top Payees (All Years)</div>
                         <table class="table table-hover pal-table">
                             <thead>
                                 <tr><th>Payee</th><th>Total</th></tr>
@@ -389,7 +522,7 @@ tags:
                     </div>
 
                     <div class="sidebar-table">
-                        <div class="label">Top Account Codes</div>
+                        <div class="label">Top Account Codes (All Years)</div>
                         <table class="table table-hover pal-table">
                             <thead>
                                 <tr><th>Account</th><th>Total</th></tr>
@@ -437,6 +570,18 @@ tags:
     trailing365: [
       {% for mk, amt in trailing_12 %}
         { month: "{{ mk }}", amount: {{ amt }} }{{ "," if not loop.last }}
+      {% endfor %}
+    ],
+    piePayeesCanvas: "pal-pie-payees-chart",
+    piePayees: [
+      {% for name, amt in current_year_top_payees %}
+        { label: "{{ name | replace('"', '\\"') }}", amount: {{ amt }} }{{ "," if not loop.last }}
+      {% endfor %}
+    ],
+    pieAccountsCanvas: "pal-pie-accounts-chart",
+    pieAccounts: [
+      {% for alt, amt in current_year_top_accounts %}
+        { label: "{{ alt }}", amount: {{ amt }} }{{ "," if not loop.last }}
       {% endfor %}
     ]
   };

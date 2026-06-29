@@ -572,32 +572,11 @@
   }
 
   // --------------------------------------------------------------------
-  // Report-date month panel (inline, not a modal) -- auto-loads on page
-  // load using the report's own generation date, per the "Report Date"
-  // card requirement.
-  // --------------------------------------------------------------------
-
-  async function loadReportDatePanel(year, month) {
-    const panel = document.getElementById("pal-report-date-panel");
-    if (!panel) return;
-
-    const records = await fetchRecords(`${DATA_ROOT}/BY_YEAR/${year}/${monthKey(year, month)}.json`);
-    const total = records.reduce((sum, r) => sum + parseAmount(r.gross), 0);
-    const topPayeeEntry = sumByKey(records, (r) => (r.name || "Unknown").trim(), 1)[0];
-
-    const totalEl = panel.querySelector("[data-pal-field='total']");
-    const countEl = panel.querySelector("[data-pal-field='count']");
-    const topPayeeEl = panel.querySelector("[data-pal-field='top-payee']");
-
-    if (totalEl) totalEl.textContent = formatAmount(total);
-    if (countEl) countEl.textContent = records.length.toLocaleString();
-    if (topPayeeEl) topPayeeEl.textContent = topPayeeEntry ? topPayeeEntry[0] : "\u2014";
-  }
-
-  // --------------------------------------------------------------------
-  // Trailing-365-day overview chart (main page, not in a modal).
-  // Built from data already embedded in the page by the Jinja template
-  // (window.PALedgerData.trailing365), no fetch required.
+  // Trailing-365-day overview chart and the two current-year pie charts
+  // (main page, not in a modal). All three are built from data already
+  // embedded in the page by the Jinja template (window.PALedgerData),
+  // no fetch required -- unlike the modal drill-downs, these never need
+  // to hit DATA/L1/ since the template precomputes exactly what they need.
   // --------------------------------------------------------------------
 
   function renderTrailing365Chart(canvasId, series) {
@@ -623,6 +602,33 @@
     });
   }
 
+  /** Renders a top-N doughnut/pie chart from pre-aggregated {label, amount}
+   *  entries embedded by the template (current-year top payees/accounts).
+   *  Used by both new 2nd-summary pie-chart cards -- same rendering logic,
+   *  different data and canvas id. */
+  function renderPieChart(canvasId, entries) {
+    const canvas = document.getElementById(canvasId);
+    if (!canvas || !entries || entries.length === 0) return;
+
+    new Chart(canvas.getContext("2d"), {
+      type: "doughnut",
+      data: {
+        labels: entries.map((e) => e.label),
+        datasets: [{
+          data: entries.map((e) => e.amount),
+          backgroundColor: CHART_PALETTE,
+        }],
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { position: "bottom", labels: { boxWidth: 10, font: { size: 10 } } },
+        },
+      },
+    });
+  }
+
   // --------------------------------------------------------------------
   // Init
   // --------------------------------------------------------------------
@@ -630,12 +636,9 @@
   function init() {
     const cfg = window.PALedgerData || {};
 
-    // Each of these is independent: a failure in one (e.g. Chart.js
+    // Each chart render is independent: a failure in one (e.g. Chart.js
     // failed to load from its CDN due to a network block or ad blocker)
-    // must never prevent the others from running. Without this
-    // isolation, an uncaught exception in the chart step would silently
-    // abort the report-date panel fetch below it, since both lived in
-    // one synchronous function.
+    // must never prevent the others from running.
     try {
       if (window.Chart && window.Chart.defaults) {
         window.Chart.defaults.font.family =
@@ -645,22 +648,33 @@
       console.warn("PALedger: Chart.js font default setup failed", err);
     }
 
+    if (!window.Chart) {
+      console.warn("PALedger: Chart.js did not load; charts skipped.");
+      return;
+    }
+
     try {
-      if (window.Chart && cfg.trailing365 && cfg.trailing365Canvas) {
+      if (cfg.trailing365 && cfg.trailing365Canvas) {
         renderTrailing365Chart(cfg.trailing365Canvas, cfg.trailing365);
-      } else if (!window.Chart) {
-        console.warn("PALedger: Chart.js did not load; trailing-365 chart skipped.");
       }
     } catch (err) {
       console.warn("PALedger: trailing-365 chart failed to render", err);
     }
 
-    if (cfg.reportYear && cfg.reportMonth) {
-      // Not wrapped in try/catch: loadReportDatePanel is itself async
-      // and already isolates its own fetch failures (fetchRecords never
-      // throws), so a rejected promise here would only ever come from a
-      // genuine programming error worth seeing in the console.
-      loadReportDatePanel(cfg.reportYear, cfg.reportMonth);
+    try {
+      if (cfg.piePayees && cfg.piePayeesCanvas) {
+        renderPieChart(cfg.piePayeesCanvas, cfg.piePayees);
+      }
+    } catch (err) {
+      console.warn("PALedger: top-payees pie chart failed to render", err);
+    }
+
+    try {
+      if (cfg.pieAccounts && cfg.pieAccountsCanvas) {
+        renderPieChart(cfg.pieAccountsCanvas, cfg.pieAccounts);
+      }
+    } catch (err) {
+      console.warn("PALedger: top-accounts pie chart failed to render", err);
     }
   }
 

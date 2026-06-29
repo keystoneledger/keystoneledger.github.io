@@ -831,3 +831,104 @@ td.pal-empty {
         transition: none;
     }
 }
+
+
+/*
+ * ====================================================================
+ * Additions: Rolling 30 Days, combined info card, current-year pie
+ * charts, ACH/Grant + Common Descriptions sections.
+ * ====================================================================
+*/
+
+/*
+ * ------------------------------------------------------- 4-COLUMN GRID
+ * The existing grid only defined 3/9/12-column helpers (card-col-3,
+ * report-col-9, report-col-12). The 2nd summary row now needs a
+ * 3-across layout (combined card + 2 pie charts) at 1/3 width each.
+*/
+
+.card-col-4 {
+    flex: 0 0 33.3333%;
+    max-width: 33.3333%;
+    padding-right: 8px;
+    padding-left: 8px;
+}
+
+@media (max-width: 900px) {
+    .card-col-4 {
+        flex: 0 0 100%;
+        max-width: 100%;
+    }
+}
+
+/*
+ * ------------------------------------------------------- BLUE AMOUNT
+ * Used for the rolling-30-days total and the "$X through {date}"
+ * subtitle above the trailing-12-month trend chart, per the
+ * "highlight Total Spend in blue, matching" requirement.
+*/
+
+.pal-blue-amount {
+    color: var(--title-text-color);
+    font-weight: 700;
+}
+
+/*
+ * ----------------------------------------------------- ROLLING 30 DAYS
+*/
+
+.pal-rolling-30-table {
+    margin-top: 1rem;
+}
+
+/*
+ * ------------------------------------------------------ STACKED CARD
+ * The combined Grand Total / Total Records / Direct Vendor / ACH /
+ * Unparsed-Date / Data As Of card -- one card, six items stacked
+ * vertically with a light divider between each.
+*/
+
+.pal-stacked-card {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    height: 100%;
+}
+
+.pal-stacked-item {
+    padding: 0.15rem 0;
+}
+
+.pal-stacked-divider {
+    border-top: 1px solid var(--common-border);
+    margin: 0;
+}
+
+/*
+ * --------------------------------------------------------- PIE CARDS
+*/
+
+.pal-pie-card-wrap {
+    position: relative;
+    height: 220px;
+    margin-top: 0.5rem;
+}
+
+.card-pie-payees .card-body,
+.card-pie-accounts .card-body {
+    display: flex;
+    flex-direction: column;
+}
+
+/*
+ * ----------------------------------------------- ACH / DESCRIPTIONS
+ * Both new full-width sections reuse .year-row/.year-title/.pal-table
+ * styling already defined above (same look/feel as Prior Years, per
+ * the requirement), so only the hint paragraph needs its own rule.
+*/
+
+.pal-ach-row .pal-hint,
+.pal-descriptions-row .pal-hint {
+    margin-bottom: 1rem;
+    max-width: 65ch;
+}
