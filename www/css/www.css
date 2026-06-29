@@ -77,18 +77,14 @@ h4 {
     transition: transform .25s cubic-bezier(.215,.61,.355,1),box-shadow .25s cubic-bezier(.215,.61,.355,1);
     transition: transform .25s cubic-bezier(.215,.61,.355,1),box-shadow .25s cubic-bezier(.215,.61,.355,1),-webkit-transform .25s cubic-bezier(.215,.61,.355,1),-webkit-box-shadow .25s cubic-bezier(.215,.61,.355,1);
     padding:  30px;
-
     filter: drop-shadow(0 0.2rem 0.25rem rgba(0, 0, 0, 0.2));
-
     max-width: 90%;
-
     margin-top:  5%;
+    margin-bottom: 5%;
     margin-left: auto;
     margin-right: auto;
     padding-top:  2%;
-
     border-radius:  0.25em;
-
     background-image: url("../img/ux/swatch_ur.png");
     background-position: top right;
     background-repeat: no-repeat;
