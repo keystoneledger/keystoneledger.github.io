@@ -687,25 +687,75 @@
   }
 
   /** Highlights one slice of a previously-rendered pie/doughnut chart,
-   *  called from the legend table row's onmouseenter. Uses Chart.js's
-   *  setActiveElements, which drives the same visual hover state
-   *  (offset/highlight) the chart would show on a real mouseover of that
-   *  slice -- this just triggers it programmatically from the table
-   *  row instead. */
+   *  called from the legend table row's onmouseenter. Sets both the
+   *  active element (which triggers the segment-offset grow effect) AND
+   *  the tooltip's active element (so the tooltip appears over the
+   *  highlighted slice), per Chart.js 4's documented programmatic hover
+   *  API -- setActiveElements alone is not sufficient to show the tooltip;
+   *  chart.tooltip.setActiveElements must also be called. */
   function highlightPieSlice(canvasId, sliceIndex) {
     const chart = pieChartRegistry[canvasId];
     if (!chart) return;
-    chart.setActiveElements([{ datasetIndex: 0, index: sliceIndex }]);
+    const activeEl = [{ datasetIndex: 0, index: sliceIndex }];
+    chart.setActiveElements(activeEl);
+    if (chart.tooltip) {
+      chart.tooltip.setActiveElements(activeEl, { x: 0, y: 0 });
+    }
     chart.update();
   }
 
-  /** Clears any active-element highlight on a chart, called from the
-   *  legend table row's onmouseleave. */
+  /** Clears any active-element highlight and tooltip on a chart, called
+   *  from the legend table row's onmouseleave. */
   function clearPieHighlight(canvasId) {
     const chart = pieChartRegistry[canvasId];
     if (!chart) return;
     chart.setActiveElements([]);
+    if (chart.tooltip) {
+      chart.tooltip.setActiveElements([], { x: 0, y: 0 });
+    }
     chart.update();
+  }
+
+  /** Renders the all-years seasonal radar chart into the combined-info
+   *  card, showing total spend per calendar month (Jan–Dec) summed
+   *  across all years in the dataset. */
+  function renderRadarChart(canvasId, monthlyTotals) {
+    const canvas = document.getElementById(canvasId);
+    if (!canvas || !monthlyTotals || monthlyTotals.length !== 12) return;
+
+    new Chart(canvas.getContext("2d"), {
+      type: "radar",
+      data: {
+        labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun",
+                 "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
+        datasets: [{
+          label: "Spend by month (all years)",
+          data: monthlyTotals,
+          borderColor: "#2f7da0",
+          backgroundColor: "rgba(47,125,160,0.15)",
+          pointBackgroundColor: "#16365b",
+          pointRadius: 4,
+          pointHoverRadius: 6,
+        }],
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { display: false },
+        },
+        scales: {
+          r: {
+            beginAtZero: true,
+            ticks: {
+              callback: (v) => "$" + Number(v).toLocaleString("en-US", { notation: "compact" }),
+              font: { size: 9 },
+            },
+            pointLabels: { font: { size: 11, weight: "600" } },
+          },
+        },
+      },
+    });
   }
 
   // --------------------------------------------------------------------
@@ -824,6 +874,14 @@
         }
       } catch (err) {
         console.warn("PALedger: top-accounts pie chart failed to render", err);
+      }
+
+      try {
+        if (cfg.radarData && cfg.radarCanvas) {
+          renderRadarChart(cfg.radarCanvas, cfg.radarData);
+        }
+      } catch (err) {
+        console.warn("PALedger: radar chart failed to render", err);
       }
     }
 

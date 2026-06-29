@@ -836,6 +836,20 @@ td.pal-empty {
 }
 
 /*
+ * ------------------------------------------------------------ RADAR CHART
+*/
+
+.pal-radar-card {
+    margin-top: 1rem;
+}
+
+.pal-radar-wrap {
+    position: relative;
+    height: 320px;
+    margin-top: 0.5rem;
+}
+
+/*
  * -------------------------------------------------- REDUCED MOTION
 */
 
@@ -974,6 +988,23 @@ td.pal-empty {
 
 .pal-pie-chart-col .label {
     text-align: center;
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--title-text-color);
+    letter-spacing: -0.01em;
+    margin-bottom: 0.25rem;
+}
+
+.pal-pie-legend-row td.pal-link-cell {
+    color: var(--title-text-color);
+    cursor: pointer;
+    text-decoration: none;
+    border-bottom: 1px dashed transparent;
+    transition: border-bottom-color 0.15s ease;
+}
+
+.pal-pie-legend-row:hover td.pal-link-cell {
+    border-bottom-color: var(--title-text-color);
 }
 
 .pal-pie-card-wrap {
@@ -1006,7 +1037,8 @@ td.pal-empty {
 
 .pal-hbar {
     height: 14px;
-    background: linear-gradient(90deg, #2f7da0, #16365b);
+    background-color: #9dddee;
+    border: 1px solid #16365b;
     border-radius: 3px;
     min-width: 2px;
 }

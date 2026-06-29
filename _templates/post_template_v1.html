@@ -146,6 +146,18 @@
 {%- set trailing_12 = all_months | sort -%}
 {%- set trailing_12 = trailing_12 | rejectattr("0", "gt", report_month_key) | list -%}
 {%- set trailing_12 = trailing_12[-12:] -%}
+
+{#- Radar chart: total spend per calendar month (1-12) summed across
+    ALL years in the dataset. Used to show seasonal payment patterns.
+    YYYY-MM keys sort correctly as strings; the month number is the last
+    two characters (positions 5-7 of "YYYY-MM"). -#}
+{%- set radar_months = [0,0,0,0,0,0,0,0,0,0,0,0] -%}
+{%- for year_key, year_data in data.by_year.items() -%}
+    {%- for mk, mval in year_data.months.items() -%}
+        {%- set month_idx = (mk[5:7] | int) - 1 -%}
+        {%- set _ = radar_months.__setitem__(month_idx, radar_months[month_idx] + (mval.amount | float)) -%}
+    {%- endfor -%}
+{%- endfor -%}
 ---
 layout: post
 title: PA Treasury Checkbook -- Daily Report
@@ -314,7 +326,7 @@ tags:
                                                             onmouseleave="PALedger.clearPieHighlight('pal-pie-payees-chart')"
                                                             onclick="PALedger.openName('{{ name | replace("'", "\\'") }}', '{{ months_in_year(data.by_name.get(name, {}).get('months', {}), current_year_key) }}', '{{ current_year_key }}')">
                                                             <td><span class="pal-swatch" style="background-color: {{ chart_palette[loop.index0 % chart_palette|length] }};"></span></td>
-                                                            <td>{{ name }}</td>
+                                                            <td class="pal-link-cell">{{ name }}</td>
                                                             <td class="pal-amount-cell">{{ usd(amt) }}</td>
                                                         </tr>
                                                         {% endfor %}
@@ -346,7 +358,7 @@ tags:
                                                             onmouseleave="PALedger.clearPieHighlight('pal-pie-accounts-chart')"
                                                             onclick="PALedger.openAcct('{{ alt }}', '{{ months_in_year(data.by_acct.get(alt, {}).get('months', {}), current_year_key) }}', '{{ current_year_key }}')">
                                                             <td><span class="pal-swatch" style="background-color: {{ chart_palette[loop.index0 % chart_palette|length] }};"></span></td>
-                                                            <td>{{ alt }}</td>
+                                                            <td class="pal-link-cell">{{ alt }}</td>
                                                             <td class="pal-amount-cell">{{ usd(amt) }}</td>
                                                         </tr>
                                                         {% endfor %}
@@ -371,6 +383,13 @@ tags:
                                         <div class="pal-stacked-item">
                                             <div class="label">Grand Total (All Years)</div>
                                             <div class="value">{{ usd(data.grand_total) }}</div>
+                                        </div>
+                                        <div class="pal-stacked-divider"></div>
+                                        <div class="pal-radar-card">
+                                            <div class="label">Spend by Month (All Years)</div>
+                                            <div class="pal-radar-wrap">
+                                                <canvas id="pal-radar-chart"></canvas>
+                                            </div>
                                         </div>
                                         <div class="pal-stacked-divider"></div>
                                         <div class="pal-stacked-item">
@@ -569,6 +588,7 @@ tags:
                         {%- set _ = description_triples.append((description, entry, entry.amount | float)) -%}
                     {%- endfor -%}
                     {%- set all_descriptions = description_triples | sort(attribute="2", reverse=true) -%}
+                    {%- set desc_max = (all_descriptions | map(attribute="2") | list | max) if all_descriptions else 0 -%}
                     <div class="row year-row pal-descriptions-row" id="common-descriptions">
                         <div class="col-md-12">
                             <div class="year-post">
@@ -578,10 +598,12 @@ tags:
                                         <tr>
                                             <th>Description</th>
                                             <th>Total Spend</th>
+                                            <th class="pal-bar-col">&nbsp;</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         {% for description, entry, _amt in all_descriptions %}
+                                            {%- set bar_pct = (_amt / desc_max * 100) if desc_max > 0 else 0 -%}
                                             <tr class="pal-pager-row">
                                                 <td>
                                                     <span class="pal-link"
@@ -590,6 +612,9 @@ tags:
                                                     </span>
                                                 </td>
                                                 <td class="pal-amount-cell">{{ usd(entry.amount) }}</td>
+                                                <td class="pal-bar-col">
+                                                    <div class="pal-hbar" style="width: {{ "%.1f"|format(bar_pct) }}%;"></div>
+                                                </td>
                                             </tr>
                                         {% endfor %}
                                     </tbody>
@@ -690,6 +715,8 @@ tags:
       {% for alt, amt in current_year_top_accounts %}
         { label: "{{ alt }}", amount: {{ amt }} }{{ "," if not loop.last }}
       {% endfor %}
-    ]
+    ],
+    radarCanvas: "pal-radar-chart",
+    radarData: {{ radar_months | tojson }}
   };
 </script>
