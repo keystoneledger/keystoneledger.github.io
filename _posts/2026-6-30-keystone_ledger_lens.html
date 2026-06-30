@@ -533,7 +533,7 @@ tags:
                                         <div class="pal-stacked-divider"></div>
                                         <div class="pal-stacked-item">
                                             <div class="label">Data As Of</div>
-                                            <div class="value pal-asof">2026-06-30T15:10:35Z</div>
+                                            <div class="value pal-asof">2026-06-30T16:47:31Z</div>
                                         </div>
                                     </div>
                                 </div>
@@ -2280,6 +2280,70 @@ tags:
                         </table>
                     </div>
 
+                    <!-- WIR PAYEE BREAKDOWN -- "WIR Payee" is a wire-
+                         transfer placeholder (like ACH PAYEE) where the
+                         recipient's identity is not published. Unlike
+                         ACH PAYEE, there is no dedicated data.wir_payee
+                         field in L2 -- WIR Payee is just a regular entry
+                         in data.by_name, the same as any other payee in
+                         the sidebar's Top Payees table above. So its
+                         month-keys come straight from
+                         data.by_name['WIR Payee'].months, exactly like
+                         the onclick on any other sidebar payee row, and
+                         PALedger.initWirBreakdown() (dashboard.js) does
+                         ONE fetch of that payee's full record history to
+                         drive all three visuals below: a radar chart
+                         (spend by calendar month, all years -- same
+                         pattern as the "Spend by Month" radar above),
+                         and two pie+legend cards (by description, by
+                         account) stacked vertically, kept inside this
+                         narrow sidebar column rather than the wider
+                         50/50 layout used for the ACH breakdown -- the
+                         legends here use the existing slim 2-column
+                         sidebar-table style (Name/Total, no swatch
+                         column) to match the Top Payees/Top Accounts
+                         tables immediately above. --><div class="sidebar-table pal-wir-card">
+                        <div class="label">WIR Payees</div>
+                        <p class="pal-hint">Special wire transfers where the recipient's identity is not published.</p>
+
+                        <div class="pal-radar-card">
+                            <div class="label">Spend by Month (All Years)</div>
+                            <div class="pal-radar-wrap">
+                                <canvas id="pal-wir-radar-chart"></canvas>
+                            </div>
+                        </div>
+
+                        <div class="pal-wir-pie-block">
+                            <div class="label">By Description (All Years)</div>
+                            <div class="pal-pie-card-wrap">
+                                <canvas id="pal-wir-description-chart"></canvas>
+                            </div>
+                            <table class="table table-hover pal-table" id="pal-wir-description-legend">
+                                <thead>
+                                    <tr><th>Description</th><th>Total</th></tr>
+                                </thead>
+                                <tbody>
+                                    <tr><td colspan="2" class="pal-empty">Loading&hellip;</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="pal-wir-pie-block">
+                            <div class="label">By Account (All Years)</div>
+                            <div class="pal-pie-card-wrap">
+                                <canvas id="pal-wir-account-chart"></canvas>
+                            </div>
+                            <table class="table table-hover pal-table" id="pal-wir-account-legend">
+                                <thead>
+                                    <tr><th>Account</th><th>Total</th></tr>
+                                </thead>
+                                <tbody>
+                                    <tr><td colspan="2" class="pal-empty">Loading&hellip;</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
                 </div>
                 <!-- END SIDEBAR CONTENT 33% WIDE -->
 
@@ -2382,6 +2446,7 @@ tags:
     radarCanvas: "pal-radar-chart",
     radarData: [2968221361.73, 2426208736.88, 5031612717.78, 1773558753.02, 1837563146.07, 2842354536.5899997, 2923420244.77, 1914610243.83, 1847915184.05, 1039459094.56, 2089990494.84, 2645015899.55],
     achMonthKeys: "2019-10,2019-11,2019-12,2020-01,2020-02,2020-03,2020-04,2020-05,2020-06,2020-07,2020-09,2020-10,2020-11,2020-12,2021-01,2021-02,2021-03,2021-04,2021-05,2021-06,2021-07,2021-08,2021-09,2021-10,2021-11,2021-12,2022-01,2022-02,2022-03,2022-04,2022-05,2022-06,2022-07,2022-08,2022-10,2022-11,2022-12,2023-01,2023-02,2023-03,2023-04,2023-05,2023-06,2023-07,2023-08,2023-09,2023-10,2023-11,2023-12,2024-01,2024-02,2024-03,2024-04,2024-05,2024-06,2024-07,2024-08,2024-09,2024-10,2024-11,2024-12,2025-01,2025-02,2025-03,2025-04,2025-05,2025-06,2025-07,2025-08,2025-09,2025-10,2025-11,2025-12,2026-01,2026-02,2026-03,2026-04,2026-05,2026-06",
+    wirMonthKeys: "",
     timelineCanvas: "pal-timeline-chart",
     timelineBarCanvas: "pal-timeline-bar-chart",
     timelineData: [
