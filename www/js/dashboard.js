@@ -174,18 +174,23 @@
     const modal = ensureModal();
     modal.querySelector("#pal-modal-title").textContent = title;
 
-    // Always restore the chart wrap and clear any README content that a
-    // previous openReadme() call may have left behind. This must happen
-    // here -- at the start of every modal open -- rather than at close
-    // time, because close-event listeners fire asynchronously relative
-    // to the next openX() call and can't guarantee clean state in time.
+    // Always restore the chart wrap and table/pagination, and clear any
+    // README content that a previous openReadme() call may have injected.
+    // This must happen here -- at the start of every modal open -- so the
+    // next drill-down always finds a clean, fully-visible modal structure.
     const chartWrap = modal.querySelector(".pal-modal-chart-wrap");
     if (chartWrap) chartWrap.style.display = "";
 
+    const tableEl = modal.querySelector("#pal-modal-table");
+    if (tableEl) tableEl.style.display = "";
+
+    const paginationEl = modal.querySelector("#pal-modal-pagination");
+    if (paginationEl) paginationEl.style.display = "";
+
     const tableWrap = modal.querySelector(".pal-modal-table-wrap");
     if (tableWrap) {
-      const readmeBody = tableWrap.querySelector(".pal-readme-body, .pal-readme-loading, .pal-readme-error");
-      if (readmeBody) readmeBody.remove();
+      const readmeContent = tableWrap.querySelector(".pal-readme-body, .pal-readme-loading, .pal-readme-error");
+      if (readmeContent) readmeContent.remove();
     }
 
     modal.classList.add("pal-open");
@@ -879,16 +884,30 @@
   async function openReadme() {
     openModal("About This Data");
 
-    // Hide the chart canvas -- this modal is a document, not a chart.
+    // Hide the chart canvas and the existing table/pagination -- this
+    // modal shows a document, not a data table. Crucially, we HIDE them
+    // rather than remove or replace them: openModal() above already
+    // cleared any previous README content, so the table and pagination
+    // elements are clean and just need to be out of sight while the
+    // README is showing. They'll be un-hidden by openModal() the next
+    // time any drill-down is opened.
     const chartWrap = document.querySelector("#pal-modal .pal-modal-chart-wrap");
     if (chartWrap) chartWrap.style.display = "none";
 
-    // Replace the table area with a loading indicator, then the content.
+    const tableEl = document.getElementById("pal-modal-table");
+    const paginationEl = document.getElementById("pal-modal-pagination");
+    if (tableEl) tableEl.style.display = "none";
+    if (paginationEl) paginationEl.style.display = "none";
+
     const tableWrap = document.querySelector("#pal-modal .pal-modal-table-wrap");
     if (!tableWrap) return;
 
-    tableWrap.innerHTML =
-      '<p class="pal-readme-loading">Loading\u2026</p>';
+    // Inject a README container div ALONGSIDE the existing table/pagination
+    // (not replacing them). openModal() removes this div on the next open.
+    const readmeEl = document.createElement("div");
+    readmeEl.className = "pal-readme-loading";
+    readmeEl.textContent = "Loading\u2026";
+    tableWrap.appendChild(readmeEl);
 
     let markdown, markedLib;
     try {
@@ -900,26 +919,23 @@
         loadMarked(),
       ]);
     } catch (err) {
-      tableWrap.innerHTML =
-        `<p class="pal-readme-error">Could not load the README: ${err.message}. ` +
+      readmeEl.className = "pal-readme-error";
+      readmeEl.innerHTML =
+        `Could not load the README: ${err.message}. ` +
         `<a href="${README_URL.replace("raw.githubusercontent.com", "github.com").replace("/main/", "/blob/main/")}" ` +
-        `target="_blank" rel="noopener">Open on GitHub instead.</a></p>`;
+        `target="_blank" rel="noopener">Open on GitHub instead.</a>`;
       return;
     }
 
-    // marked.js 9.x uses marked.parse(); earlier versions used marked()
-    // directly. Support both so this works regardless of which version
-    // the CDN happens to return.
     const html =
       typeof markedLib.parse === "function"
         ? markedLib.parse(markdown)
         : markedLib(markdown);
 
-    tableWrap.innerHTML = `<div class="pal-readme-body">${html}</div>`;
+    readmeEl.className = "pal-readme-body";
+    readmeEl.innerHTML = html;
 
-    // Make any links inside the rendered README open in a new tab,
-    // so the reader doesn't accidentally navigate away from the dashboard.
-    tableWrap.querySelectorAll("a").forEach((a) => {
+    readmeEl.querySelectorAll("a").forEach((a) => {
       a.setAttribute("target", "_blank");
       a.setAttribute("rel", "noopener");
     });
