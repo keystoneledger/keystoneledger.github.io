@@ -884,6 +884,24 @@ td.pal-empty {
     margin-top: 0.5rem;
 }
 
+/* The mobile horizontal-bar version of the timeline scrolls vertically
+   rather than compressing every month into limited width -- a fixed
+   container height with overflow-y:auto, tall enough to show several
+   months at once without being unusably short. Hidden by default;
+   .pal-timeline-mobile-only flips this on below the breakpoint (see
+   the mobile section near the end of this file), and
+   .pal-timeline-desktop-only does the reverse for the line chart. */
+.pal-timeline-bar-wrap {
+    position: relative;
+    height: 480px;
+    overflow-y: auto;
+    margin-top: 0.5rem;
+}
+
+.pal-timeline-mobile-only {
+    display: none;
+}
+
 /*
  * -------------------------------------------------- REDUCED MOTION
 */
@@ -1323,5 +1341,62 @@ td.pal-empty {
        clicking an account code) -- so it's the one hidden here. */
     .pal-col-category {
         display: none;
+    }
+
+    /* Mobile text was inheriting the browser's default text color
+       rather than this site's intended --primary-text-color (#111827,
+       defined at the top of this file but never actually applied
+       anywhere, including on desktop) -- on phones in particular this
+       rendered noticeably lighter/harder to read, in both data tables
+       and the README modal. Scoped to mobile only, per the request, to
+       avoid an unrequested desktop appearance change. */
+    body {
+        color: var(--primary-text-color);
+    }
+
+    /* .wrapper (max-width:90% + 30px padding), .container.main (1rem
+       padding), and .card (width:95%) each shave usable width off the
+       page independently -- on a 375-430px phone those three
+       restrictions compound into roughly 64% of the actual screen
+       width being usable, which is why cards look cramped. Loosen each
+       layer specifically on mobile: wrapper goes nearly edge-to-edge
+       with much smaller padding, and cards go to the full width of
+       their (now wider) column. */
+    .wrapper {
+        max-width: 100%;
+        padding: 12px;
+        padding-top: 12px;
+    }
+
+    .container.main {
+        padding: 1rem 0.25rem;
+    }
+
+    .card {
+        width: 100%;
+    }
+
+    /* .header .top-right p is float:right/text-align:right, sized for
+       a desktop two-column header layout -- on mobile this leaves the
+       text pinned to one edge rather than centered, which is the
+       requested fix. */
+    .header .top-right p {
+        float: none;
+        text-align: center;
+        width: 100%;
+    }
+
+    /* Swap which timeline chart is visible: the line-chart canvas
+       (desktop/tablet) hides, the horizontal-bar canvas (mobile) shows.
+       Both canvases exist in the DOM at all times -- dashboard.js
+       decides which one to actually render into via matchMedia, so the
+       hidden one never gets a Chart.js instance created for it at all,
+       not just hidden after the fact. */
+    .pal-timeline-desktop-only {
+        display: none;
+    }
+
+    .pal-timeline-mobile-only {
+        display: block;
     }
 }

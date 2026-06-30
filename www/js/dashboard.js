@@ -498,7 +498,14 @@
         responsive: true,
         maintainAspectRatio: false,
         plugins: {
-          legend: { position: "right", labels: { boxWidth: 12, font: { size: 11 } } },
+          // On a narrow phone, a right-side legend competing for
+          // horizontal space with the pie itself makes both unreadably
+          // small inside the modal's fixed-height chart wrap -- bottom
+          // placement lets the pie use the full available width and
+          // the legend wrap onto its own line(s) underneath instead.
+          legend: window.matchMedia("(max-width: 430px)").matches
+            ? { position: "bottom", labels: { boxWidth: 10, font: { size: 10 } } }
+            : { position: "right", labels: { boxWidth: 12, font: { size: 11 } } },
           title: { display: true, text: "Top payees this month", font: { size: 13, weight: "600" } },
         },
       },
@@ -813,6 +820,77 @@
     });
   }
 
+  /** Mobile-only horizontal-bar version of the all-history timeline.
+   *  Same data as renderTimelineChart, but as one horizontal bar per
+   *  month rather than a compressed line -- avoids cramming 50+ months
+   *  into a phone's limited width by instead growing DOWNWARD (one row
+   *  per month) inside a fixed-height, vertically-scrollable container
+   *  (.pal-timeline-bar-wrap, overflow-y:auto in CSS).
+   *
+   *  Chart.js's `maintainAspectRatio: false` only controls how the
+   *  chart fills ITS canvas -- it doesn't make a short container scroll
+   *  to fit more bars. To get genuinely readable per-month bars (not
+   *  squished into a fixed 480px regardless of month count), the
+   *  canvas's own pixel height is set explicitly here, proportional to
+   *  the number of months, and the canvas is allowed to be taller than
+   *  its scroll-container -- that's what makes the container scroll. */
+  function renderTimelineBarChart(canvasId, series) {
+    const canvas = document.getElementById(canvasId);
+    if (!canvas || !series || series.length === 0) return;
+
+    const labels = series.map((p) => p.month);
+    const values = series.map((p) => p.amount);
+
+    // ~28px per bar is comfortable for a month label + bar at mobile
+    // font sizes; below ~10 months just fill the visible container
+    // height instead of leaving a tiny chart.
+    const pxPerBar = 28;
+    canvas.style.height = Math.max(480, labels.length * pxPerBar) + "px";
+
+    new Chart(canvas.getContext("2d"), {
+      type: "bar",
+      data: {
+        labels,
+        datasets: [{
+          label: "Monthly spend",
+          data: values,
+          backgroundColor: "#9dddee",
+          borderColor: "#16365b",
+          borderWidth: 1,
+        }],
+      },
+      options: {
+        indexAxis: "y",
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            callbacks: {
+              label: (ctx) => " $" + Number(ctx.parsed.x).toLocaleString("en-US", {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2,
+              }),
+            },
+          },
+        },
+        scales: {
+          x: {
+            beginAtZero: true,
+            ticks: {
+              callback: (v) => "$" + Number(v).toLocaleString("en-US", { notation: "compact" }),
+              font: { size: 9 },
+            },
+          },
+          y: {
+            ticks: { font: { size: 10 } },
+            grid: { display: false },
+          },
+        },
+      },
+    });
+  }
+
   /** Renders the all-years seasonal radar chart into the combined-info
    *  card, showing total spend per calendar month (Jan–Dec) summed
    *  across all years in the dataset. */
@@ -1074,8 +1152,20 @@
       }
 
       try {
-        if (cfg.timelineData && cfg.timelineCanvas) {
-          renderTimelineChart(cfg.timelineCanvas, cfg.timelineData);
+        if (cfg.timelineData) {
+          // Matches the CSS breakpoint that swaps .pal-timeline-desktop-only
+          // / .pal-timeline-mobile-only visibility (max-width: 430px) --
+          // both must agree, or the visible canvas could end up with no
+          // chart rendered into it. Checked once at load time rather than
+          // on resize, since orientation/window changes mid-session are
+          // an edge case not worth the complexity of tearing down and
+          // rebuilding a Chart.js instance.
+          const isMobileWidth = window.matchMedia("(max-width: 430px)").matches;
+          if (isMobileWidth && cfg.timelineBarCanvas) {
+            renderTimelineBarChart(cfg.timelineBarCanvas, cfg.timelineData);
+          } else if (cfg.timelineCanvas) {
+            renderTimelineChart(cfg.timelineCanvas, cfg.timelineData);
+          }
         }
       } catch (err) {
         console.warn("PALedger: timeline chart failed to render", err);

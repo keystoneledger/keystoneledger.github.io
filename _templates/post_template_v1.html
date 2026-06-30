@@ -276,8 +276,23 @@ tags:
                             <div class="card pal-card-full-width pal-timeline-card">
                                 <div class="card-body">
                                     <div class="label">Monthly Spend &mdash; All Years</div>
-                                    <div class="pal-timeline-wrap">
+                                    <!-- Desktop/tablet: line chart, full history compressed
+                                         horizontally with every-4th-month labels. On a phone
+                                         that compression makes 50+ months unreadable even
+                                         angled, so a second canvas renders the same data as a
+                                         horizontal bar chart instead (one row per month, the
+                                         chart container scrolls vertically) -- shown only
+                                         below the mobile breakpoint via .pal-timeline-mobile-only
+                                         / .pal-timeline-desktop-only (see www.css). Both
+                                         canvases are fed the same timelineData; dashboard.js
+                                         decides which one to actually render based on
+                                         window.matchMedia at load time, so only one Chart.js
+                                         instance is ever created. -->
+                                    <div class="pal-timeline-wrap pal-timeline-desktop-only">
                                         <canvas id="pal-timeline-chart"></canvas>
+                                    </div>
+                                    <div class="pal-timeline-bar-wrap pal-timeline-mobile-only">
+                                        <canvas id="pal-timeline-bar-chart"></canvas>
                                     </div>
                                 </div>
                             </div>
@@ -726,6 +741,7 @@ tags:
     radarCanvas: "pal-radar-chart",
     radarData: {{ radar_months | tojson }},
     timelineCanvas: "pal-timeline-chart",
+    timelineBarCanvas: "pal-timeline-bar-chart",
     timelineData: [
       {%- set full_timeline = all_months | rejectattr("0", "gt", report_month_key) | list -%}
       {% for mk, amt in full_timeline %}
