@@ -1235,6 +1235,31 @@ td.pal-empty {
 }
 
 /*
+ * ------------------------------------------------------------ WIR CARD
+ * The sidebar WIR Payee card stacks three visuals vertically (radar,
+ * then two pie+legend blocks) inside the narrow ~25%-width sidebar
+ * column, per the requirement that it stay within that column rather
+ * than spanning the full row like the ACH breakdown cards.
+*/
+
+.pal-wir-card {
+    text-align: left;
+}
+
+.pal-wir-card .pal-hint {
+    margin-top: 0.25rem;
+    margin-bottom: 0.75rem;
+}
+
+.pal-wir-pie-block {
+    margin-top: 1.5rem;
+}
+
+.pal-wir-pie-block .label {
+    margin-bottom: 0.25rem;
+}
+
+/*
  * ====================================================================
  * MOBILE BREAKPOINTS -- intentionally placed at the very end of this
  * file. Several of the rules below (.pal-pie-card-wrap, .pal-radar-wrap,

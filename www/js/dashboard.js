@@ -437,6 +437,23 @@
     return [...totals.entries()].sort((a, b) => (a[0] < b[0] ? -1 : 1));
   }
 
+  /** Sum amounts per CALENDAR month (Jan=0..Dec=11), summed across ALL
+   *  years present in `records` -- the client-side equivalent of the
+   *  Jinja radar_months computation used for the page's main "Spend by
+   *  Month (All Years)" radar, needed here because there's no
+   *  pre-aggregated L2 field for WIR Payee the way there is for
+   *  ach_payee; this works from the same raw records already fetched
+   *  to build the WIR pie charts. */
+  function sumByCalendarMonth(records) {
+    const totals = new Array(12).fill(0);
+    records.forEach((r) => {
+      const d = parseRecordDate(r);
+      if (!d) return;
+      totals[d.getMonth()] += parseAmount(r.gross);
+    });
+    return totals;
+  }
+
   const CHART_PALETTE = [
     "#2f7da0", "#16365b", "#9dddee", "#fa1b3e", "#5b9279",
     "#c98a3e", "#7a6ba0", "#3e8e7e", "#a85b7a", "#6b8e23",
@@ -873,6 +890,135 @@
       (label) => openAchBreakdownDetail("description", label));
     renderAchLegendRows(acctTbody, byAccount, "pal-pie-ach-account-chart",
       (label) => openAchBreakdownDetail("alt", label));
+  }
+
+  // --------------------------------------------------------------------
+  // WIR Payee breakdown -- sidebar card with a radar (spend by calendar
+  // month, all years) + two pie+legend cards (by description, by
+  // account), all driven by one fetch. "WIR Payee" has no dedicated L2
+  // field the way ACH PAYEE does (data.ach_payee) -- it's just a
+  // regular entry in data.by_name, so its month-keys come from there
+  // via the template, the same way any other sidebar payee's
+  // drill-down gets its month list.
+  // --------------------------------------------------------------------
+
+  let wirRecordsCache = null;
+
+  /** Builds the <tbody> rows for a SLIM 2-column legend (Name, Total --
+   *  no swatch column), matching the existing sidebar-table style used
+   *  by Top Payees/Top Accounts immediately above this card, per the
+   *  requirement that the WIR card's legends "match the slim 2-column
+   *  table design" rather than the wider swatch+name+amount style used
+   *  by the ACH breakdown cards. Hover-highlight/click still work
+   *  identically -- they only need the row's index into `entries` to
+   *  map back to the correct pie slice, not a visible swatch. */
+  function renderSlimLegendRows(tbodyEl, entries, canvasId, onRowClick, emptyLabel) {
+    tbodyEl.innerHTML = "";
+    if (entries.length === 0) {
+      const tr = document.createElement("tr");
+      tr.innerHTML = `<td colspan="2" class="pal-empty">${emptyLabel}</td>`;
+      tbodyEl.appendChild(tr);
+      return;
+    }
+
+    entries.forEach(([label, amount], index) => {
+      const tr = document.createElement("tr");
+
+      const labelTd = document.createElement("td");
+      const link = document.createElement("span");
+      link.className = "pal-link";
+      link.textContent = label;
+      labelTd.appendChild(link);
+
+      const amountTd = document.createElement("td");
+      amountTd.className = "pal-amount-cell";
+      amountTd.textContent = formatAmount(amount);
+
+      tr.appendChild(labelTd);
+      tr.appendChild(amountTd);
+
+      tr.addEventListener("mouseenter", () => highlightPieSlice(canvasId, index));
+      tr.addEventListener("mouseleave", () => clearPieHighlight(canvasId));
+      tr.addEventListener("click", () => onRowClick(label));
+
+      tbodyEl.appendChild(tr);
+    });
+  }
+
+  /** Drill-down for a WIR legend-row click -- filters the already-
+   *  fetched wirRecordsCache in memory, exactly mirroring
+   *  openAchBreakdownDetail(); no second fetch. */
+  function openWirBreakdownDetail(filterField, filterValue) {
+    const title = filterField === "description"
+      ? `${filterValue} (WIR only)`
+      : `Account ${filterValue} (WIR only)`;
+    openModal(title);
+
+    const records = (wirRecordsCache || []).filter((r) => {
+      if (filterField === "description") return (r.description || "").trim() === filterValue;
+      return (r.alt || "") === filterValue;
+    });
+
+    const series = sumByYearMonth(records);
+    setModalChart({
+      type: "line",
+      data: {
+        labels: series.map(([k]) => k),
+        datasets: [{
+          label: `${title} -- spend over time`,
+          data: series.map(([, v]) => v),
+          borderColor: "#7a6ba0",
+          backgroundColor: "rgba(122,107,160,0.08)",
+          fill: true,
+          tension: 0.25,
+          pointRadius: 3,
+        }],
+      },
+      options: baseChartOptions("Spend over time"),
+    });
+
+    renderTable(records, standardColumns());
+  }
+
+  /** WIR Payee equivalent of initAchBreakdown() -- one fetch of WIR
+   *  Payee's full record history, then builds three visuals from that
+   *  single fetch: a calendar-month radar (seasonal pattern, all
+   *  years) and two pie+legend cards (by description, by account)
+   *  using the slim 2-column legend style. */
+  async function initWirBreakdown(monthKeysCsv) {
+    const descTbody = document.querySelector("#pal-wir-description-legend tbody");
+    const acctTbody = document.querySelector("#pal-wir-account-legend tbody");
+    if (!descTbody || !acctTbody) return;
+
+    const monthKeys = (monthKeysCsv || "").split(",").filter(Boolean);
+    if (monthKeys.length === 0) {
+      // No WIR Payee activity in this dataset at all -- show empty
+      // states rather than leaving "Loading..." displayed forever.
+      renderSlimLegendRows(descTbody, [], "pal-wir-description-chart", () => {}, "No WIR Payee records found.");
+      renderSlimLegendRows(acctTbody, [], "pal-wir-account-chart", () => {}, "No WIR Payee records found.");
+      return;
+    }
+
+    const basePath = `${DATA_ROOT}/BY_NAME/${sanitizeForPath("WIR Payee")}`;
+    const records = await fetchAllMonths(basePath, monthKeys);
+    wirRecordsCache = records;
+
+    if (window.Chart) {
+      renderRadarChart("pal-wir-radar-chart", sumByCalendarMonth(records));
+    }
+
+    const byDescription = sumByKey(records, (r) => (r.description || "Unknown").trim(), 20);
+    const byAccount = sumByKey(records, (r) => r.alt || "Unknown", 20);
+
+    if (window.Chart) {
+      renderPieChart("pal-wir-description-chart", byDescription.map(([label, amount]) => ({ label, amount })));
+      renderPieChart("pal-wir-account-chart", byAccount.map(([label, amount]) => ({ label, amount })));
+    }
+
+    renderSlimLegendRows(descTbody, byDescription, "pal-wir-description-chart",
+      (label) => openWirBreakdownDetail("description", label), "No WIR Payee records found.");
+    renderSlimLegendRows(acctTbody, byAccount, "pal-wir-account-chart",
+      (label) => openWirBreakdownDetail("alt", label), "No WIR Payee records found.");
   }
 
   /** Renders the all-history monthly timeline -- a line chart spanning
@@ -1315,6 +1461,17 @@
       console.warn("PALedger: ACH breakdown failed to initialize", err);
     }
 
+    // Same reasoning as initAchBreakdown above -- legends/click-through
+    // work without Chart.js, only the charts themselves are skipped.
+    // monthKeysCsv may legitimately be an empty string if this dataset
+    // has no WIR Payee activity at all -- initWirBreakdown() handles
+    // that by rendering empty-state legends rather than erroring.
+    try {
+      initWirBreakdown(cfg.wirMonthKeys);
+    } catch (err) {
+      console.warn("PALedger: WIR breakdown failed to initialize", err);
+    }
+
     // Independent of Chart.js entirely -- the descriptions pager is
     // plain DOM show/hide, so it must run regardless of whether Chart.js
     // loaded. Previously this whole block sat after an `if (!window.Chart)
@@ -1341,5 +1498,6 @@
     clearPieHighlight,
     openReadme,
     initAchBreakdown,
+    initWirBreakdown,
   };
 })();
