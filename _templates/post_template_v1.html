@@ -260,25 +260,29 @@ tags:
 
 
             <!-- ================================================== -->
-            <!-- TOP SUMMARY: row kept as a placeholder. The "Year   -->
-            <!-- over Year" card was removed per request; the column -->
-            <!-- is left empty (no card) rather than deleting the    -->
-            <!-- row, so this slot is easy to refill later.          -->
+            <!-- ALL-HISTORY MONTHLY TIMELINE -- full-width line chart   -->
+            <!-- covering every month from the start of the dataset to   -->
+            <!-- the current report month, with every 4th month labeled. -->
             <!-- ================================================== -->
             <div class="row report-row">
                 <div class="col-md-12 report-col-12">
-                    <div class="container kpi-row">
+                    <div class="container kpi-row pal-kpi-timeline-row">
                         <div class="row card-row">
-
-                            <div class="col-md-3 card-col-3">
-                                <!-- intentionally empty -->
+                            <div class="col-md-12">
+                                <div class="card pal-card-full-width pal-timeline-card">
+                                    <div class="card-body">
+                                        <div class="label">Monthly Spend &mdash; All Years</div>
+                                        <div class="pal-timeline-wrap">
+                                            <canvas id="pal-timeline-chart"></canvas>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
-
                         </div>
                     </div>
                 </div>
             </div>
-            <!-- END TOP SUMMARY -->
+            <!-- END ALL-HISTORY MONTHLY TIMELINE -->
 
 
             <!-- ================================================== -->
@@ -317,7 +321,7 @@ tags:
                                             <div class="col-md-6 pal-pie-legend-col">
                                                 <table class="pal-table pal-pie-legend-table">
                                                     <thead>
-                                                        <tr><th></th><th>Payee</th><th>Total</th></tr>
+                                                        <tr><th></th><th>Payee</th><th>{{ report_year }} Total</th></tr>
                                                     </thead>
                                                     <tbody>
                                                         {% for name, amt in current_year_top_payees %}
@@ -349,7 +353,7 @@ tags:
                                             <div class="col-md-6 pal-pie-legend-col">
                                                 <table class="pal-table pal-pie-legend-table">
                                                     <thead>
-                                                        <tr><th></th><th>Account</th><th>Total</th></tr>
+                                                        <tr><th></th><th>Account</th><th>{{ report_year }} Total</th></tr>
                                                     </thead>
                                                     <tbody>
                                                         {% for alt, amt in current_year_top_accounts %}
@@ -717,6 +721,13 @@ tags:
       {% endfor %}
     ],
     radarCanvas: "pal-radar-chart",
-    radarData: {{ radar_months | tojson }}
+    radarData: {{ radar_months | tojson }},
+    timelineCanvas: "pal-timeline-chart",
+    timelineData: [
+      {%- set full_timeline = all_months | rejectattr("0", "gt", report_month_key) | list -%}
+      {% for mk, amt in full_timeline %}
+        { month: "{{ mk }}", amount: {{ amt }} }{{ "," if not loop.last }}
+      {% endfor %}
+    ]
   };
 </script>

@@ -736,6 +736,74 @@
     chart.update();
   }
 
+  /** Renders the all-history monthly timeline -- a line chart spanning
+   *  every month from the start of the dataset to the report date,
+   *  with every 4th month labeled on the x-axis to keep the chart
+   *  readable across potentially 50+ months of history. Labels start
+   *  from the first month (index 0) so they land on consistent
+   *  quarters regardless of where the dataset begins. */
+  function renderTimelineChart(canvasId, series) {
+    const canvas = document.getElementById(canvasId);
+    if (!canvas || !series || series.length === 0) return;
+
+    const labels = series.map((p) => p.month);
+    const values = series.map((p) => p.amount);
+
+    new Chart(canvas.getContext("2d"), {
+      type: "line",
+      data: {
+        labels,
+        datasets: [{
+          label: "Monthly spend",
+          data: values,
+          borderColor: "#2f7da0",
+          backgroundColor: "rgba(47,125,160,0.07)",
+          fill: true,
+          tension: 0.3,
+          pointRadius: 0,
+          pointHoverRadius: 5,
+          borderWidth: 2,
+        }],
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            callbacks: {
+              label: (ctx) => " $" + Number(ctx.parsed.y).toLocaleString("en-US", {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2,
+              }),
+            },
+          },
+        },
+        scales: {
+          x: {
+            ticks: {
+              // Show every 4th label starting from index 0, hide the rest.
+              // maxRotation/minRotation keep labels horizontal.
+              maxRotation: 0,
+              minRotation: 0,
+              callback: function(val, index) {
+                return index % 4 === 0 ? this.getLabelForValue(val) : null;
+              },
+              autoSkip: false,
+            },
+            grid: { display: false },
+          },
+          y: {
+            beginAtZero: true,
+            ticks: {
+              callback: (v) => "$" + Number(v).toLocaleString("en-US", { notation: "compact" }),
+            },
+          },
+        },
+      },
+    });
+  }
+
   /** Renders the all-years seasonal radar chart into the combined-info
    *  card, showing total spend per calendar month (Jan–Dec) summed
    *  across all years in the dataset. */
@@ -994,6 +1062,14 @@
         }
       } catch (err) {
         console.warn("PALedger: radar chart failed to render", err);
+      }
+
+      try {
+        if (cfg.timelineData && cfg.timelineCanvas) {
+          renderTimelineChart(cfg.timelineCanvas, cfg.timelineData);
+        }
+      } catch (err) {
+        console.warn("PALedger: timeline chart failed to render", err);
       }
     }
 

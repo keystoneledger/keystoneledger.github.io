@@ -867,6 +867,21 @@ td.pal-empty {
     margin-top: 0.5rem;
 }
 
+.pal-kpi-timeline-row {
+    min-height: 0;
+}
+
+.pal-timeline-card {
+    width: 100%;
+    padding: 0.75rem 1rem 0.5rem;
+}
+
+.pal-timeline-wrap {
+    position: relative;
+    height: 200px;
+    margin-top: 0.5rem;
+}
+
 /*
  * -------------------------------------------------- REDUCED MOTION
 */
