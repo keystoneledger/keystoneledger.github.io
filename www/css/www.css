@@ -922,16 +922,23 @@ td.pal-empty {
 */
 
 /*
- * ------------------------------------------------------- 4 & 8 COLUMN GRID
+ * ------------------------------------------------------- 4, 6 & 8 COLUMN GRID
  * The existing grid only defined 3/9/12-column helpers (card-col-3,
- * report-col-9, report-col-12). The 2nd summary row now needs a
- * 66%/33% split: card-col-8 (pie charts, stacked) + card-col-4
- * (combined info card).
+ * report-col-9, report-col-12). The 2nd summary row needs a 66%/33%
+ * split (card-col-8 + card-col-4); the new ACH-by-description/
+ * ACH-by-account pie cards need an even 50/50 split (card-col-6).
 */
 
 .card-col-4 {
     flex: 0 0 33.3333%;
     max-width: 33.3333%;
+    padding-right: 8px;
+    padding-left: 8px;
+}
+
+.card-col-6 {
+    flex: 0 0 50%;
+    max-width: 50%;
     padding-right: 8px;
     padding-left: 8px;
 }
@@ -945,6 +952,7 @@ td.pal-empty {
 
 @media (max-width: 900px) {
     .card-col-4,
+    .card-col-6,
     .card-col-8 {
         flex: 0 0 100%;
         max-width: 100%;

@@ -745,6 +745,136 @@
     chart.update();
   }
 
+  // --------------------------------------------------------------------
+  // ACH/Grant breakdown by description and by account -- two pie+legend
+  // cards below the "ACH / Grant Disbursements by Year" table.
+  //
+  // Unlike the Top Payees/Top Accounts pie cards (server-rendered by
+  // the Jinja template from L2 summary data), this breakdown needs raw
+  // per-record description/alt fields that only exist in L1's
+  // BY_NAME/ACH_PAYEE/*.json files -- L2's ach_payee only has totals by
+  // month. So this fetches ACH PAYEE's full history ONCE on page load,
+  // computes both top-20 rankings client-side, and keeps the raw
+  // records array in memory afterward so a legend-row click can filter
+  // it directly for the drill-down modal -- no second fetch needed.
+  // --------------------------------------------------------------------
+
+  let achRecordsCache = null;
+
+  /** Builds the <tbody> rows for one ACH legend table: swatch, name
+   *  (clickable, wired for hover-highlight), amount. Mirrors the
+   *  server-rendered legend markup in the template (Top Payees/Top
+   *  Accounts pie cards) but built in JS since this data isn't
+   *  available to Jinja at render time. */
+  function renderAchLegendRows(tbodyEl, entries, canvasId, onRowClick) {
+    tbodyEl.innerHTML = "";
+    if (entries.length === 0) {
+      const tr = document.createElement("tr");
+      tr.innerHTML = '<td colspan="3" class="pal-empty">No ACH/Grant records found.</td>';
+      tbodyEl.appendChild(tr);
+      return;
+    }
+
+    entries.forEach(([label, amount], index) => {
+      const tr = document.createElement("tr");
+      tr.className = "pal-pie-legend-row";
+
+      const swatchTd = document.createElement("td");
+      const swatch = document.createElement("span");
+      swatch.className = "pal-swatch";
+      swatch.style.backgroundColor = CHART_PALETTE[index % CHART_PALETTE.length];
+      swatchTd.appendChild(swatch);
+
+      const labelTd = document.createElement("td");
+      labelTd.className = "pal-link-cell";
+      labelTd.textContent = label;
+
+      const amountTd = document.createElement("td");
+      amountTd.className = "pal-amount-cell";
+      amountTd.textContent = formatAmount(amount);
+
+      tr.appendChild(swatchTd);
+      tr.appendChild(labelTd);
+      tr.appendChild(amountTd);
+
+      tr.addEventListener("mouseenter", () => highlightPieSlice(canvasId, index));
+      tr.addEventListener("mouseleave", () => clearPieHighlight(canvasId));
+      tr.addEventListener("click", () => onRowClick(label));
+
+      tbodyEl.appendChild(tr);
+    });
+  }
+
+  /** Opens the drill-down modal for one description or account WITHIN
+   *  the already-fetched ACH PAYEE record set -- filters the in-memory
+   *  array rather than fetching again, per the requirement that this
+   *  view reuse data already pulled to build the pie charts. This is
+   *  deliberately narrower than openDescription()/openAcct() (which
+   *  show that description/account across ALL payees): this view is
+   *  ACH-only, matching what the pie chart itself represents. */
+  function openAchBreakdownDetail(filterField, filterValue) {
+    const title = filterField === "description"
+      ? `${filterValue} (ACH/Grant only)`
+      : `Account ${filterValue} (ACH/Grant only)`;
+    openModal(title);
+
+    const records = (achRecordsCache || []).filter((r) => {
+      if (filterField === "description") return (r.description || "").trim() === filterValue;
+      return (r.alt || "") === filterValue;
+    });
+
+    const series = sumByYearMonth(records);
+    setModalChart({
+      type: "line",
+      data: {
+        labels: series.map(([k]) => k),
+        datasets: [{
+          label: `${title} -- spend over time`,
+          data: series.map(([, v]) => v),
+          borderColor: "#16365b",
+          backgroundColor: "rgba(22,54,91,0.08)",
+          fill: true,
+          tension: 0.25,
+          pointRadius: 3,
+        }],
+      },
+      options: baseChartOptions("Spend over time"),
+    });
+
+    renderTable(records, standardColumns());
+  }
+
+  /** Fetches ACH PAYEE's complete record history once (using the same
+   *  DATA_ROOT/BY_NAME path every other payee drill-down uses), then
+   *  builds and renders both top-20 pie+legend cards from that single
+   *  fetch. monthKeysCsv covers every month with ACH activity across
+   *  all years -- the template passes data.ach_payee.months.keys()
+   *  directly, the same all-years month list already used to populate
+   *  the "ACH / Grant Disbursements by Year" table above these cards. */
+  async function initAchBreakdown(monthKeysCsv) {
+    const descTbody = document.querySelector("#pal-pie-ach-description-legend tbody");
+    const acctTbody = document.querySelector("#pal-pie-ach-account-legend tbody");
+    if (!descTbody || !acctTbody) return;
+
+    const monthKeys = (monthKeysCsv || "").split(",").filter(Boolean);
+    const basePath = `${DATA_ROOT}/BY_NAME/${sanitizeForPath("ACH PAYEE")}`;
+    const records = await fetchAllMonths(basePath, monthKeys);
+    achRecordsCache = records;
+
+    const byDescription = sumByKey(records, (r) => (r.description || "Unknown").trim(), 20);
+    const byAccount = sumByKey(records, (r) => r.alt || "Unknown", 20);
+
+    if (window.Chart) {
+      renderPieChart("pal-pie-ach-description-chart", byDescription.map(([label, amount]) => ({ label, amount })));
+      renderPieChart("pal-pie-ach-account-chart", byAccount.map(([label, amount]) => ({ label, amount })));
+    }
+
+    renderAchLegendRows(descTbody, byDescription, "pal-pie-ach-description-chart",
+      (label) => openAchBreakdownDetail("description", label));
+    renderAchLegendRows(acctTbody, byAccount, "pal-pie-ach-account-chart",
+      (label) => openAchBreakdownDetail("alt", label));
+  }
+
   /** Renders the all-history monthly timeline -- a line chart spanning
    *  every month from the start of the dataset to the report date,
    *  with every 4th month labeled on the x-axis to keep the chart
@@ -1172,6 +1302,19 @@
       }
     }
 
+    // Independent of the Chart.js-availability guard above: the legend
+    // tables and click-through still work without Chart.js (only the
+    // pie slices themselves don't render), so this is called
+    // unconditionally -- initAchBreakdown() internally checks
+    // window.Chart before calling renderPieChart.
+    try {
+      if (cfg.achMonthKeys) {
+        initAchBreakdown(cfg.achMonthKeys);
+      }
+    } catch (err) {
+      console.warn("PALedger: ACH breakdown failed to initialize", err);
+    }
+
     // Independent of Chart.js entirely -- the descriptions pager is
     // plain DOM show/hide, so it must run regardless of whether Chart.js
     // loaded. Previously this whole block sat after an `if (!window.Chart)
@@ -1197,5 +1340,6 @@
     highlightPieSlice,
     clearPieHighlight,
     openReadme,
+    initAchBreakdown,
   };
 })();
