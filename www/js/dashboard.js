@@ -441,7 +441,7 @@
    *  years present in `records` -- the client-side equivalent of the
    *  Jinja radar_months computation used for the page's main "Spend by
    *  Month (All Years)" radar, needed here because there's no
-   *  pre-aggregated L2 field for WIR Payee the way there is for
+   *  pre-aggregated L2 field for WIR PAYEE the way there is for
    *  ach_payee; this works from the same raw records already fetched
    *  to build the WIR pie charts. */
   function sumByCalendarMonth(records) {
@@ -893,9 +893,9 @@
   }
 
   // --------------------------------------------------------------------
-  // WIR Payee breakdown -- sidebar card with a radar (spend by calendar
+  // WIR PAYEE breakdown -- sidebar card with a radar (spend by calendar
   // month, all years) + two pie+legend cards (by description, by
-  // account), all driven by one fetch. "WIR Payee" has no dedicated L2
+  // account), all driven by one fetch. "WIR PAYEE" has no dedicated L2
   // field the way ACH PAYEE does (data.ach_payee) -- it's just a
   // regular entry in data.by_name, so its month-keys come from there
   // via the template, the same way any other sidebar payee's
@@ -980,7 +980,7 @@
     renderTable(records, standardColumns());
   }
 
-  /** WIR Payee equivalent of initAchBreakdown() -- one fetch of WIR
+  /** WIR PAYEE equivalent of initAchBreakdown() -- one fetch of WIR
    *  Payee's full record history, then builds three visuals from that
    *  single fetch: a calendar-month radar (seasonal pattern, all
    *  years) and two pie+legend cards (by description, by account)
@@ -992,14 +992,14 @@
 
     const monthKeys = (monthKeysCsv || "").split(",").filter(Boolean);
     if (monthKeys.length === 0) {
-      // No WIR Payee activity in this dataset at all -- show empty
+      // No WIR PAYEE activity in this dataset at all -- show empty
       // states rather than leaving "Loading..." displayed forever.
-      renderSlimLegendRows(descTbody, [], "pal-wir-description-chart", () => {}, "No WIR Payee records found.");
-      renderSlimLegendRows(acctTbody, [], "pal-wir-account-chart", () => {}, "No WIR Payee records found.");
+      renderSlimLegendRows(descTbody, [], "pal-wir-description-chart", () => {}, "No WIR PAYEE records found.");
+      renderSlimLegendRows(acctTbody, [], "pal-wir-account-chart", () => {}, "No WIR PAYEE records found.");
       return;
     }
 
-    const basePath = `${DATA_ROOT}/BY_NAME/${sanitizeForPath("WIR Payee")}`;
+    const basePath = `${DATA_ROOT}/BY_NAME/${sanitizeForPath("WIR PAYEE")}`;
     const records = await fetchAllMonths(basePath, monthKeys);
     wirRecordsCache = records;
 
@@ -1016,9 +1016,9 @@
     }
 
     renderSlimLegendRows(descTbody, byDescription, "pal-wir-description-chart",
-      (label) => openWirBreakdownDetail("description", label), "No WIR Payee records found.");
+      (label) => openWirBreakdownDetail("description", label), "No WIR PAYEE records found.");
     renderSlimLegendRows(acctTbody, byAccount, "pal-wir-account-chart",
-      (label) => openWirBreakdownDetail("alt", label), "No WIR Payee records found.");
+      (label) => openWirBreakdownDetail("alt", label), "No WIR PAYEE records found.");
   }
 
   /** Renders the all-history monthly timeline -- a line chart spanning
@@ -1464,7 +1464,7 @@
     // Same reasoning as initAchBreakdown above -- legends/click-through
     // work without Chart.js, only the charts themselves are skipped.
     // monthKeysCsv may legitimately be an empty string if this dataset
-    // has no WIR Payee activity at all -- initWirBreakdown() handles
+    // has no WIR PAYEE activity at all -- initWirBreakdown() handles
     // that by rendering empty-state legends rather than erroring.
     try {
       initWirBreakdown(cfg.wirMonthKeys);

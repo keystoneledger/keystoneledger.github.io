@@ -763,15 +763,15 @@ tags:
                         </table>
                     </div>
 
-                    <!-- WIR PAYEE BREAKDOWN -- "WIR Payee" is a wire-
+                    <!-- WIR PAYEE BREAKDOWN -- "WIR PAYEE" is a wire-
                          transfer placeholder (like ACH PAYEE) where the
                          recipient's identity is not published. Unlike
                          ACH PAYEE, there is no dedicated data.wir_payee
-                         field in L2 -- WIR Payee is just a regular entry
+                         field in L2 -- WIR PAYEE is just a regular entry
                          in data.by_name, the same as any other payee in
                          the sidebar's Top Payees table above. So its
                          month-keys come straight from
-                         data.by_name['WIR Payee'].months, exactly like
+                         data.by_name['WIR PAYEE'].months, exactly like
                          the onclick on any other sidebar payee row, and
                          PALedger.initWirBreakdown() (dashboard.js) does
                          ONE fetch of that payee's full record history to
@@ -785,10 +785,15 @@ tags:
                          legends here use the existing slim 2-column
                          sidebar-table style (Name/Total, no swatch
                          column) to match the Top Payees/Top Accounts
-                         tables immediately above. -->
-                    {%- set wir_entry = data.by_name.get('WIR Payee', {}) -%}
+                         tables immediately above. The whole block is
+                         wrapped in a real .card (not .sidebar-table, an
+                         earlier mistake) to visually read as one
+                         self-contained card like every other section
+                         on the page, rather than a plain table list. -->
+                    {%- set wir_entry = data.by_name.get('WIR PAYEE', {}) -%}
                     {%- set wir_month_keys = wir_entry.get('months', {}).keys() | join(',') -%}
-                    <div class="sidebar-table pal-wir-card">
+                    <div class="card pal-wir-card">
+                        <div class="card-body">
                         <div class="label">WIR Payees</div>
                         <p class="pal-hint">Special wire transfers where the recipient's identity is not published.</p>
 
@@ -828,6 +833,7 @@ tags:
                                 </tbody>
                             </table>
                         </div>
+                    </div>
                     </div>
 
                 </div>
