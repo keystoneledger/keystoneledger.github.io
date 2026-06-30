@@ -459,6 +459,21 @@
     "#c98a3e", "#7a6ba0", "#3e8e7e", "#a85b7a", "#6b8e23",
   ];
 
+  // Same 10 colors as CHART_PALETTE, reordered, used ONLY by the two
+  // WIR pie charts -- every other pie/doughnut on the page (Top
+  // Payees, Top Accounts, the ACH breakdown) uses CHART_PALETTE in its
+  // original order, so two charts sitting near each other on the page
+  // (e.g. ACH's "by description" pie and WIR's "by description" pie)
+  // would otherwise assign the same color to their #1-ranked slice,
+  // making them look like the same chart restyled rather than two
+  // distinct breakdowns. This is purely a different starting order of
+  // the identical color set, not a different palette -- WIR still
+  // shares the page's overall color language.
+  const WIR_CHART_PALETTE = [
+    "#7a6ba0", "#3e8e7e", "#fa1b3e", "#9dddee", "#a85b7a",
+    "#2f7da0", "#6b8e23", "#16365b", "#c98a3e", "#5b9279",
+  ];
+
   // --------------------------------------------------------------------
   // Public drill-down entry points
   // (called directly from onclick="" attributes in the Jinja template)
@@ -707,7 +722,13 @@
    *  different data and canvas id. No legend (legend: false) since the
    *  adjacent HTML table in the template already serves as the legend --
    *  a second, separate Chart.js-drawn legend would just duplicate it. */
-  function renderPieChart(canvasId, entries) {
+  /** Renders a top-N doughnut/pie chart from pre-aggregated {label, amount}
+   *  entries. `palette` is optional and defaults to the shared
+   *  CHART_PALETTE -- pass WIR_CHART_PALETTE explicitly for the WIR
+   *  cards so their slices don't visually match every other pie chart
+   *  on the page color-for-color. No legend (legend: false) since the
+   *  adjacent HTML table in the template already serves as the legend. */
+  function renderPieChart(canvasId, entries, palette) {
     const canvas = document.getElementById(canvasId);
     if (!canvas || !entries || entries.length === 0) return;
 
@@ -717,7 +738,7 @@
         labels: entries.map((e) => e.label),
         datasets: [{
           data: entries.map((e) => e.amount),
-          backgroundColor: CHART_PALETTE,
+          backgroundColor: palette || CHART_PALETTE,
         }],
       },
       options: {
@@ -1011,8 +1032,8 @@
     const byAccount = sumByKey(records, (r) => r.alt || "Unknown", 20);
 
     if (window.Chart) {
-      renderPieChart("pal-wir-description-chart", byDescription.map(([label, amount]) => ({ label, amount })));
-      renderPieChart("pal-wir-account-chart", byAccount.map(([label, amount]) => ({ label, amount })));
+      renderPieChart("pal-wir-description-chart", byDescription.map(([label, amount]) => ({ label, amount })), WIR_CHART_PALETTE);
+      renderPieChart("pal-wir-account-chart", byAccount.map(([label, amount]) => ({ label, amount })), WIR_CHART_PALETTE);
     }
 
     renderSlimLegendRows(descTbody, byDescription, "pal-wir-description-chart",

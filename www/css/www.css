@@ -1246,6 +1246,22 @@ td.pal-empty {
     text-align: left;
 }
 
+/* The card title was previously just .label -- the same small, muted,
+   uppercase style used for KPI card labels everywhere else ("GRAND
+   TOTAL", "TOTAL RECORDS", etc.), which reads as a minor field label
+   rather than a section heading. This gives it its own larger, bolder,
+   title-cased treatment so it actually reads as the heading for the
+   whole card, similar in weight to h2.year-title used elsewhere on the
+   page (but sized for the narrower sidebar column it lives in). */
+.pal-wir-title {
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--title-text-color);
+    text-transform: capitalize;
+    letter-spacing: -0.01em;
+    margin-bottom: 0.25rem;
+}
+
 .pal-wir-card .pal-hint {
     margin-top: 0.25rem;
     margin-bottom: 0.75rem;
@@ -1257,6 +1273,31 @@ td.pal-empty {
 
 .pal-wir-pie-block .label {
     margin-bottom: 0.25rem;
+}
+
+/* The WIR legend tables (#pal-wir-description-legend,
+   #pal-wir-account-legend) inherit table.pal-table's default cell
+   padding (0.5rem 0.6rem) and table-hover's bootstrap padding, which
+   together inset the table's visible content from the card's edges.
+   Zeroing the table's own margin and tightening cell horizontal
+   padding lets it run flush to the card boundary instead, and a
+   smaller font-size (vs. the page-wide 0.9rem table.pal-table default)
+   keeps the slim 2-column layout from feeling cramped at that width.
+   Scoped to these two specific tables by ID rather than changing
+   table.pal-table globally, since every other table on the page should
+   keep its current spacing/size. */
+#pal-wir-description-legend,
+#pal-wir-account-legend {
+    margin: 0;
+}
+
+#pal-wir-description-legend th,
+#pal-wir-description-legend td,
+#pal-wir-account-legend th,
+#pal-wir-account-legend td {
+    padding-left: 0;
+    padding-right: 0;
+    font-size: 0.82rem;
 }
 
 /*
