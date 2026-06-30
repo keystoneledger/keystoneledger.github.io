@@ -1399,4 +1399,35 @@ td.pal-empty {
     .pal-timeline-mobile-only {
         display: block;
     }
+
+    /* --muted-text-color (#434343) text inherits body's font-weight:100
+       site-wide -- none of the rules using this variable set their own
+       weight. At small sizes (0.75-0.8rem, the size most of these are
+       set at) combined with that ultra-thin weight, this text is hard
+       to read on a phone even though the color itself (#434343) isn't
+       actually that light in isolation. Bumped to full weight (600) on
+       mobile and darkened slightly, covering every selector that uses
+       --muted-text-color for genuinely readable body content: KPI card
+       labels (.label, used everywhere -- "TOP PAYEES", "GRAND TOTAL",
+       etc.), table column headers (.pal-prior-years-table th and the
+       generic table.pal-table thead th), hint/explanatory text
+       (.pal-hint), the "% of total" sub-values (.pal-subvalue), the
+       pagination summary ("12 records"), README loading/error states,
+       and the report date line. Deliberately excludes
+       .pal-modal-close (the X icon) and h4.year-subtitle (currently
+       unused, leftover from a removed section) -- neither is
+       readability-sensitive body text. */
+    .label,
+    h3.post-date,
+    .pal-hint,
+    .pal-subvalue,
+    .pal-prior-years-table th,
+    table.pal-table thead th,
+    td.pal-empty,
+    .pal-page-summary,
+    .pal-readme-loading,
+    .pal-readme-error {
+        font-weight: 600;
+        color: #2d2d2d;
+    }
 }
