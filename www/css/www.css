@@ -1072,3 +1072,114 @@ td.pal-empty {
     margin-bottom: 1rem;
     max-width: 65ch;
 }
+
+/*
+ * ----------------------------------------------- README
+*/
+
+.pal-readme-loading,
+.pal-readme-error {
+    color: var(--muted-text-color);
+    padding: 1.5rem 0;
+    text-align: center;
+}
+
+.pal-readme-error a {
+    color: var(--title-text-color);
+}
+
+.pal-readme-body {
+    font-size: 0.95rem;
+    line-height: 1.65;
+    color: var(--card-text-color);
+}
+
+.pal-readme-body h1 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--title-text-color);
+    margin: 0 0 0.5rem;
+    padding-bottom: 0.4rem;
+    border-bottom: 2px solid var(--common-border);
+}
+
+.pal-readme-body h2 {
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--card-text-color);
+    margin: 1.75rem 0 0.5rem;
+    padding-bottom: 0.25rem;
+    border-bottom: 1px solid var(--common-border);
+}
+
+.pal-readme-body h3 {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--card-text-color);
+    margin: 1.25rem 0 0.35rem;
+}
+
+.pal-readme-body p {
+    margin: 0 0 0.9rem;
+}
+
+.pal-readme-body ul,
+.pal-readme-body ol {
+    margin: 0 0 0.9rem 1.4rem;
+    padding: 0;
+}
+
+.pal-readme-body li {
+    margin-bottom: 0.35rem;
+}
+
+.pal-readme-body a {
+    color: var(--title-text-color);
+}
+
+.pal-readme-body a:hover {
+    text-decoration: underline;
+}
+
+.pal-readme-body table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 0.75rem 0 1rem;
+    font-size: 0.88rem;
+}
+
+.pal-readme-body th {
+    background: var(--primary-bg-grey);
+    font-weight: 600;
+    text-align: left;
+    padding: 0.45rem 0.75rem;
+    border: 1px solid var(--common-border);
+}
+
+.pal-readme-body td {
+    padding: 0.4rem 0.75rem;
+    border: 1px solid var(--common-border);
+    vertical-align: top;
+}
+
+.pal-readme-body tr:nth-child(even) td {
+    background: var(--primary-bg-lt);
+}
+
+.pal-readme-body hr {
+    border: none;
+    border-top: 1px solid var(--common-border);
+    margin: 1.5rem 0;
+}
+
+.pal-readme-body code {
+    background: var(--primary-bg-grey);
+    border-radius: 3px;
+    padding: 0.1em 0.35em;
+    font-size: 0.88em;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+}
+
+.pal-readme-body strong {
+    font-weight: 700;
+}

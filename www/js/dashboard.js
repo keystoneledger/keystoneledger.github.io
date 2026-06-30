@@ -828,7 +828,123 @@
   }
 
   // --------------------------------------------------------------------
-  // Init
+  // README modal -- fetches the raw markdown from GitHub, converts it
+  // to HTML using marked.js (loaded lazily on first call so pages that
+  // never open the README don't pay the load cost), and displays it in
+  // the existing #pal-modal. The modal's chart area is hidden since
+  // this is a document view, not a data drill-down.
+  // --------------------------------------------------------------------
+
+  const README_URL =
+    "https://raw.githubusercontent.com/keystoneledger/keystoneledger.github.io/main/README.md";
+
+  /** Load marked.js from CDN lazily (only when the README is first
+   *  opened). Returns a Promise that resolves to the global `marked`
+   *  object. If marked.js is already on the page, resolves immediately. */
+  function loadMarked() {
+    if (window.marked) return Promise.resolve(window.marked);
+    return new Promise((resolve, reject) => {
+      const script = document.createElement("script");
+      script.src = "https://cdnjs.cloudflare.com/ajax/libs/marked/9.1.6/marked.min.js";
+      script.onload = () => resolve(window.marked);
+      script.onerror = () => reject(new Error("marked.js failed to load"));
+      document.head.appendChild(script);
+    });
+  }
+
+  /** Opens the existing #pal-modal with the rendered README content.
+   *  Replaces whatever the modal was showing (chart + table) with a
+   *  scrollable document view. Calling any other openX() function
+   *  afterward will restore the normal chart+table layout.
+   *
+   *  Call this from the README button's onclick, replacing the existing
+   *  href/target="_blank" behaviour:
+   *    onclick="event.preventDefault(); PALedger.openReadme();"
+   */
+  async function openReadme() {
+    openModal("About This Data");
+
+    // Hide the chart canvas -- this modal is a document, not a chart.
+    const chartWrap = document.querySelector("#pal-modal .pal-modal-chart-wrap");
+    if (chartWrap) chartWrap.style.display = "none";
+
+    // Replace the table area with a loading indicator, then the content.
+    const tableWrap = document.querySelector("#pal-modal .pal-modal-table-wrap");
+    if (!tableWrap) return;
+
+    tableWrap.innerHTML =
+      '<p class="pal-readme-loading">Loading\u2026</p>';
+
+    let markdown, markedLib;
+    try {
+      [markdown, markedLib] = await Promise.all([
+        fetch(README_URL, { cache: "no-store" }).then((r) => {
+          if (!r.ok) throw new Error(`HTTP ${r.status}`);
+          return r.text();
+        }),
+        loadMarked(),
+      ]);
+    } catch (err) {
+      tableWrap.innerHTML =
+        `<p class="pal-readme-error">Could not load the README: ${err.message}. ` +
+        `<a href="${README_URL.replace("raw.githubusercontent.com", "github.com").replace("/main/", "/blob/main/")}" ` +
+        `target="_blank" rel="noopener">Open on GitHub instead.</a></p>`;
+      return;
+    }
+
+    // marked.js 9.x uses marked.parse(); earlier versions used marked()
+    // directly. Support both so this works regardless of which version
+    // the CDN happens to return.
+    const html =
+      typeof markedLib.parse === "function"
+        ? markedLib.parse(markdown)
+        : markedLib(markdown);
+
+    tableWrap.innerHTML = `<div class="pal-readme-body">${html}</div>`;
+
+    // Make any links inside the rendered README open in a new tab,
+    // so the reader doesn't accidentally navigate away from the dashboard.
+    tableWrap.querySelectorAll("a").forEach((a) => {
+      a.setAttribute("target", "_blank");
+      a.setAttribute("rel", "noopener");
+    });
+  }
+
+  // When the modal closes (via the X button or clicking the overlay),
+  // restore the chart-wrap visibility so the next drill-down modal
+  // looks normal. Hook into the existing closeModal function by wrapping
+  // it rather than replacing it, so existing behaviour is unchanged.
+  const _originalCloseModal = closeModal;
+  // (closeModal is already defined above in this IIFE; we reassign the
+  // local variable here so openReadme's cleanup runs on every close.)
+  // Note: because closeModal is called by name inside the IIFE's event
+  // listeners, we patch the behaviour via the shared chartWrap element
+  // directly in the close event instead.
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") _restoreModalChartWrap();
+  });
+
+  function _restoreModalChartWrap() {
+    const chartWrap = document.querySelector("#pal-modal .pal-modal-chart-wrap");
+    if (chartWrap) chartWrap.style.display = "";
+  }
+
+  // Patch the close button and overlay click to also restore the chart wrap.
+  // We do this on DOMContentLoaded so the modal elements exist.
+  document.addEventListener("DOMContentLoaded", () => {
+    const modal = document.getElementById("pal-modal");
+    if (!modal) return;
+    const closeBtn = modal.querySelector(".pal-modal-close");
+    if (closeBtn) {
+      const orig = closeBtn.onclick;
+      closeBtn.addEventListener("click", _restoreModalChartWrap);
+    }
+    modal.addEventListener("click", (e) => {
+      if (e.target === modal) _restoreModalChartWrap();
+    });
+  });
+
+  // --------------------------------------------------------------------
   // --------------------------------------------------------------------
 
   function init() {
@@ -909,5 +1025,6 @@
     openDescription,
     highlightPieSlice,
     clearPieHighlight,
+    openReadme,
   };
 })();
