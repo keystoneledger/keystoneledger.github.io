@@ -1430,4 +1430,23 @@ td.pal-empty {
         font-weight: 600;
         color: #2d2d2d;
     }
+
+    /* table.pal-table td (and th) is the actual VALUE in every table on
+       the page -- payee names, dates, dollar amounts, descriptions,
+       account codes -- in Prior Years, ACH/Grant, Descriptions, the
+       sidebar Top Payees/Accounts, the Rolling 30 Days table, and the
+       modal's record table. The previous mobile-readability pass only
+       targeted selectors using --muted-text-color (headers, labels,
+       hints), which never included plain table cells -- td was never
+       muted-colored, it was simply inheriting body's font-weight:100
+       with no color of its own, so the earlier body{color:...} mobile
+       fix darkened it but never addressed the weight. That's the bug:
+       data cells were dark AND thin, which still reads as faint at
+       small sizes. Slightly lighter than the header weight above (500
+       vs 600) so headers still visually lead the data, but a decisive
+       jump from 100. */
+    table.pal-table th,
+    table.pal-table td {
+        font-weight: 500;
+    }
 }
