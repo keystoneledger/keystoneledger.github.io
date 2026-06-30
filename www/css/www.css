@@ -399,7 +399,7 @@ ul.arrowlist li {
 .card-row {}
 
 .kpi-row {
-    min-height: 140px;
+    min-height: 50px;
 }
 .card-col-3 {}
 
@@ -1054,8 +1054,8 @@ td.pal-empty {
 }
 
 .pal-hbar {
-    height: 14px;
-    background-color: #7ecce3;
+    height: 20px;
+    background-color: #fa1b3e;
     border-radius: 3px;
     min-width: 2px;
 }
