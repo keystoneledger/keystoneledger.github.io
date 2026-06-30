@@ -1070,6 +1070,13 @@ td.pal-empty {
     min-width: 120px;
 }
 
+/* Below ~430px (large-phone breakpoint) a 120px-minimum bar column
+   forces the remaining text columns (Year/Total/YoY, or
+   Description/Total) into an unreadably narrow space on Prior Years,
+   ACH/Grant Disbursements, and Most Common Descriptions. All three
+   tables share the .pal-bar-col class, so one rule covers all three --
+   the bar is decorative (the number next to it already conveys the
+   same information), so hiding it loses no data. */
 .pal-hbar {
     height: 20px;
     background-color: #fd8d9e;
@@ -1199,4 +1206,122 @@ td.pal-empty {
 
 .pal-readme-body strong {
     font-weight: 700;
+}
+
+/*
+ * ====================================================================
+ * MOBILE BREAKPOINTS -- intentionally placed at the very end of this
+ * file. Several of the rules below (.pal-pie-card-wrap, .pal-radar-wrap,
+ * .pal-chart-card, .pal-timeline-wrap, .pal-modal-chart-wrap) override
+ * base rules defined earlier in this file with equal selector
+ * specificity (a single class each) -- CSS resolves equal-specificity
+ * conflicts by source order, so these overrides MUST come after every
+ * base rule they're meant to override, or the base rule silently wins
+ * regardless of viewport width. (This bit during development: an
+ * earlier version of these media queries sat mid-file, before the base
+ * .pal-pie-card-wrap rule, and the mobile height reduction never took
+ * effect as a result.) Keep all mobile overrides consolidated here
+ * rather than scattered near each feature's base rules.
+ * ====================================================================
+*/
+
+@media (max-width: 700px) {
+    /* Chart-first, legend-below on mobile: the chart is the visual the
+       reader opened the card to see, so it should appear before the
+       legend table once the two pie-card columns stack vertically.
+       Both columns are flex children of .pal-pie-card-row (.row is
+       already display:flex), so reordering via the `order` property is
+       enough -- no markup/DOM changes needed. */
+    .pal-pie-chart-col {
+        order: -1;
+    }
+
+    /* Fixed chart-container heights below are sized for desktop. On a
+       narrow phone the same heights make every chart look unusually
+       tall and thin relative to its (now much narrower) width. Reduce
+       each proportionally so charts keep a readable aspect ratio. */
+    .pal-chart-card {
+        height: 220px;
+    }
+
+    .pal-timeline-wrap {
+        height: 200px;
+    }
+
+    .pal-pie-card-wrap {
+        height: 200px;
+    }
+
+    .pal-modal-chart-wrap {
+        height: 200px;
+    }
+
+    /* The radar chart specifically needs roughly equal width/height to
+       keep its 12 monthly spokes legible -- a short, wide radar reads
+       poorly. Constrain it to a centered, roughly square box rather
+       than letting it stretch full-width like the other (rectangular)
+       charts. */
+    .pal-radar-wrap {
+        height: auto;
+        aspect-ratio: 1 / 1;
+        max-width: 320px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+}
+
+@media (max-width: 430px) {
+    .pal-chart-card {
+        height: 200px;
+    }
+
+    .pal-timeline-wrap {
+        height: 180px;
+    }
+
+    .pal-pie-card-wrap {
+        height: 180px;
+    }
+
+    .pal-modal-chart-wrap {
+        height: 180px;
+    }
+
+    .pal-radar-wrap {
+        max-width: 260px;
+    }
+
+    /* Pagination buttons (modal table pager + descriptions pager) are
+       sized with small padding/font for a dense desktop look. At
+       0.3rem/0.65rem padding + 0.85rem font the actual tap target is
+       roughly 28-30px tall -- below the ~44px minimum both Apple's HIG
+       and Google's Material guidelines recommend for comfortable touch
+       targets. min-height/min-width here don't change the visual size
+       much (padding still controls that on most buttons) but guarantee
+       a minimum hit area even for single-character page-number buttons. */
+    .pal-pagination button {
+        min-height: 44px;
+        min-width: 44px;
+        padding: 0.5rem 0.75rem;
+    }
+
+    /* A 120px-minimum bar column forces the remaining text columns
+       (Year/Total/YoY, or Description/Total) into an unreadably narrow
+       space on Prior Years, ACH/Grant Disbursements, and Most Common
+       Descriptions -- all three share .pal-bar-col, so one rule covers
+       all three. The bar is decorative (the adjacent number already
+       conveys the same information), so hiding it loses no data. */
+    .pal-bar-col {
+        display: none;
+    }
+
+    /* The modal's record table (Date/Payee/Amount/Category/Account) has
+       no bar column to hide, but 5 text columns is still too many for a
+       375-430px phone. Category is the least essential of the five --
+       Date/Payee/Amount are the core transaction facts, and Account is
+       often the reason the modal was opened in the first place (e.g.
+       clicking an account code) -- so it's the one hidden here. */
+    .pal-col-category {
+        display: none;
+    }
 }

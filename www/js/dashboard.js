@@ -272,6 +272,7 @@
       columns.forEach((col) => {
         const th = document.createElement("th");
         th.textContent = col.label;
+        if (col.className) th.classList.add(col.className);
         if (col.sortable) {
           th.classList.add("pal-sortable");
           if (col.key === sortKey) {
@@ -388,6 +389,7 @@
       {
         key: "description", label: "Category", sortable: true,
         sortValue: (r) => (r.description || "").toLowerCase(),
+        className: "pal-col-category",
       },
       { key: "alt", label: "Account", sortable: true },
     ];
