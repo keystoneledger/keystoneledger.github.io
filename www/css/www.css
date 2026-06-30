@@ -400,6 +400,8 @@ ul.arrowlist li {
 
 .kpi-row {
     min-height: 50px;
+    margin-top: 25px;
+    margin-bottom: 25px;
 }
 .card-col-3 {}
 
