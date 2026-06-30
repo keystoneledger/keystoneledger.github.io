@@ -173,6 +173,21 @@
   function openModal(title) {
     const modal = ensureModal();
     modal.querySelector("#pal-modal-title").textContent = title;
+
+    // Always restore the chart wrap and clear any README content that a
+    // previous openReadme() call may have left behind. This must happen
+    // here -- at the start of every modal open -- rather than at close
+    // time, because close-event listeners fire asynchronously relative
+    // to the next openX() call and can't guarantee clean state in time.
+    const chartWrap = modal.querySelector(".pal-modal-chart-wrap");
+    if (chartWrap) chartWrap.style.display = "";
+
+    const tableWrap = modal.querySelector(".pal-modal-table-wrap");
+    if (tableWrap) {
+      const readmeBody = tableWrap.querySelector(".pal-readme-body, .pal-readme-loading, .pal-readme-error");
+      if (readmeBody) readmeBody.remove();
+    }
+
     modal.classList.add("pal-open");
     document.body.classList.add("pal-modal-active");
   }
@@ -910,41 +925,6 @@
     });
   }
 
-  // When the modal closes (via the X button or clicking the overlay),
-  // restore the chart-wrap visibility so the next drill-down modal
-  // looks normal. Hook into the existing closeModal function by wrapping
-  // it rather than replacing it, so existing behaviour is unchanged.
-  const _originalCloseModal = closeModal;
-  // (closeModal is already defined above in this IIFE; we reassign the
-  // local variable here so openReadme's cleanup runs on every close.)
-  // Note: because closeModal is called by name inside the IIFE's event
-  // listeners, we patch the behaviour via the shared chartWrap element
-  // directly in the close event instead.
-  document.addEventListener("keydown", (e) => {
-    if (e.key === "Escape") _restoreModalChartWrap();
-  });
-
-  function _restoreModalChartWrap() {
-    const chartWrap = document.querySelector("#pal-modal .pal-modal-chart-wrap");
-    if (chartWrap) chartWrap.style.display = "";
-  }
-
-  // Patch the close button and overlay click to also restore the chart wrap.
-  // We do this on DOMContentLoaded so the modal elements exist.
-  document.addEventListener("DOMContentLoaded", () => {
-    const modal = document.getElementById("pal-modal");
-    if (!modal) return;
-    const closeBtn = modal.querySelector(".pal-modal-close");
-    if (closeBtn) {
-      const orig = closeBtn.onclick;
-      closeBtn.addEventListener("click", _restoreModalChartWrap);
-    }
-    modal.addEventListener("click", (e) => {
-      if (e.target === modal) _restoreModalChartWrap();
-    });
-  });
-
-  // --------------------------------------------------------------------
   // --------------------------------------------------------------------
 
   function init() {
