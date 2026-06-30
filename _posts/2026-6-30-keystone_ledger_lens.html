@@ -533,7 +533,7 @@ tags:
                                         <div class="pal-stacked-divider"></div>
                                         <div class="pal-stacked-item">
                                             <div class="label">Data As Of</div>
-                                            <div class="value pal-asof">2026-06-30T12:49:18Z</div>
+                                            <div class="value pal-asof">2026-06-30T15:10:35Z</div>
                                         </div>
                                     </div>
                                 </div>
@@ -874,6 +874,72 @@ tags:
                         </div>
                     </div>
                     <!-- END ITEM ROW 3 -->
+
+                    <!-- ITEM ROW 3b: ACH/Grant disbursements broken down
+                         by description and by account, top 20 each, as
+                         two side-by-side pie+legend cards (50/50 split,
+                         same visual pattern as the Top Payees/Top
+                         Accounts pie cards above). Unlike those cards,
+                         the data here can't be server-rendered -- L2's
+                         ach_payee only has totals by month, not by
+                         description or account, and isolating "only
+                         ACH PAYEE's records, broken down by description/
+                         account" requires the raw per-record fields
+                         (description, alt) that only exist in the L1
+                         BY_NAME/ACH_PAYEE/*.json files Jinja never sees.
+                         So these start as empty shells (title + canvas +
+                         empty legend tbody) and PALedger.initAchBreakdown()
+                         fetches ACH PAYEE's full history once, computes
+                         both top-20 rankings client-side, and populates
+                         both cards together -- see dashboard.js. -->
+                    <div class="row report-row">
+                        <div class="col-md-12 report-col-12">
+                            <div class="container kpi-row">
+                                <div class="row card-row">
+
+                                    <div class="col-md-6 card-col-6">
+                                        <div class="card card-pie-ach-description pal-pie-card">
+                                            <div class="card-body">
+                                                <div class="label">Top 20 ACH/Grant Disbursements by Description (All Years)</div>
+                                                <div class="pal-pie-card-wrap">
+                                                    <canvas id="pal-pie-ach-description-chart"></canvas>
+                                                </div>
+                                                <table class="pal-table pal-pie-legend-table" id="pal-pie-ach-description-legend">
+                                                    <thead>
+                                                        <tr><th></th><th>Description</th><th>Total</th></tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <tr><td colspan="3" class="pal-empty">Loading&hellip;</td></tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-6 card-col-6">
+                                        <div class="card card-pie-ach-account pal-pie-card">
+                                            <div class="card-body">
+                                                <div class="label">Top 20 ACH/Grant Disbursements by Account (All Years)</div>
+                                                <div class="pal-pie-card-wrap">
+                                                    <canvas id="pal-pie-ach-account-chart"></canvas>
+                                                </div>
+                                                <table class="pal-table pal-pie-legend-table" id="pal-pie-ach-account-legend">
+                                                    <thead>
+                                                        <tr><th></th><th>Account</th><th>Total</th></tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <tr><td colspan="3" class="pal-empty">Loading&hellip;</td></tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- END ITEM ROW 3b -->
 
                     <!-- ITEM ROW 4: most common Descriptions, all-years,
                          same look/feel as Prior Years / ACH above, but
@@ -2315,6 +2381,7 @@ tags:
     ],
     radarCanvas: "pal-radar-chart",
     radarData: [2968221361.73, 2426208736.88, 5031612717.78, 1773558753.02, 1837563146.07, 2842354536.5899997, 2923420244.77, 1914610243.83, 1847915184.05, 1039459094.56, 2089990494.84, 2645015899.55],
+    achMonthKeys: "2019-10,2019-11,2019-12,2020-01,2020-02,2020-03,2020-04,2020-05,2020-06,2020-07,2020-09,2020-10,2020-11,2020-12,2021-01,2021-02,2021-03,2021-04,2021-05,2021-06,2021-07,2021-08,2021-09,2021-10,2021-11,2021-12,2022-01,2022-02,2022-03,2022-04,2022-05,2022-06,2022-07,2022-08,2022-10,2022-11,2022-12,2023-01,2023-02,2023-03,2023-04,2023-05,2023-06,2023-07,2023-08,2023-09,2023-10,2023-11,2023-12,2024-01,2024-02,2024-03,2024-04,2024-05,2024-06,2024-07,2024-08,2024-09,2024-10,2024-11,2024-12,2025-01,2025-02,2025-03,2025-04,2025-05,2025-06,2025-07,2025-08,2025-09,2025-10,2025-11,2025-12,2026-01,2026-02,2026-03,2026-04,2026-05,2026-06",
     timelineCanvas: "pal-timeline-chart",
     timelineBarCanvas: "pal-timeline-bar-chart",
     timelineData: [
