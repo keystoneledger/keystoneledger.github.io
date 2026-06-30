@@ -760,8 +760,13 @@
           backgroundColor: "rgba(47,125,160,0.07)",
           fill: true,
           tension: 0.3,
-          pointRadius: 0,
+          // Visible circle markers at every data point, matching the
+          // Fiscal Year trend chart's pointRadius/pointHoverRadius
+          // (renderTrailing365Chart above) so hover locations are
+          // equally obvious on both charts.
+          pointRadius: 3,
           pointHoverRadius: 5,
+          pointBackgroundColor: "#2f7da0",
           borderWidth: 2,
         }],
       },
@@ -782,10 +787,12 @@
         scales: {
           x: {
             ticks: {
-              // Show every 4th label starting from index 0, hide the rest.
-              // maxRotation/minRotation keep labels horizontal.
-              maxRotation: 0,
-              minRotation: 0,
+              // Show every 4th label starting from index 0, hide the
+              // rest. Angled (-45deg) so labels don't overlap each
+              // other across 50+ months of history -- horizontal
+              // labels at this density collide regardless of spacing.
+              maxRotation: 45,
+              minRotation: 45,
               callback: function(val, index) {
                 return index % 4 === 0 ? this.getLabelForValue(val) : null;
               },
