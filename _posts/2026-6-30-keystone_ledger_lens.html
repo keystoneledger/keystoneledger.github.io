@@ -204,18 +204,21 @@ tags:
             <!-- ALL-HISTORY MONTHLY TIMELINE -- full-width line chart   -->
             <!-- covering every month from the start of the dataset to   -->
             <!-- the current report month, with every 4th month labeled. -->
+            <!-- No nested .container here (same reasoning as the        -->
+            <!-- Rolling 30 Days panel above): Bootstrap's centered,      -->
+            <!-- padded .container, nested a second time inside an       -->
+            <!-- already-full-width col-md-12, produces a left/right     -->
+            <!-- edge mismatch that's only visible at full row width.    -->
             <!-- ================================================== -->
             <div class="row report-row">
                 <div class="col-md-12 report-col-12">
-                    <div class="container kpi-row pal-kpi-timeline-row">
-                        <div class="row card-row">
-                            <div class="col-md-12">
-                                <div class="card pal-card-full-width pal-timeline-card">
-                                    <div class="card-body">
-                                        <div class="label">Monthly Spend &mdash; All Years</div>
-                                        <div class="pal-timeline-wrap">
-                                            <canvas id="pal-timeline-chart"></canvas>
-                                        </div>
+                    <div class="row card-row pal-kpi-timeline-row">
+                        <div class="col-md-12">
+                            <div class="card pal-card-full-width pal-timeline-card">
+                                <div class="card-body">
+                                    <div class="label">Monthly Spend &mdash; All Years</div>
+                                    <div class="pal-timeline-wrap">
+                                        <canvas id="pal-timeline-chart"></canvas>
                                     </div>
                                 </div>
                             </div>
@@ -515,7 +518,7 @@ tags:
                                         <div class="pal-stacked-divider"></div>
                                         <div class="pal-stacked-item">
                                             <div class="label">Data As Of</div>
-                                            <div class="value pal-asof">2026-06-30T00:55:16Z</div>
+                                            <div class="value pal-asof">2026-06-30T01:13:25Z</div>
                                         </div>
                                     </div>
                                 </div>
