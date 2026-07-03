@@ -1302,24 +1302,33 @@ td.pal-empty {
 
 /*
  * ------------------------------------------------- DESCRIPTION BREAKDOWNS
- * Per-description pie+legend card pairs, below the descriptions table.
+ * 10 per-description payee pie cards arranged as 5 rows × 2 cards.
+ * Each card: title, pie chart stacked on top, legend table below.
 */
 
-.pal-desc-breakdown {
-    margin-top: 2rem;
-    padding-top: 1.25rem;
-    border-top: 1px solid var(--common-border);
+.pal-desc-breakdown-row {
+    margin-top: 1.5rem;
 }
 
-.pal-desc-breakdown-title {
-    font-size: 1rem;
+.pal-desc-card {
+    height: 100%;
+}
+
+.pal-desc-card-title {
+    font-size: 0.95rem;
     font-weight: 600;
     color: var(--title-text-color);
-    margin-bottom: 0.75rem;
+    margin-bottom: 0.35rem;
 }
 
-.pal-desc-breakdown-cards {
-    margin-top: 0.25rem;
+.pal-desc-legend {
+    margin-top: 0.75rem;
+}
+
+.pal-desc-legend th,
+.pal-desc-legend td {
+    font-size: 0.82rem;
+    padding: 0.3rem 0.4rem;
 }
 
 /*

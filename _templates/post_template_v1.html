@@ -729,47 +729,49 @@ tags:
                                 </table>
                                 <div class="pal-pagination" id="pal-descriptions-pagination"></div>
 
-                                <!-- Per-description pie breakdowns: top payees and top
-                                     accounts for each of the top 10 descriptions, shown
-                                     as side-by-side pie+legend cards. Data is pre-embedded
-                                     in PALedgerData.descriptionBreakdowns (from the new
-                                     top_payees/top_accounts fields in L2) -- no fetch. -->
-                                {% for description, entry, _amt in all_descriptions[:10] %}
-                                {%- set slug = id_slug(description) -%}
-                                {%- set payee_count = entry.top_payees | length -%}
-                                <div class="pal-desc-breakdown">
-                                    <h4 class="pal-desc-breakdown-title">
-                                        <span class="pal-link"
-                                              onclick="PALedger.openDescription('{{ description | replace("'", "\\'") }}', '{{ entry.months.keys() | join(',') }}')">
-                                            {{ description }}
-                                        </span>
-                                    </h4>
-                                    <div class="row card-row pal-desc-breakdown-cards">
+                                <!-- Per-description pie breakdowns: top payees for each
+                                     of the top 10 descriptions, arranged as 5 rows of
+                                     2 cards each. Each card: description title, pie chart
+                                     stacked on top, legend table below. Data comes from
+                                     PALedgerData.descriptionBreakdowns (pre-embedded from
+                                     L2 top_payees fields) -- no fetch required. -->
+                                {%- set desc_pairs = [] -%}
+                                {%- for description, entry, _amt in all_descriptions[:10] -%}
+                                    {%- set _ = desc_pairs.append((description, entry)) -%}
+                                {%- endfor -%}
 
-                                        <div class="col-md-12">
-                                            <div class="card pal-pie-card">
-                                                <div class="card-body">
-                                                    <div class="label">Top {{ payee_count if payee_count < 10 else 10 }} Payees</div>
-                                                    <div class="row pal-pie-card-row">
-                                                        <div class="col-md-6 pal-pie-chart-col">
-                                                            <div class="pal-pie-card-wrap">
-                                                                <canvas id="pal-desc-payees-chart-{{ slug }}"></canvas>
-                                                            </div>
-                                                        </div>
-                                                        <div class="col-md-6 pal-pie-legend-col">
-                                                            <table class="pal-table pal-pie-legend-table" id="pal-desc-payees-legend-{{ slug }}">
-                                                                <thead><tr><th></th><th>Payee</th><th>Total</th></tr></thead>
-                                                                <tbody>
-                                                                    <tr><td colspan="3" class="pal-empty">Loading&hellip;</td></tr>
-                                                                </tbody>
-                                                            </table>
-                                                        </div>
-                                                    </div>
+                                {% for i in range(0, desc_pairs|length, 2) %}
+                                <div class="row card-row pal-desc-breakdown-row">
+                                    {% for j in [0, 1] %}
+                                    {% if i + j < desc_pairs|length %}
+                                    {%- set description = desc_pairs[i+j][0] -%}
+                                    {%- set entry = desc_pairs[i+j][1] -%}
+                                    {%- set slug = id_slug(description) -%}
+                                    {%- set payee_count = entry.top_payees | length -%}
+                                    <div class="col-md-6 card-col-6">
+                                        <div class="card pal-pie-card pal-desc-card">
+                                            <div class="card-body">
+                                                <div class="pal-desc-card-title">
+                                                    <span class="pal-link"
+                                                          onclick="PALedger.openDescription('{{ description | replace("'", "\\'") }}', '{{ entry.months.keys() | join(',') }}')">
+                                                        {{ description }}
+                                                    </span>
                                                 </div>
+                                                <div class="label">Top {{ payee_count if payee_count < 10 else 10 }} Payees</div>
+                                                <div class="pal-pie-card-wrap">
+                                                    <canvas id="pal-desc-payees-chart-{{ slug }}"></canvas>
+                                                </div>
+                                                <table class="pal-table pal-pie-legend-table pal-desc-legend" id="pal-desc-payees-legend-{{ slug }}">
+                                                    <thead><tr><th></th><th>Payee</th><th>Total</th></tr></thead>
+                                                    <tbody>
+                                                        <tr><td colspan="3" class="pal-empty">Loading&hellip;</td></tr>
+                                                    </tbody>
+                                                </table>
                                             </div>
                                         </div>
-
                                     </div>
+                                    {% endif %}
+                                    {% endfor %}
                                 </div>
                                 {% endfor %}
                             </div>
