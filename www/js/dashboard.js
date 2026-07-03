@@ -474,6 +474,28 @@
     "#2f7da0", "#6b8e23", "#16365b", "#c98a3e", "#5b9279",
   ];
 
+  // Ten distinct shuffles of CHART_PALETTE's 10 colors, one assigned to
+  // each of the top-10 description subsections. Each pair of pie charts
+  // within a subsection shares the same shuffle (payees-left and
+  // accounts-right for the same description use the same visual language)
+  // but adjacent subsections use a different rotation so they don't
+  // all look identical. These are not random -- they are pre-computed
+  // rotations of the same set so the page's overall color language is
+  // preserved while still giving each subsection a visually distinct
+  // first-slice color.
+  const DESCRIPTION_PALETTES = [
+    ["#5b9279", "#c98a3e", "#7a6ba0", "#2f7da0", "#a85b7a", "#16365b", "#6b8e23", "#fa1b3e", "#3e8e7e", "#9dddee"],
+    ["#3e8e7e", "#fa1b3e", "#16365b", "#5b9279", "#9dddee", "#a85b7a", "#c98a3e", "#6b8e23", "#2f7da0", "#7a6ba0"],
+    ["#c98a3e", "#9dddee", "#a85b7a", "#3e8e7e", "#6b8e23", "#fa1b3e", "#2f7da0", "#5b9279", "#7a6ba0", "#16365b"],
+    ["#a85b7a", "#6b8e23", "#2f7da0", "#c98a3e", "#16365b", "#9dddee", "#fa1b3e", "#7a6ba0", "#5b9279", "#3e8e7e"],
+    ["#6b8e23", "#16365b", "#fa1b3e", "#a85b7a", "#7a6ba0", "#3e8e7e", "#9dddee", "#5b9279", "#c98a3e", "#2f7da0"],
+    ["#fa1b3e", "#7a6ba0", "#9dddee", "#6b8e23", "#2f7da0", "#5b9279", "#3e8e7e", "#16365b", "#a85b7a", "#c98a3e"],
+    ["#9dddee", "#2f7da0", "#5b9279", "#fa1b3e", "#3e8e7e", "#7a6ba0", "#16365b", "#c98a3e", "#6b8e23", "#a85b7a"],
+    ["#16365b", "#5b9279", "#c98a3e", "#9dddee", "#fa1b3e", "#6b8e23", "#a85b7a", "#3e8e7e", "#2f7da0", "#7a6ba0"],
+    ["#2f7da0", "#a85b7a", "#6b8e23", "#7a6ba0", "#5b9279", "#c98a3e", "#fa1b3e", "#9dddee", "#3e8e7e", "#16365b"],
+    ["#7a6ba0", "#3e8e7e", "#2f7da0", "#16365b", "#c98a3e", "#fa1b3e", "#5b9279", "#a85b7a", "#9dddee", "#6b8e23"],
+  ];
+
   // --------------------------------------------------------------------
   // Public drill-down entry points
   // (called directly from onclick="" attributes in the Jinja template)
@@ -804,7 +826,7 @@
    *  server-rendered legend markup in the template (Top Payees/Top
    *  Accounts pie cards) but built in JS since this data isn't
    *  available to Jinja at render time. */
-  function renderAchLegendRows(tbodyEl, entries, canvasId, onRowClick) {
+  function renderAchLegendRows(tbodyEl, entries, canvasId, onRowClick, palette) {
     tbodyEl.innerHTML = "";
     if (entries.length === 0) {
       const tr = document.createElement("tr");
@@ -813,6 +835,8 @@
       return;
     }
 
+    const activePalette = palette || CHART_PALETTE;
+
     entries.forEach(([label, amount], index) => {
       const tr = document.createElement("tr");
       tr.className = "pal-pie-legend-row";
@@ -820,7 +844,7 @@
       const swatchTd = document.createElement("td");
       const swatch = document.createElement("span");
       swatch.className = "pal-swatch";
-      swatch.style.backgroundColor = CHART_PALETTE[index % CHART_PALETTE.length];
+      swatch.style.backgroundColor = activePalette[index % activePalette.length];
       swatchTd.appendChild(swatch);
 
       const labelTd = document.createElement("td");
@@ -1040,6 +1064,68 @@
       (label) => openWirBreakdownDetail("description", label), "No WIR PAYEE records found.");
     renderSlimLegendRows(acctTbody, byAccount, "pal-wir-account-chart",
       (label) => openWirBreakdownDetail("alt", label), "No WIR PAYEE records found.");
+  }
+
+  // --------------------------------------------------------------------
+  // Per-description pie chart breakdowns (top payees + top accounts)
+  // These charts are driven entirely by data pre-embedded in the page
+  // by the Jinja template (PALedgerData.descriptionBreakdowns), which
+  // in turn comes from the new top_payees/top_accounts fields added to
+  // each by_description entry in the L2 summary by report_pa_checkbook.py.
+  // No fetch is required -- all data is available at DOMContentLoaded.
+  // --------------------------------------------------------------------
+
+  /** Renders all per-description pie+legend card pairs. `breakdowns` is
+   *  an array of { slug, description, payees: [[name,amt],...],
+   *  accounts: [[alt,amt],...] } objects embedded by the template for
+   *  the top 10 descriptions. Each pair gets a unique palette from
+   *  DESCRIPTION_PALETTES so adjacent subsections are visually distinct. */
+  function initDescriptionBreakdowns(breakdowns) {
+    if (!breakdowns || breakdowns.length === 0) return;
+
+    breakdowns.forEach((item, i) => {
+      const palette = DESCRIPTION_PALETTES[i % DESCRIPTION_PALETTES.length];
+      const payeeCanvasId = `pal-desc-payees-chart-${item.slug}`;
+      const acctCanvasId = `pal-desc-accts-chart-${item.slug}`;
+
+      // Render pie charts (guarded by Chart.js availability)
+      if (window.Chart) {
+        renderPieChart(
+          payeeCanvasId,
+          item.payees.map(([label, amount]) => ({ label, amount: parseFloat(amount) })),
+          palette
+        );
+        renderPieChart(
+          acctCanvasId,
+          item.accounts.map(([label, amount]) => ({ label, amount: parseFloat(amount) })),
+          palette
+        );
+      }
+
+      // Legend tables: payees
+      const payeeTbody = document.querySelector(`#pal-desc-payees-legend-${item.slug} tbody`);
+      if (payeeTbody) {
+        renderAchLegendRows(
+          payeeTbody,
+          item.payees,
+          payeeCanvasId,
+          (name) => openName(name, ""),
+          palette
+        );
+      }
+
+      // Legend tables: accounts
+      const acctTbody = document.querySelector(`#pal-desc-accts-legend-${item.slug} tbody`);
+      if (acctTbody) {
+        renderAchLegendRows(
+          acctTbody,
+          item.accounts,
+          acctCanvasId,
+          (alt) => openAcct(alt, ""),
+          palette
+        );
+      }
+    });
   }
 
   /** Renders the all-history monthly timeline -- a line chart spanning
@@ -1482,6 +1568,16 @@
       console.warn("PALedger: ACH breakdown failed to initialize", err);
     }
 
+    // Per-description pie breakdown charts. Data is fully pre-embedded
+    // by the template -- no fetch needed. Guarded same as ACH/WIR.
+    try {
+      if (cfg.descriptionBreakdowns) {
+        initDescriptionBreakdowns(cfg.descriptionBreakdowns);
+      }
+    } catch (err) {
+      console.warn("PALedger: description breakdowns failed to initialize", err);
+    }
+
     // Same reasoning as initAchBreakdown above -- legends/click-through
     // work without Chart.js, only the charts themselves are skipped.
     // monthKeysCsv may legitimately be an empty string if this dataset
@@ -1520,5 +1616,6 @@
     openReadme,
     initAchBreakdown,
     initWirBreakdown,
+    initDescriptionBreakdowns,
   };
 })();

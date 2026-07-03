@@ -1301,6 +1301,28 @@ td.pal-empty {
 }
 
 /*
+ * ------------------------------------------------- DESCRIPTION BREAKDOWNS
+ * Per-description pie+legend card pairs, below the descriptions table.
+*/
+
+.pal-desc-breakdown {
+    margin-top: 2rem;
+    padding-top: 1.25rem;
+    border-top: 1px solid var(--common-border);
+}
+
+.pal-desc-breakdown-title {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--title-text-color);
+    margin-bottom: 0.75rem;
+}
+
+.pal-desc-breakdown-cards {
+    margin-top: 0.25rem;
+}
+
+/*
  * ====================================================================
  * MOBILE BREAKPOINTS -- intentionally placed at the very end of this
  * file. Several of the rules below (.pal-pie-card-wrap, .pal-radar-wrap,
