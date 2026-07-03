@@ -1086,42 +1086,32 @@
     breakdowns.forEach((item, i) => {
       const palette = DESCRIPTION_PALETTES[i % DESCRIPTION_PALETTES.length];
       const payeeCanvasId = `pal-desc-payees-chart-${item.slug}`;
-      const acctCanvasId = `pal-desc-accts-chart-${item.slug}`;
 
-      // Render pie charts (guarded by Chart.js availability)
+      // Convert payees array (objects with name/amount/monthKeys) into
+      // the [label, amount] pairs renderPieChart and renderAchLegendRows expect
+      const payeeEntries = item.payees.map((p) => [p.name, p.amount]);
+
       if (window.Chart) {
         renderPieChart(
           payeeCanvasId,
-          item.payees.map(([label, amount]) => ({ label, amount: parseFloat(amount) })),
-          palette
-        );
-        renderPieChart(
-          acctCanvasId,
-          item.accounts.map(([label, amount]) => ({ label, amount: parseFloat(amount) })),
+          payeeEntries.map(([label, amount]) => ({ label, amount: parseFloat(amount) })),
           palette
         );
       }
 
-      // Legend tables: payees
       const payeeTbody = document.querySelector(`#pal-desc-payees-legend-${item.slug} tbody`);
       if (payeeTbody) {
         renderAchLegendRows(
           payeeTbody,
-          item.payees,
+          payeeEntries,
           payeeCanvasId,
-          (name) => openName(name, ""),
-          palette
-        );
-      }
-
-      // Legend tables: accounts
-      const acctTbody = document.querySelector(`#pal-desc-accts-legend-${item.slug} tbody`);
-      if (acctTbody) {
-        renderAchLegendRows(
-          acctTbody,
-          item.accounts,
-          acctCanvasId,
-          (alt) => openAcct(alt, ""),
+          // Pass the payee's own all-time month-keys so openName fetches
+          // the right L1 files. Without this, an empty string was passed
+          // and fetchAllMonths returned zero records (modal appeared blank).
+          (name) => {
+            const payeeObj = item.payees.find((p) => p.name === name);
+            openName(name, payeeObj ? payeeObj.monthKeys : "");
+          },
           palette
         );
       }

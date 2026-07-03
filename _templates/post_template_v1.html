@@ -1,6 +1,26 @@
 {%- macro usd(amount) -%}
     ${{ "{:,.2f}".format(amount | float) }}
 {%- endmacro -%}
+{%- macro id_slug(raw) -%}
+    {#- Produces a string safe for use as an HTML element ID and in
+        CSS querySelector calls. Stricter than sanitize_tag (which
+        targets filesystem paths): also replaces & . , ( ) [ ] # @ !
+        and any other character that is not alphanumeric or underscore,
+        since querySelector fails on IDs containing those characters
+        even though they are valid in HTML id attributes. -#}
+    {%- set v = raw | trim -%}
+    {%- set v = v | replace(" ", "_") -%}
+    {%- set v = v | replace("&", "_") -%}
+    {%- set v = v | replace(".", "_") -%}
+    {%- set v = v | replace(",", "_") -%}
+    {%- set v = v | replace("(", "_") | replace(")", "_") -%}
+    {%- set v = v | replace("[", "_") | replace("]", "_") -%}
+    {%- set v = v | replace("/", "_") | replace("\\", "_") | replace(":", "_") -%}
+    {%- set v = v | replace("*", "_") | replace("?", "_") | replace('"', "_") -%}
+    {%- set v = v | replace("<", "_") | replace(">", "_") | replace("|", "_") | replace("'", "_") -%}
+    {%- set v = v | replace("#", "_") | replace("@", "_") | replace("!", "_") -%}
+    {{- v if v not in ["", ".", ".."] else "_EMPTY_" -}}
+{%- endmacro -%}
 {%- macro months_in_year(months_dict, year_key) -%}
     {%- set result = [] -%}
     {%- for mk in months_dict.keys() -%}
@@ -715,9 +735,8 @@ tags:
                                      in PALedgerData.descriptionBreakdowns (from the new
                                      top_payees/top_accounts fields in L2) -- no fetch. -->
                                 {% for description, entry, _amt in all_descriptions[:10] %}
-                                {%- set slug = sanitize_tag(description) -%}
+                                {%- set slug = id_slug(description) -%}
                                 {%- set payee_count = entry.top_payees | length -%}
-                                {%- set acct_count = entry.top_accounts | length -%}
                                 <div class="pal-desc-breakdown">
                                     <h4 class="pal-desc-breakdown-title">
                                         <span class="pal-link"
@@ -727,36 +746,25 @@ tags:
                                     </h4>
                                     <div class="row card-row pal-desc-breakdown-cards">
 
-                                        <div class="col-md-6 card-col-6">
+                                        <div class="col-md-12">
                                             <div class="card pal-pie-card">
                                                 <div class="card-body">
                                                     <div class="label">Top {{ payee_count if payee_count < 10 else 10 }} Payees</div>
-                                                    <div class="pal-pie-card-wrap">
-                                                        <canvas id="pal-desc-payees-chart-{{ slug }}"></canvas>
+                                                    <div class="row pal-pie-card-row">
+                                                        <div class="col-md-6 pal-pie-chart-col">
+                                                            <div class="pal-pie-card-wrap">
+                                                                <canvas id="pal-desc-payees-chart-{{ slug }}"></canvas>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-6 pal-pie-legend-col">
+                                                            <table class="pal-table pal-pie-legend-table" id="pal-desc-payees-legend-{{ slug }}">
+                                                                <thead><tr><th></th><th>Payee</th><th>Total</th></tr></thead>
+                                                                <tbody>
+                                                                    <tr><td colspan="3" class="pal-empty">Loading&hellip;</td></tr>
+                                                                </tbody>
+                                                            </table>
+                                                        </div>
                                                     </div>
-                                                    <table class="pal-table pal-pie-legend-table" id="pal-desc-payees-legend-{{ slug }}">
-                                                        <thead><tr><th></th><th>Payee</th><th>Total</th></tr></thead>
-                                                        <tbody>
-                                                            <tr><td colspan="3" class="pal-empty">Loading&hellip;</td></tr>
-                                                        </tbody>
-                                                    </table>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <div class="col-md-6 card-col-6">
-                                            <div class="card pal-pie-card">
-                                                <div class="card-body">
-                                                    <div class="label">Top {{ acct_count if acct_count < 10 else 10 }} Accounts</div>
-                                                    <div class="pal-pie-card-wrap">
-                                                        <canvas id="pal-desc-accts-chart-{{ slug }}"></canvas>
-                                                    </div>
-                                                    <table class="pal-table pal-pie-legend-table" id="pal-desc-accts-legend-{{ slug }}">
-                                                        <thead><tr><th></th><th>Account</th><th>Total</th></tr></thead>
-                                                        <tbody>
-                                                            <tr><td colspan="3" class="pal-empty">Loading&hellip;</td></tr>
-                                                        </tbody>
-                                                    </table>
                                                 </div>
                                             </div>
                                         </div>
@@ -948,10 +956,17 @@ tags:
     descriptionBreakdowns: [
       {% for description, entry, _amt in all_descriptions[:10] %}
       {
-        slug: "{{ sanitize_tag(description) }}",
+        slug: "{{ id_slug(description) }}",
         description: "{{ description | replace('"', '\\"') }}",
-        payees: {{ entry.top_payees | tojson }},
-        accounts: {{ entry.top_accounts | tojson }}
+        payees: [
+          {% for payee_name, payee_amt in entry.top_payees %}
+          {
+            name: "{{ payee_name | replace('"', '\\"') | replace("'", "\\'") }}",
+            amount: "{{ payee_amt }}",
+            monthKeys: "{{ data.by_name.get(payee_name, {}).get('months', {}).keys() | join(',') }}"
+          }{{ "," if not loop.last }}
+          {% endfor %}
+        ]
       }{{ "," if not loop.last }}
       {% endfor %}
     ]
