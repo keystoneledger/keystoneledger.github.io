@@ -533,7 +533,7 @@ tags:
                                         <div class="pal-stacked-divider"></div>
                                         <div class="pal-stacked-item">
                                             <div class="label">Data As Of</div>
-                                            <div class="value pal-asof">2026-07-03T21:47:33Z</div>
+                                            <div class="value pal-asof">2026-07-03T22:31:56Z</div>
                                         </div>
                                     </div>
                                 </div>
@@ -2046,350 +2046,270 @@ tags:
                                 </table>
                                 <div class="pal-pagination" id="pal-descriptions-pagination"></div>
 
-                                <!-- Per-description pie breakdowns: top payees and top
-                                     accounts for each of the top 10 descriptions, shown
-                                     as side-by-side pie+legend cards. Data is pre-embedded
-                                     in PALedgerData.descriptionBreakdowns (from the new
-                                     top_payees/top_accounts fields in L2) -- no fetch. -->
-                                <div class="pal-desc-breakdown">
-                                    <h4 class="pal-desc-breakdown-title">
-                                        <span class="pal-link"
-                                              onclick="PALedger.openDescription('Debt Service - Princ', '2019-10,2019-11,2019-12,2020-01,2020-02,2020-03,2020-04,2020-05,2020-06,2020-07,2020-09,2020-10,2020-11,2020-12,2021-01,2021-02,2021-03,2021-04,2021-05,2021-06,2021-07,2021-08,2021-09,2021-10,2021-11,2022-01,2022-02,2022-03,2022-04,2022-05,2022-06,2022-07,2022-08,2022-09,2022-10,2022-12,2023-01,2023-02,2023-03,2023-04,2023-05,2023-06,2023-07,2023-08,2023-09,2023-10,2023-12,2024-01,2024-02,2024-03,2024-04,2024-05,2024-06,2024-07,2024-08,2024-09,2024-12,2025-01,2025-02,2025-03,2025-04,2025-05,2025-07,2025-08,2025-09,2025-12,2026-01,2026-02,2026-04,2026-05')">
-                                            Debt Service - Princ
-                                        </span>
-                                    </h4>
-                                    <div class="row card-row pal-desc-breakdown-cards">
-
-                                        <div class="col-md-12">
-                                            <div class="card pal-pie-card">
-                                                <div class="card-body">
-                                                    <div class="label">Top 8 Payees</div>
-                                                    <div class="row pal-pie-card-row">
-                                                        <div class="col-md-6 pal-pie-chart-col">
-                                                            <div class="pal-pie-card-wrap">
-                                                                <canvas id="pal-desc-payees-chart-Debt_Service_-_Princ"></canvas>
-                                                            </div>
-                                                        </div>
-                                                        <div class="col-md-6 pal-pie-legend-col">
-                                                            <table class="pal-table pal-pie-legend-table" id="pal-desc-payees-legend-Debt_Service_-_Princ">
-                                                                <thead><tr><th></th><th>Payee</th><th>Total</th></tr></thead>
-                                                                <tbody>
-                                                                    <tr><td colspan="3" class="pal-empty">Loading&hellip;</td></tr>
-                                                                </tbody>
-                                                            </table>
-                                                        </div>
-                                                    </div>
+                                <!-- Per-description pie breakdowns: top payees for each
+                                     of the top 10 descriptions, arranged as 5 rows of
+                                     2 cards each. Each card: description title, pie chart
+                                     stacked on top, legend table below. Data comes from
+                                     PALedgerData.descriptionBreakdowns (pre-embedded from
+                                     L2 top_payees fields) -- no fetch required. -->
+                                <div class="row card-row pal-desc-breakdown-row">
+                                    
+                                    <div class="col-md-6 card-col-6">
+                                        <div class="card pal-pie-card pal-desc-card">
+                                            <div class="card-body">
+                                                <div class="pal-desc-card-title">
+                                                    <span class="pal-link"
+                                                          onclick="PALedger.openDescription('Debt Service - Princ', '2019-10,2019-11,2019-12,2020-01,2020-02,2020-03,2020-04,2020-05,2020-06,2020-07,2020-09,2020-10,2020-11,2020-12,2021-01,2021-02,2021-03,2021-04,2021-05,2021-06,2021-07,2021-08,2021-09,2021-10,2021-11,2022-01,2022-02,2022-03,2022-04,2022-05,2022-06,2022-07,2022-08,2022-09,2022-10,2022-12,2023-01,2023-02,2023-03,2023-04,2023-05,2023-06,2023-07,2023-08,2023-09,2023-10,2023-12,2024-01,2024-02,2024-03,2024-04,2024-05,2024-06,2024-07,2024-08,2024-09,2024-12,2025-01,2025-02,2025-03,2025-04,2025-05,2025-07,2025-08,2025-09,2025-12,2026-01,2026-02,2026-04,2026-05')">
+                                                        Debt Service - Princ
+                                                    </span>
                                                 </div>
+                                                <div class="label">Top 8 Payees</div>
+                                                <div class="pal-pie-card-wrap">
+                                                    <canvas id="pal-desc-payees-chart-Debt_Service_-_Princ"></canvas>
+                                                </div>
+                                                <table class="pal-table pal-pie-legend-table pal-desc-legend" id="pal-desc-payees-legend-Debt_Service_-_Princ">
+                                                    <thead><tr><th></th><th>Payee</th><th>Total</th></tr></thead>
+                                                    <tbody>
+                                                        <tr><td colspan="3" class="pal-empty">Loading&hellip;</td></tr>
+                                                    </tbody>
+                                                </table>
                                             </div>
                                         </div>
-
                                     </div>
+                                    
+                                    
+                                    <div class="col-md-6 card-col-6">
+                                        <div class="card pal-pie-card pal-desc-card">
+                                            <div class="card-body">
+                                                <div class="pal-desc-card-title">
+                                                    <span class="pal-link"
+                                                          onclick="PALedger.openDescription('Grants & Payments to', '2019-10,2019-11,2019-12,2020-01,2020-02,2020-03,2020-04,2020-05,2020-06,2020-07,2020-08,2020-09,2020-10,2020-11,2020-12,2021-01,2021-02,2021-03,2021-04,2021-05,2021-06,2021-07,2021-08,2021-09,2021-10,2021-11,2021-12,2022-01,2022-02,2022-03,2022-04,2022-05,2022-06,2022-07,2022-08,2022-09,2022-10,2022-11,2022-12,2023-01,2023-02,2023-03,2023-04,2023-05,2023-06,2023-07,2023-08,2023-09,2023-10,2023-11,2023-12,2024-01,2024-02,2024-03,2024-04,2024-05,2024-06,2024-07,2024-08,2024-09,2024-10,2024-11,2024-12,2025-01,2025-02,2025-03,2025-04,2025-05,2025-06,2025-07,2025-08,2025-09,2025-10,2025-11,2025-12,2026-01,2026-02,2026-03,2026-04,2026-05,2026-06,2026-07')">
+                                                        Grants & Payments to
+                                                    </span>
+                                                </div>
+                                                <div class="label">Top 10 Payees</div>
+                                                <div class="pal-pie-card-wrap">
+                                                    <canvas id="pal-desc-payees-chart-Grants___Payments_to"></canvas>
+                                                </div>
+                                                <table class="pal-table pal-pie-legend-table pal-desc-legend" id="pal-desc-payees-legend-Grants___Payments_to">
+                                                    <thead><tr><th></th><th>Payee</th><th>Total</th></tr></thead>
+                                                    <tbody>
+                                                        <tr><td colspan="3" class="pal-empty">Loading&hellip;</td></tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    
                                 </div>
-                                <div class="pal-desc-breakdown">
-                                    <h4 class="pal-desc-breakdown-title">
-                                        <span class="pal-link"
-                                              onclick="PALedger.openDescription('Grants & Payments to', '2019-10,2019-11,2019-12,2020-01,2020-02,2020-03,2020-04,2020-05,2020-06,2020-07,2020-08,2020-09,2020-10,2020-11,2020-12,2021-01,2021-02,2021-03,2021-04,2021-05,2021-06,2021-07,2021-08,2021-09,2021-10,2021-11,2021-12,2022-01,2022-02,2022-03,2022-04,2022-05,2022-06,2022-07,2022-08,2022-09,2022-10,2022-11,2022-12,2023-01,2023-02,2023-03,2023-04,2023-05,2023-06,2023-07,2023-08,2023-09,2023-10,2023-11,2023-12,2024-01,2024-02,2024-03,2024-04,2024-05,2024-06,2024-07,2024-08,2024-09,2024-10,2024-11,2024-12,2025-01,2025-02,2025-03,2025-04,2025-05,2025-06,2025-07,2025-08,2025-09,2025-10,2025-11,2025-12,2026-01,2026-02,2026-03,2026-04,2026-05,2026-06,2026-07')">
-                                            Grants & Payments to
-                                        </span>
-                                    </h4>
-                                    <div class="row card-row pal-desc-breakdown-cards">
-
-                                        <div class="col-md-12">
-                                            <div class="card pal-pie-card">
-                                                <div class="card-body">
-                                                    <div class="label">Top 10 Payees</div>
-                                                    <div class="row pal-pie-card-row">
-                                                        <div class="col-md-6 pal-pie-chart-col">
-                                                            <div class="pal-pie-card-wrap">
-                                                                <canvas id="pal-desc-payees-chart-Grants___Payments_to"></canvas>
-                                                            </div>
-                                                        </div>
-                                                        <div class="col-md-6 pal-pie-legend-col">
-                                                            <table class="pal-table pal-pie-legend-table" id="pal-desc-payees-legend-Grants___Payments_to">
-                                                                <thead><tr><th></th><th>Payee</th><th>Total</th></tr></thead>
-                                                                <tbody>
-                                                                    <tr><td colspan="3" class="pal-empty">Loading&hellip;</td></tr>
-                                                                </tbody>
-                                                            </table>
-                                                        </div>
-                                                    </div>
+                                
+                                <div class="row card-row pal-desc-breakdown-row">
+                                    
+                                    <div class="col-md-6 card-col-6">
+                                        <div class="card pal-pie-card pal-desc-card">
+                                            <div class="card-body">
+                                                <div class="pal-desc-card-title">
+                                                    <span class="pal-link"
+                                                          onclick="PALedger.openDescription('Debt Service', '2019-05,2019-09,2019-10,2019-11,2019-12,2020-01,2020-02,2020-04,2020-05,2020-06,2020-07,2020-08,2020-09,2020-10,2020-11,2020-12,2021-01,2021-02,2021-04,2021-05,2021-06,2021-07,2021-08,2021-10,2021-11,2021-12,2022-02,2022-04,2022-05,2022-06,2022-08,2022-09,2022-10,2022-12,2023-02,2023-03,2023-04,2023-05,2023-06,2023-07,2023-08,2023-12,2024-01,2024-02,2024-04,2024-07,2024-09,2024-10,2025-01,2025-03,2025-06,2025-07,2025-08,2025-10,2025-12,2026-01,2026-05,2026-06')">
+                                                        Debt Service
+                                                    </span>
                                                 </div>
+                                                <div class="label">Top 7 Payees</div>
+                                                <div class="pal-pie-card-wrap">
+                                                    <canvas id="pal-desc-payees-chart-Debt_Service"></canvas>
+                                                </div>
+                                                <table class="pal-table pal-pie-legend-table pal-desc-legend" id="pal-desc-payees-legend-Debt_Service">
+                                                    <thead><tr><th></th><th>Payee</th><th>Total</th></tr></thead>
+                                                    <tbody>
+                                                        <tr><td colspan="3" class="pal-empty">Loading&hellip;</td></tr>
+                                                    </tbody>
+                                                </table>
                                             </div>
                                         </div>
-
                                     </div>
+                                    
+                                    
+                                    <div class="col-md-6 card-col-6">
+                                        <div class="card pal-pie-card pal-desc-card">
+                                            <div class="card-body">
+                                                <div class="pal-desc-card-title">
+                                                    <span class="pal-link"
+                                                          onclick="PALedger.openDescription('Debt Service - Inter', '2019-09,2019-10,2019-11,2019-12,2020-01,2020-02,2020-03,2020-04,2020-05,2020-06,2020-07,2020-08,2020-09,2020-11,2020-12,2021-01,2021-02,2021-03,2021-04,2021-05,2021-06,2021-07,2021-08,2021-09,2021-10,2021-11,2021-12,2022-01,2022-02,2022-03,2022-04,2022-06,2022-07,2022-08,2022-09,2022-10,2022-11,2022-12,2023-01,2023-02,2023-03,2023-04,2023-06,2023-07,2023-08,2023-09,2023-10,2023-11,2023-12,2024-01,2024-02,2024-03,2024-06,2024-07,2024-08,2024-09,2024-10,2024-11,2024-12,2025-01,2025-02,2025-03,2025-06,2025-07,2025-08,2025-10,2025-11,2026-01,2026-02,2026-03,2026-06')">
+                                                        Debt Service - Inter
+                                                    </span>
+                                                </div>
+                                                <div class="label">Top 6 Payees</div>
+                                                <div class="pal-pie-card-wrap">
+                                                    <canvas id="pal-desc-payees-chart-Debt_Service_-_Inter"></canvas>
+                                                </div>
+                                                <table class="pal-table pal-pie-legend-table pal-desc-legend" id="pal-desc-payees-legend-Debt_Service_-_Inter">
+                                                    <thead><tr><th></th><th>Payee</th><th>Total</th></tr></thead>
+                                                    <tbody>
+                                                        <tr><td colspan="3" class="pal-empty">Loading&hellip;</td></tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    
                                 </div>
-                                <div class="pal-desc-breakdown">
-                                    <h4 class="pal-desc-breakdown-title">
-                                        <span class="pal-link"
-                                              onclick="PALedger.openDescription('Debt Service', '2019-05,2019-09,2019-10,2019-11,2019-12,2020-01,2020-02,2020-04,2020-05,2020-06,2020-07,2020-08,2020-09,2020-10,2020-11,2020-12,2021-01,2021-02,2021-04,2021-05,2021-06,2021-07,2021-08,2021-10,2021-11,2021-12,2022-02,2022-04,2022-05,2022-06,2022-08,2022-09,2022-10,2022-12,2023-02,2023-03,2023-04,2023-05,2023-06,2023-07,2023-08,2023-12,2024-01,2024-02,2024-04,2024-07,2024-09,2024-10,2025-01,2025-03,2025-06,2025-07,2025-08,2025-10,2025-12,2026-01,2026-05,2026-06')">
-                                            Debt Service
-                                        </span>
-                                    </h4>
-                                    <div class="row card-row pal-desc-breakdown-cards">
-
-                                        <div class="col-md-12">
-                                            <div class="card pal-pie-card">
-                                                <div class="card-body">
-                                                    <div class="label">Top 7 Payees</div>
-                                                    <div class="row pal-pie-card-row">
-                                                        <div class="col-md-6 pal-pie-chart-col">
-                                                            <div class="pal-pie-card-wrap">
-                                                                <canvas id="pal-desc-payees-chart-Debt_Service"></canvas>
-                                                            </div>
-                                                        </div>
-                                                        <div class="col-md-6 pal-pie-legend-col">
-                                                            <table class="pal-table pal-pie-legend-table" id="pal-desc-payees-legend-Debt_Service">
-                                                                <thead><tr><th></th><th>Payee</th><th>Total</th></tr></thead>
-                                                                <tbody>
-                                                                    <tr><td colspan="3" class="pal-empty">Loading&hellip;</td></tr>
-                                                                </tbody>
-                                                            </table>
-                                                        </div>
-                                                    </div>
+                                
+                                <div class="row card-row pal-desc-breakdown-row">
+                                    
+                                    <div class="col-md-6 card-col-6">
+                                        <div class="card pal-pie-card pal-desc-card">
+                                            <div class="card-body">
+                                                <div class="pal-desc-card-title">
+                                                    <span class="pal-link"
+                                                          onclick="PALedger.openDescription('Operating', '2019-09,2019-10,2019-11,2019-12,2020-01,2020-02,2020-03,2020-04,2020-05,2020-06,2020-07,2020-08,2020-09,2020-10,2020-11,2020-12,2021-01,2021-02,2021-03,2021-04,2021-05,2021-06,2021-07,2021-08,2021-09,2021-10,2021-11,2021-12,2022-01,2022-02,2022-03,2022-04,2022-05,2022-06,2022-07,2022-08,2022-09,2022-10,2022-11,2022-12,2023-01,2023-02,2023-03,2023-04,2023-05,2023-06,2023-07,2023-08,2023-09,2023-10,2023-11,2023-12,2024-01,2024-02,2024-03,2024-04,2024-05,2024-06,2024-07,2024-08,2024-09,2024-10,2024-11,2024-12,2025-01,2025-02,2025-03,2025-04,2025-05,2025-06,2025-07,2025-08,2025-09,2025-10,2025-11,2025-12,2026-01,2026-02,2026-03,2026-04,2026-05,2026-06,2026-07')">
+                                                        Operating
+                                                    </span>
                                                 </div>
+                                                <div class="label">Top 10 Payees</div>
+                                                <div class="pal-pie-card-wrap">
+                                                    <canvas id="pal-desc-payees-chart-Operating"></canvas>
+                                                </div>
+                                                <table class="pal-table pal-pie-legend-table pal-desc-legend" id="pal-desc-payees-legend-Operating">
+                                                    <thead><tr><th></th><th>Payee</th><th>Total</th></tr></thead>
+                                                    <tbody>
+                                                        <tr><td colspan="3" class="pal-empty">Loading&hellip;</td></tr>
+                                                    </tbody>
+                                                </table>
                                             </div>
                                         </div>
-
                                     </div>
+                                    
+                                    
+                                    <div class="col-md-6 card-col-6">
+                                        <div class="card pal-pie-card pal-desc-card">
+                                            <div class="card-body">
+                                                <div class="pal-desc-card-title">
+                                                    <span class="pal-link"
+                                                          onclick="PALedger.openDescription('Advertising', '2019-08,2019-09,2019-10,2019-11,2019-12,2020-01,2020-02,2020-03,2020-04,2020-05,2020-06,2020-07,2020-08,2020-09,2020-10,2020-11,2020-12,2021-01,2021-02,2021-03,2021-04,2021-05,2021-06,2021-07,2021-08,2021-09,2021-10,2021-11,2021-12,2022-01,2022-02,2022-03,2022-04,2022-05,2022-06,2022-07,2022-08,2022-09,2022-10,2022-11,2022-12,2023-01,2023-02,2023-03,2023-04,2023-05,2023-06,2023-07,2023-08,2023-09,2023-10,2023-11,2023-12,2024-01,2024-02,2024-03,2024-04,2024-05,2024-06,2024-07,2024-08,2024-09,2024-10,2024-11,2025-01,2025-02,2025-03,2025-04,2025-05,2025-06,2025-07,2025-08,2025-09,2025-10,2025-11,2025-12,2026-01,2026-02,2026-03,2026-04,2026-05,2026-06')">
+                                                        Advertising
+                                                    </span>
+                                                </div>
+                                                <div class="label">Top 10 Payees</div>
+                                                <div class="pal-pie-card-wrap">
+                                                    <canvas id="pal-desc-payees-chart-Advertising"></canvas>
+                                                </div>
+                                                <table class="pal-table pal-pie-legend-table pal-desc-legend" id="pal-desc-payees-legend-Advertising">
+                                                    <thead><tr><th></th><th>Payee</th><th>Total</th></tr></thead>
+                                                    <tbody>
+                                                        <tr><td colspan="3" class="pal-empty">Loading&hellip;</td></tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    
                                 </div>
-                                <div class="pal-desc-breakdown">
-                                    <h4 class="pal-desc-breakdown-title">
-                                        <span class="pal-link"
-                                              onclick="PALedger.openDescription('Debt Service - Inter', '2019-09,2019-10,2019-11,2019-12,2020-01,2020-02,2020-03,2020-04,2020-05,2020-06,2020-07,2020-08,2020-09,2020-11,2020-12,2021-01,2021-02,2021-03,2021-04,2021-05,2021-06,2021-07,2021-08,2021-09,2021-10,2021-11,2021-12,2022-01,2022-02,2022-03,2022-04,2022-06,2022-07,2022-08,2022-09,2022-10,2022-11,2022-12,2023-01,2023-02,2023-03,2023-04,2023-06,2023-07,2023-08,2023-09,2023-10,2023-11,2023-12,2024-01,2024-02,2024-03,2024-06,2024-07,2024-08,2024-09,2024-10,2024-11,2024-12,2025-01,2025-02,2025-03,2025-06,2025-07,2025-08,2025-10,2025-11,2026-01,2026-02,2026-03,2026-06')">
-                                            Debt Service - Inter
-                                        </span>
-                                    </h4>
-                                    <div class="row card-row pal-desc-breakdown-cards">
-
-                                        <div class="col-md-12">
-                                            <div class="card pal-pie-card">
-                                                <div class="card-body">
-                                                    <div class="label">Top 6 Payees</div>
-                                                    <div class="row pal-pie-card-row">
-                                                        <div class="col-md-6 pal-pie-chart-col">
-                                                            <div class="pal-pie-card-wrap">
-                                                                <canvas id="pal-desc-payees-chart-Debt_Service_-_Inter"></canvas>
-                                                            </div>
-                                                        </div>
-                                                        <div class="col-md-6 pal-pie-legend-col">
-                                                            <table class="pal-table pal-pie-legend-table" id="pal-desc-payees-legend-Debt_Service_-_Inter">
-                                                                <thead><tr><th></th><th>Payee</th><th>Total</th></tr></thead>
-                                                                <tbody>
-                                                                    <tr><td colspan="3" class="pal-empty">Loading&hellip;</td></tr>
-                                                                </tbody>
-                                                            </table>
-                                                        </div>
-                                                    </div>
+                                
+                                <div class="row card-row pal-desc-breakdown-row">
+                                    
+                                    <div class="col-md-6 card-col-6">
+                                        <div class="card pal-pie-card pal-desc-card">
+                                            <div class="card-body">
+                                                <div class="pal-desc-card-title">
+                                                    <span class="pal-link"
+                                                          onclick="PALedger.openDescription('Prof Svcs-Not Spec\'d', '2019-01,2019-07,2019-08,2019-09,2019-10,2019-11,2019-12,2020-01,2020-02,2020-03,2020-04,2020-05,2020-06,2020-07,2020-08,2020-09,2020-10,2020-11,2020-12,2021-01,2021-02,2021-03,2021-04,2021-05,2021-06,2021-07,2021-08,2021-09,2021-10,2021-11,2021-12,2022-01,2022-02,2022-03,2022-04,2022-05,2022-06,2022-07,2022-08,2022-09,2022-10,2022-11,2022-12,2023-01,2023-02,2023-03,2023-04,2023-05,2023-06,2023-07,2023-08,2023-09,2023-10,2023-11,2023-12,2024-01,2024-02,2024-03,2024-04,2024-05,2024-06,2024-07,2024-08,2024-09,2024-10,2024-11,2024-12,2025-01,2025-02,2025-03,2025-04,2025-05,2025-06,2025-07,2025-08,2025-09,2025-10,2025-11,2025-12,2026-01,2026-02,2026-03,2026-04,2026-05,2026-06')">
+                                                        Prof Svcs-Not Spec'd
+                                                    </span>
                                                 </div>
+                                                <div class="label">Top 10 Payees</div>
+                                                <div class="pal-pie-card-wrap">
+                                                    <canvas id="pal-desc-payees-chart-Prof_Svcs-Not_Spec_d"></canvas>
+                                                </div>
+                                                <table class="pal-table pal-pie-legend-table pal-desc-legend" id="pal-desc-payees-legend-Prof_Svcs-Not_Spec_d">
+                                                    <thead><tr><th></th><th>Payee</th><th>Total</th></tr></thead>
+                                                    <tbody>
+                                                        <tr><td colspan="3" class="pal-empty">Loading&hellip;</td></tr>
+                                                    </tbody>
+                                                </table>
                                             </div>
                                         </div>
-
                                     </div>
+                                    
+                                    
+                                    <div class="col-md-6 card-col-6">
+                                        <div class="card pal-pie-card pal-desc-card">
+                                            <div class="card-body">
+                                                <div class="pal-desc-card-title">
+                                                    <span class="pal-link"
+                                                          onclick="PALedger.openDescription('Administrative Services', '2019-03,2019-04,2019-06,2019-07,2019-08,2019-09,2019-10,2019-11,2019-12,2020-01,2020-02,2020-03,2020-04,2020-05,2020-06,2020-07,2020-08,2020-09,2020-10,2020-11,2020-12,2021-02,2021-03,2021-04,2021-05,2021-06,2021-07,2021-08,2021-09,2021-10,2021-11,2021-12,2022-01,2022-02,2022-03,2022-04,2022-05,2022-06,2022-07,2022-08,2022-09,2022-10,2022-11,2022-12,2023-01,2023-02,2023-03,2023-04,2023-05,2023-06,2023-07,2023-08,2023-09,2023-10,2023-11,2023-12,2024-01,2024-02,2024-03,2024-04,2024-05,2024-06,2024-07,2024-08,2024-09,2024-10,2024-11,2024-12,2025-01,2025-02,2025-03,2025-04,2025-05,2025-07,2025-08,2025-09,2025-10,2025-11,2025-12,2026-01,2026-02,2026-03,2026-04,2026-05')">
+                                                        Administrative Services
+                                                    </span>
+                                                </div>
+                                                <div class="label">Top 10 Payees</div>
+                                                <div class="pal-pie-card-wrap">
+                                                    <canvas id="pal-desc-payees-chart-Administrative_Services"></canvas>
+                                                </div>
+                                                <table class="pal-table pal-pie-legend-table pal-desc-legend" id="pal-desc-payees-legend-Administrative_Services">
+                                                    <thead><tr><th></th><th>Payee</th><th>Total</th></tr></thead>
+                                                    <tbody>
+                                                        <tr><td colspan="3" class="pal-empty">Loading&hellip;</td></tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    
                                 </div>
-                                <div class="pal-desc-breakdown">
-                                    <h4 class="pal-desc-breakdown-title">
-                                        <span class="pal-link"
-                                              onclick="PALedger.openDescription('Operating', '2019-09,2019-10,2019-11,2019-12,2020-01,2020-02,2020-03,2020-04,2020-05,2020-06,2020-07,2020-08,2020-09,2020-10,2020-11,2020-12,2021-01,2021-02,2021-03,2021-04,2021-05,2021-06,2021-07,2021-08,2021-09,2021-10,2021-11,2021-12,2022-01,2022-02,2022-03,2022-04,2022-05,2022-06,2022-07,2022-08,2022-09,2022-10,2022-11,2022-12,2023-01,2023-02,2023-03,2023-04,2023-05,2023-06,2023-07,2023-08,2023-09,2023-10,2023-11,2023-12,2024-01,2024-02,2024-03,2024-04,2024-05,2024-06,2024-07,2024-08,2024-09,2024-10,2024-11,2024-12,2025-01,2025-02,2025-03,2025-04,2025-05,2025-06,2025-07,2025-08,2025-09,2025-10,2025-11,2025-12,2026-01,2026-02,2026-03,2026-04,2026-05,2026-06,2026-07')">
-                                            Operating
-                                        </span>
-                                    </h4>
-                                    <div class="row card-row pal-desc-breakdown-cards">
-
-                                        <div class="col-md-12">
-                                            <div class="card pal-pie-card">
-                                                <div class="card-body">
-                                                    <div class="label">Top 10 Payees</div>
-                                                    <div class="row pal-pie-card-row">
-                                                        <div class="col-md-6 pal-pie-chart-col">
-                                                            <div class="pal-pie-card-wrap">
-                                                                <canvas id="pal-desc-payees-chart-Operating"></canvas>
-                                                            </div>
-                                                        </div>
-                                                        <div class="col-md-6 pal-pie-legend-col">
-                                                            <table class="pal-table pal-pie-legend-table" id="pal-desc-payees-legend-Operating">
-                                                                <thead><tr><th></th><th>Payee</th><th>Total</th></tr></thead>
-                                                                <tbody>
-                                                                    <tr><td colspan="3" class="pal-empty">Loading&hellip;</td></tr>
-                                                                </tbody>
-                                                            </table>
-                                                        </div>
-                                                    </div>
+                                
+                                <div class="row card-row pal-desc-breakdown-row">
+                                    
+                                    <div class="col-md-6 card-col-6">
+                                        <div class="card pal-pie-card pal-desc-card">
+                                            <div class="card-body">
+                                                <div class="pal-desc-card-title">
+                                                    <span class="pal-link"
+                                                          onclick="PALedger.openDescription('Sftwre Lic Proc Rec', '2019-09,2019-10,2019-12,2020-01,2020-02,2020-03,2020-04,2020-05,2020-06,2020-07,2020-08,2020-09,2020-10,2020-11,2020-12,2021-01,2021-02,2021-03,2021-04,2021-05,2021-06,2021-07,2021-08,2021-09,2021-10,2021-11,2021-12,2022-01,2022-02,2022-03,2022-04,2022-05,2022-06,2022-07,2022-08,2022-09,2022-10,2022-11,2022-12,2023-01,2023-02,2023-03,2023-04,2023-05,2023-06,2023-08,2023-09,2023-10,2023-11,2023-12,2024-01,2024-02,2024-03,2024-04,2024-05,2024-06,2024-07,2024-08,2024-09,2024-10,2024-11,2024-12,2025-01,2025-02,2025-03,2025-04,2025-05,2025-06,2025-07,2025-08,2025-09,2025-10,2025-11,2025-12,2026-01,2026-02,2026-03,2026-04,2026-05,2026-06')">
+                                                        Sftwre Lic Proc Rec
+                                                    </span>
                                                 </div>
+                                                <div class="label">Top 10 Payees</div>
+                                                <div class="pal-pie-card-wrap">
+                                                    <canvas id="pal-desc-payees-chart-Sftwre_Lic_Proc_Rec"></canvas>
+                                                </div>
+                                                <table class="pal-table pal-pie-legend-table pal-desc-legend" id="pal-desc-payees-legend-Sftwre_Lic_Proc_Rec">
+                                                    <thead><tr><th></th><th>Payee</th><th>Total</th></tr></thead>
+                                                    <tbody>
+                                                        <tr><td colspan="3" class="pal-empty">Loading&hellip;</td></tr>
+                                                    </tbody>
+                                                </table>
                                             </div>
                                         </div>
-
                                     </div>
-                                </div>
-                                <div class="pal-desc-breakdown">
-                                    <h4 class="pal-desc-breakdown-title">
-                                        <span class="pal-link"
-                                              onclick="PALedger.openDescription('Advertising', '2019-08,2019-09,2019-10,2019-11,2019-12,2020-01,2020-02,2020-03,2020-04,2020-05,2020-06,2020-07,2020-08,2020-09,2020-10,2020-11,2020-12,2021-01,2021-02,2021-03,2021-04,2021-05,2021-06,2021-07,2021-08,2021-09,2021-10,2021-11,2021-12,2022-01,2022-02,2022-03,2022-04,2022-05,2022-06,2022-07,2022-08,2022-09,2022-10,2022-11,2022-12,2023-01,2023-02,2023-03,2023-04,2023-05,2023-06,2023-07,2023-08,2023-09,2023-10,2023-11,2023-12,2024-01,2024-02,2024-03,2024-04,2024-05,2024-06,2024-07,2024-08,2024-09,2024-10,2024-11,2025-01,2025-02,2025-03,2025-04,2025-05,2025-06,2025-07,2025-08,2025-09,2025-10,2025-11,2025-12,2026-01,2026-02,2026-03,2026-04,2026-05,2026-06')">
-                                            Advertising
-                                        </span>
-                                    </h4>
-                                    <div class="row card-row pal-desc-breakdown-cards">
-
-                                        <div class="col-md-12">
-                                            <div class="card pal-pie-card">
-                                                <div class="card-body">
-                                                    <div class="label">Top 10 Payees</div>
-                                                    <div class="row pal-pie-card-row">
-                                                        <div class="col-md-6 pal-pie-chart-col">
-                                                            <div class="pal-pie-card-wrap">
-                                                                <canvas id="pal-desc-payees-chart-Advertising"></canvas>
-                                                            </div>
-                                                        </div>
-                                                        <div class="col-md-6 pal-pie-legend-col">
-                                                            <table class="pal-table pal-pie-legend-table" id="pal-desc-payees-legend-Advertising">
-                                                                <thead><tr><th></th><th>Payee</th><th>Total</th></tr></thead>
-                                                                <tbody>
-                                                                    <tr><td colspan="3" class="pal-empty">Loading&hellip;</td></tr>
-                                                                </tbody>
-                                                            </table>
-                                                        </div>
-                                                    </div>
+                                    
+                                    
+                                    <div class="col-md-6 card-col-6">
+                                        <div class="card pal-pie-card pal-desc-card">
+                                            <div class="card-body">
+                                                <div class="pal-desc-card-title">
+                                                    <span class="pal-link"
+                                                          onclick="PALedger.openDescription('Bank Service Charges', '2019-09,2019-10,2019-11,2019-12,2020-01,2020-02,2020-03,2020-04,2020-05,2020-06,2020-07,2020-08,2020-09,2020-10,2020-11,2020-12,2021-01,2021-02,2021-03,2021-04,2021-05,2021-06,2021-07,2021-08,2021-09,2021-10,2021-11,2021-12,2022-01,2022-02,2022-03,2022-04,2022-05,2022-06,2022-07,2022-08,2022-09,2022-10,2022-11,2022-12,2023-01,2023-02,2023-03,2023-04,2023-05,2023-06,2023-07,2023-08,2023-09,2023-10,2023-11,2023-12,2024-01,2024-02,2024-03,2024-04,2024-05,2024-06,2024-07,2024-08,2024-09,2024-10,2024-11,2024-12,2025-01,2025-02,2025-03,2025-04,2025-05,2025-06,2025-07,2025-08,2025-09,2025-10,2025-11,2025-12,2026-01,2026-02,2026-03,2026-04,2026-05,2026-06')">
+                                                        Bank Service Charges
+                                                    </span>
                                                 </div>
+                                                <div class="label">Top 10 Payees</div>
+                                                <div class="pal-pie-card-wrap">
+                                                    <canvas id="pal-desc-payees-chart-Bank_Service_Charges"></canvas>
+                                                </div>
+                                                <table class="pal-table pal-pie-legend-table pal-desc-legend" id="pal-desc-payees-legend-Bank_Service_Charges">
+                                                    <thead><tr><th></th><th>Payee</th><th>Total</th></tr></thead>
+                                                    <tbody>
+                                                        <tr><td colspan="3" class="pal-empty">Loading&hellip;</td></tr>
+                                                    </tbody>
+                                                </table>
                                             </div>
                                         </div>
-
                                     </div>
-                                </div>
-                                <div class="pal-desc-breakdown">
-                                    <h4 class="pal-desc-breakdown-title">
-                                        <span class="pal-link"
-                                              onclick="PALedger.openDescription('Prof Svcs-Not Spec\'d', '2019-01,2019-07,2019-08,2019-09,2019-10,2019-11,2019-12,2020-01,2020-02,2020-03,2020-04,2020-05,2020-06,2020-07,2020-08,2020-09,2020-10,2020-11,2020-12,2021-01,2021-02,2021-03,2021-04,2021-05,2021-06,2021-07,2021-08,2021-09,2021-10,2021-11,2021-12,2022-01,2022-02,2022-03,2022-04,2022-05,2022-06,2022-07,2022-08,2022-09,2022-10,2022-11,2022-12,2023-01,2023-02,2023-03,2023-04,2023-05,2023-06,2023-07,2023-08,2023-09,2023-10,2023-11,2023-12,2024-01,2024-02,2024-03,2024-04,2024-05,2024-06,2024-07,2024-08,2024-09,2024-10,2024-11,2024-12,2025-01,2025-02,2025-03,2025-04,2025-05,2025-06,2025-07,2025-08,2025-09,2025-10,2025-11,2025-12,2026-01,2026-02,2026-03,2026-04,2026-05,2026-06')">
-                                            Prof Svcs-Not Spec'd
-                                        </span>
-                                    </h4>
-                                    <div class="row card-row pal-desc-breakdown-cards">
-
-                                        <div class="col-md-12">
-                                            <div class="card pal-pie-card">
-                                                <div class="card-body">
-                                                    <div class="label">Top 10 Payees</div>
-                                                    <div class="row pal-pie-card-row">
-                                                        <div class="col-md-6 pal-pie-chart-col">
-                                                            <div class="pal-pie-card-wrap">
-                                                                <canvas id="pal-desc-payees-chart-Prof_Svcs-Not_Spec_d"></canvas>
-                                                            </div>
-                                                        </div>
-                                                        <div class="col-md-6 pal-pie-legend-col">
-                                                            <table class="pal-table pal-pie-legend-table" id="pal-desc-payees-legend-Prof_Svcs-Not_Spec_d">
-                                                                <thead><tr><th></th><th>Payee</th><th>Total</th></tr></thead>
-                                                                <tbody>
-                                                                    <tr><td colspan="3" class="pal-empty">Loading&hellip;</td></tr>
-                                                                </tbody>
-                                                            </table>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                    </div>
-                                </div>
-                                <div class="pal-desc-breakdown">
-                                    <h4 class="pal-desc-breakdown-title">
-                                        <span class="pal-link"
-                                              onclick="PALedger.openDescription('Administrative Services', '2019-03,2019-04,2019-06,2019-07,2019-08,2019-09,2019-10,2019-11,2019-12,2020-01,2020-02,2020-03,2020-04,2020-05,2020-06,2020-07,2020-08,2020-09,2020-10,2020-11,2020-12,2021-02,2021-03,2021-04,2021-05,2021-06,2021-07,2021-08,2021-09,2021-10,2021-11,2021-12,2022-01,2022-02,2022-03,2022-04,2022-05,2022-06,2022-07,2022-08,2022-09,2022-10,2022-11,2022-12,2023-01,2023-02,2023-03,2023-04,2023-05,2023-06,2023-07,2023-08,2023-09,2023-10,2023-11,2023-12,2024-01,2024-02,2024-03,2024-04,2024-05,2024-06,2024-07,2024-08,2024-09,2024-10,2024-11,2024-12,2025-01,2025-02,2025-03,2025-04,2025-05,2025-07,2025-08,2025-09,2025-10,2025-11,2025-12,2026-01,2026-02,2026-03,2026-04,2026-05')">
-                                            Administrative Services
-                                        </span>
-                                    </h4>
-                                    <div class="row card-row pal-desc-breakdown-cards">
-
-                                        <div class="col-md-12">
-                                            <div class="card pal-pie-card">
-                                                <div class="card-body">
-                                                    <div class="label">Top 10 Payees</div>
-                                                    <div class="row pal-pie-card-row">
-                                                        <div class="col-md-6 pal-pie-chart-col">
-                                                            <div class="pal-pie-card-wrap">
-                                                                <canvas id="pal-desc-payees-chart-Administrative_Services"></canvas>
-                                                            </div>
-                                                        </div>
-                                                        <div class="col-md-6 pal-pie-legend-col">
-                                                            <table class="pal-table pal-pie-legend-table" id="pal-desc-payees-legend-Administrative_Services">
-                                                                <thead><tr><th></th><th>Payee</th><th>Total</th></tr></thead>
-                                                                <tbody>
-                                                                    <tr><td colspan="3" class="pal-empty">Loading&hellip;</td></tr>
-                                                                </tbody>
-                                                            </table>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                    </div>
-                                </div>
-                                <div class="pal-desc-breakdown">
-                                    <h4 class="pal-desc-breakdown-title">
-                                        <span class="pal-link"
-                                              onclick="PALedger.openDescription('Sftwre Lic Proc Rec', '2019-09,2019-10,2019-12,2020-01,2020-02,2020-03,2020-04,2020-05,2020-06,2020-07,2020-08,2020-09,2020-10,2020-11,2020-12,2021-01,2021-02,2021-03,2021-04,2021-05,2021-06,2021-07,2021-08,2021-09,2021-10,2021-11,2021-12,2022-01,2022-02,2022-03,2022-04,2022-05,2022-06,2022-07,2022-08,2022-09,2022-10,2022-11,2022-12,2023-01,2023-02,2023-03,2023-04,2023-05,2023-06,2023-08,2023-09,2023-10,2023-11,2023-12,2024-01,2024-02,2024-03,2024-04,2024-05,2024-06,2024-07,2024-08,2024-09,2024-10,2024-11,2024-12,2025-01,2025-02,2025-03,2025-04,2025-05,2025-06,2025-07,2025-08,2025-09,2025-10,2025-11,2025-12,2026-01,2026-02,2026-03,2026-04,2026-05,2026-06')">
-                                            Sftwre Lic Proc Rec
-                                        </span>
-                                    </h4>
-                                    <div class="row card-row pal-desc-breakdown-cards">
-
-                                        <div class="col-md-12">
-                                            <div class="card pal-pie-card">
-                                                <div class="card-body">
-                                                    <div class="label">Top 10 Payees</div>
-                                                    <div class="row pal-pie-card-row">
-                                                        <div class="col-md-6 pal-pie-chart-col">
-                                                            <div class="pal-pie-card-wrap">
-                                                                <canvas id="pal-desc-payees-chart-Sftwre_Lic_Proc_Rec"></canvas>
-                                                            </div>
-                                                        </div>
-                                                        <div class="col-md-6 pal-pie-legend-col">
-                                                            <table class="pal-table pal-pie-legend-table" id="pal-desc-payees-legend-Sftwre_Lic_Proc_Rec">
-                                                                <thead><tr><th></th><th>Payee</th><th>Total</th></tr></thead>
-                                                                <tbody>
-                                                                    <tr><td colspan="3" class="pal-empty">Loading&hellip;</td></tr>
-                                                                </tbody>
-                                                            </table>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                    </div>
-                                </div>
-                                <div class="pal-desc-breakdown">
-                                    <h4 class="pal-desc-breakdown-title">
-                                        <span class="pal-link"
-                                              onclick="PALedger.openDescription('Bank Service Charges', '2019-09,2019-10,2019-11,2019-12,2020-01,2020-02,2020-03,2020-04,2020-05,2020-06,2020-07,2020-08,2020-09,2020-10,2020-11,2020-12,2021-01,2021-02,2021-03,2021-04,2021-05,2021-06,2021-07,2021-08,2021-09,2021-10,2021-11,2021-12,2022-01,2022-02,2022-03,2022-04,2022-05,2022-06,2022-07,2022-08,2022-09,2022-10,2022-11,2022-12,2023-01,2023-02,2023-03,2023-04,2023-05,2023-06,2023-07,2023-08,2023-09,2023-10,2023-11,2023-12,2024-01,2024-02,2024-03,2024-04,2024-05,2024-06,2024-07,2024-08,2024-09,2024-10,2024-11,2024-12,2025-01,2025-02,2025-03,2025-04,2025-05,2025-06,2025-07,2025-08,2025-09,2025-10,2025-11,2025-12,2026-01,2026-02,2026-03,2026-04,2026-05,2026-06')">
-                                            Bank Service Charges
-                                        </span>
-                                    </h4>
-                                    <div class="row card-row pal-desc-breakdown-cards">
-
-                                        <div class="col-md-12">
-                                            <div class="card pal-pie-card">
-                                                <div class="card-body">
-                                                    <div class="label">Top 10 Payees</div>
-                                                    <div class="row pal-pie-card-row">
-                                                        <div class="col-md-6 pal-pie-chart-col">
-                                                            <div class="pal-pie-card-wrap">
-                                                                <canvas id="pal-desc-payees-chart-Bank_Service_Charges"></canvas>
-                                                            </div>
-                                                        </div>
-                                                        <div class="col-md-6 pal-pie-legend-col">
-                                                            <table class="pal-table pal-pie-legend-table" id="pal-desc-payees-legend-Bank_Service_Charges">
-                                                                <thead><tr><th></th><th>Payee</th><th>Total</th></tr></thead>
-                                                                <tbody>
-                                                                    <tr><td colspan="3" class="pal-empty">Loading&hellip;</td></tr>
-                                                                </tbody>
-                                                            </table>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                    </div>
+                                    
+                                    
                                 </div>
                                 
                             </div>
