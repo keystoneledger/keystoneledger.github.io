@@ -1110,6 +1110,15 @@ td.pal-empty {
     min-width: 2px;
 }
 
+/* Rolling 30 Days table bars use a complementary teal rather than the
+   same pink used in Prior Years / ACH / Descriptions, so the two
+   contexts are visually distinct at a glance. #9ddfd4 is a soft
+   teal-green that sits opposite #fd8d9e on the color wheel without
+   clashing with any other palette color on the page. */
+.pal-hbar-rolling {
+    background-color: #9ddfd4;
+}
+
 /*
  * ----------------------------------------------- ACH / DESCRIPTIONS
  * Both new full-width sections reuse .year-row/.year-title/.pal-table

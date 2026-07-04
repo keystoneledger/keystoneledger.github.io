@@ -74,7 +74,7 @@
 
   /** Format a number as a plain 2-decimal string with thousands separators, no $. */
   function formatAmount(n) {
-    return n.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    return parseFloat(n).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
   }
 
   /** Parse a record's "invoice" date string (YYYY-MM-DD) into a Date, or null. */

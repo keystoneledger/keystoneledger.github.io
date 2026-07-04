@@ -251,12 +251,19 @@ tags:
                                     </div>
 
                                     {% if rolling.top_payees %}
+                                    {%- set rolling_max_ns = namespace(val=0.0) -%}
+                                    {%- for name, amount in rolling.top_payees -%}
+                                        {%- if (amount | float) > rolling_max_ns.val -%}
+                                            {%- set rolling_max_ns.val = (amount | float) -%}
+                                        {%- endif -%}
+                                    {%- endfor -%}
                                     <table class="pal-table pal-rolling-30-table">
                                         <thead>
-                                            <tr><th>Payee</th><th>Total (30 Days)</th></tr>
+                                            <tr><th>Payee</th><th>Total (30 Days)</th><th class="pal-bar-col">&nbsp;</th></tr>
                                         </thead>
                                         <tbody>
                                             {% for name, amount in rolling.top_payees %}
+                                            {%- set bar_pct = ((amount | float) / rolling_max_ns.val * 100) if rolling_max_ns.val > 0 else 0 -%}
                                             <tr>
                                                 <td>
                                                     <span class="pal-link"
@@ -265,6 +272,9 @@ tags:
                                                     </span>
                                                 </td>
                                                 <td class="pal-amount-cell">{{ usd(amount) }}</td>
+                                                <td class="pal-bar-col">
+                                                    <div class="pal-hbar pal-hbar-rolling" style="width: {{ "%.1f"|format(bar_pct) }}%;"></div>
+                                                </td>
                                             </tr>
                                             {% endfor %}
                                         </tbody>
