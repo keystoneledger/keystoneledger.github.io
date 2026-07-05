@@ -1347,9 +1347,7 @@ td.pal-empty {
 
 /* =================================================================
  * INVOICE CONTENT — PA Treasury voucher HTML styled via their own
- * class names, scoped under .pal-invoice-content so nothing bleeds
- * into the rest of the page. No JS extraction needed — the sanitizer
- * preserves all class attributes so we can target them directly.
+ * class names, scoped under .pal-invoice-content.
  * ================================================================= */
 
 .pal-invoice-content {
@@ -1359,25 +1357,12 @@ td.pal-empty {
     color: var(--card-text-color);
 }
 
-/* --- Hide outer modal chrome that PA Treasury embeds ---
-   Their HTML wraps everything in .modal-content / .modal-header /
-   .modal-body which we don't need since we're already inside our
-   own modal. Suppress their header; show only the body content. */
-.pal-invoice-content .modal-header {
-    display: none;
-}
+/* Hide PA Treasury's own modal chrome */
+.pal-invoice-content .modal-header { display: none !important; }
+.pal-invoice-content .modal-body   { padding: 0 !important; }
+.pal-invoice-content .modal-content { border: none; box-shadow: none; background: transparent; }
 
-.pal-invoice-content .modal-body {
-    padding: 0;
-}
-
-.pal-invoice-content .modal-content {
-    border: none;
-    box-shadow: none;
-    background: transparent;
-}
-
-/* --- Status banner (callout) --- */
+/* Status banner */
 .pal-invoice-content .callout {
     display: flex;
     align-items: center;
@@ -1388,20 +1373,18 @@ td.pal-empty {
     font-size: 0.85rem;
     font-weight: 500;
 }
-
 .pal-invoice-content .callout.paid {
     background-color: #e8f5e9;
     color: #2e7d32;
     border: 1px solid #a5d6a7;
 }
-
 .pal-invoice-content .callout:not(.paid) {
     background-color: #fff8e1;
     color: #5d4037;
     border: 1px solid #ffe082;
 }
 
-/* --- Section headings --- */
+/* Section headings */
 .pal-invoice-content h4.title {
     font-size: 0.78rem;
     font-weight: 700;
@@ -1411,60 +1394,42 @@ td.pal-empty {
     margin: 0 0 0.75rem 0;
     padding-bottom: 0.4rem;
     border-bottom: 2px solid var(--title-text-color);
-    max-width: 50%;
-    overflow-wrap: break-word;
-    word-wrap: break-word;
-    word-break: break-word;
     text-align: left;
     white-space: normal;
+    overflow-wrap: break-word;
 }
 
-/* The title's parent col div also needs width constrained and
-   float neutralised so max-width on the h4 takes effect. */
-.pal-invoice-content .check-holder-request .col-md-6 {
-    max-width: 50%;
-    float: none !important;
-    text-align: left;
-}
-
-/* --- Payee + amount overview row --- */
+/* Payee + amount overview row */
 .pal-invoice-content .overview {
-    display: flex;
+    display: flex !important;
     flex-wrap: wrap;
-    gap: 0;
     margin-bottom: 1rem;
     background: var(--primary-bg-color);
     border: 1px solid var(--common-border);
     border-radius: var(--common-radius);
     overflow: hidden;
     width: 100%;
-    text-align: left;
 }
-
-.pal-invoice-content .overview__addressee,
-.pal-invoice-content .overview__addressee.p-0 {
-    flex: 1 1 55%;
+.pal-invoice-content .overview__addressee {
+    flex: 1 1 50% !important;
+    max-width: 50% !important;
     padding: 10px 12px !important;
     border-right: 1px solid var(--common-border);
     text-align: left;
     overflow-wrap: break-word;
-    word-break: break-word;
-    max-width: 50%;
     box-sizing: border-box;
+    float: none !important;
+    width: auto !important;
 }
-
-.pal-invoice-content .overview__charge,
-.pal-invoice-content .overview__charge.p-0 {
-    flex: 1 1 40%;
+.pal-invoice-content .overview__charge {
+    flex: 1 1 50% !important;
+    max-width: 50% !important;
     padding: 10px 12px !important;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
     text-align: left;
-    max-width: 50%;
     box-sizing: border-box;
+    float: none !important;
+    width: auto !important;
 }
-
 .pal-invoice-content .overview__addressee__title,
 .pal-invoice-content .overview__charge__title {
     font-size: 0.72rem;
@@ -1474,14 +1439,12 @@ td.pal-empty {
     color: var(--muted-text-color);
     margin: 0 0 0.3rem 0;
 }
-
 .pal-invoice-content .overview__addressee__value {
     font-size: 0.88rem;
     font-weight: 500;
     color: var(--card-text-color);
     line-height: 1.6;
 }
-
 .pal-invoice-content .overview__charge__value {
     font-size: 1.5rem;
     font-weight: 700;
@@ -1489,23 +1452,53 @@ td.pal-empty {
     line-height: 1.2;
 }
 
-/* --- Metadata grid (invoice-issued label/value pairs) ---
-   Bootstrap's .row/.col-* rules apply on the live page and must be
-   explicitly overridden with !important. Without this the grid
-   reverts to Bootstrap's float-based columns which collapse to ~50%. */
-.pal-invoice-content .pad-left,
-.pal-invoice-content .check-holder-request,
-.pal-invoice-content .check-holder-payment {
-    margin-bottom: 1rem;
+/* Suppress redundant second Payment section and disclaimers */
+.pal-invoice-content .check-holder-payment,
+.pal-invoice-content em.small {
+    display: none !important;
 }
 
+/* Step 1: Neutralise ALL Bootstrap/float layout helpers.
+   General col-* reset — applies to every col-* inside .pal-invoice-content
+   EXCEPT the grid container, which is overridden in Step 2 below. */
 .pal-invoice-content .row {
+    display: block !important;
     margin-left: 0 !important;
     margin-right: 0 !important;
+    float: none !important;
+    width: 100% !important;
+}
+.pal-invoice-content .fl,
+.pal-invoice-content .fl-r,
+.pal-invoice-content .fr {
+    float: none !important;
+}
+.pal-invoice-content .p-0 { padding: 0 !important; }
+.pal-invoice-content .mb-0 { margin-bottom: 0; }
+.pal-invoice-content .col-md-3,
+.pal-invoice-content .col-md-5,
+.pal-invoice-content .col-md-6,
+.pal-invoice-content .col-md-7,
+.pal-invoice-content .col-sm-12,
+.pal-invoice-content .col-sm-6,
+.pal-invoice-content .col-6 {
     display: block !important;
+    float: none !important;
+    width: auto !important;
+    max-width: none !important;
+    flex: none !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
 }
 
-.pal-invoice-content .pad-left .col-sm-12 {
+/* Step 2: Grid container override.
+   MUST appear after the general col-sm-12 reset above in the file
+   so it wins on source order. Compound selectors cover every class
+   combination PA Treasury puts on this element. */
+.pal-invoice-content .pad-left .col-sm-12,
+.pal-invoice-content .pad-left .col-sm-12.fl,
+.pal-invoice-content .pad-left .col-sm-12.p-0,
+.pal-invoice-content .pad-left .col-sm-12.p-0.fl {
     display: grid !important;
     grid-template-columns: repeat(2, 1fr) !important;
     gap: 0 !important;
@@ -1514,27 +1507,21 @@ td.pal-empty {
     float: none !important;
     padding-left: 0 !important;
     padding-right: 0 !important;
-    text-align: left !important;
 }
 
-.pal-invoice-content .invoice-issued,
-.pal-invoice-content .invoice-issued.p-0 {
+/* Step 3: Grid cell padding override.
+   invoice-issued also has .p-0 which sets padding:0 in Step 1.
+   This must come after Step 1 to restore 10px padding. */
+.pal-invoice-content .invoice-issued {
     padding: 10px 12px !important;
     border-bottom: 1px solid var(--common-border);
     border-right: 1px solid var(--common-border);
-    width: 100%;
-    max-width: 100%;
     overflow-wrap: break-word;
-    word-wrap: break-word;
     word-break: break-word;
     text-align: left;
     box-sizing: border-box;
 }
-
-.pal-invoice-content .invoice-issued:nth-child(even) {
-    border-right: none;
-}
-
+.pal-invoice-content .invoice-issued:nth-child(even) { border-right: none; }
 .pal-invoice-content .invoice-issued__title {
     font-size: 0.70rem;
     font-weight: 600;
@@ -1543,7 +1530,6 @@ td.pal-empty {
     color: var(--muted-text-color);
     margin: 0 0 0.15rem 0;
 }
-
 .pal-invoice-content .invoice-issued__value {
     font-size: 0.88rem;
     font-weight: 500;
@@ -1551,7 +1537,7 @@ td.pal-empty {
     margin: 0;
 }
 
-/* --- Payment section header row (check number + pay date) --- */
+/* Payment section */
 .pal-invoice-content .invoice-number__title {
     font-size: 0.70rem;
     font-weight: 600;
@@ -1560,7 +1546,6 @@ td.pal-empty {
     color: var(--muted-text-color);
     margin: 0 0 0.15rem 0;
 }
-
 .pal-invoice-content .invoice-number__value {
     font-size: 0.88rem;
     font-weight: 500;
@@ -1568,102 +1553,10 @@ td.pal-empty {
     margin: 0;
 }
 
-/* --- Suppress the redundant second Payment section entirely.
-   check-holder-payment repeats payee address and amount already
-   shown in check-holder-request. The small disclaimer footnotes
-   (not a real check image etc.) are also not useful here. --- */
-.pal-invoice-content .check-holder-payment,
-.pal-invoice-content em.small {
-    display: none;
-}
+/* Misc */
+.pal-invoice-content .page-border { padding: 0; border: none; }
+.pal-invoice-content .small { font-size: 0.78rem; color: var(--muted-text-color); }
 
-/* --- Bootstrap float/column helpers PA Treasury uses.
-   Must use !important because Bootstrap loads on the live Jekyll
-   page and its .col-* / .row / .fl rules otherwise win. --- */
-.pal-invoice-content .fl,
-.pal-invoice-content .fl-r,
-.pal-invoice-content .fr {
-    float: none !important;
-}
-
-.pal-invoice-content .p-0:not(.invoice-issued):not(.overview__addressee):not(.overview__charge) {
-    padding: 0 !important;
-}
-
-.pal-invoice-content .col-md-3,
-.pal-invoice-content .col-md-5,
-.pal-invoice-content .col-md-6,
-.pal-invoice-content .col-md-7,
-.pal-invoice-content .col-sm-12,
-.pal-invoice-content .col-6 {
-    width: auto !important;
-    max-width: none !important;
-    flex: none !important;
-    float: none !important;
-    padding-left: 0 !important;
-    padding-right: 0 !important;
-}
-
-/* Exception: the grid container must be full-width grid */
-.pal-invoice-content .pad-left .col-sm-12 {
-    display: grid !important;
-    grid-template-columns: repeat(2, 1fr) !important;
-    width: 100% !important;
-    max-width: 100% !important;
-    padding-left: 0 !important;
-    padding-right: 0 !important;
-}
-
-/* --- Suppress Bootstrap's .row negative margins --- */
-.pal-invoice-content .row {
-    margin-left: 0 !important;
-    margin-right: 0 !important;
-    display: block !important;
-    float: none !important;
-    width: 100% !important;
-}
-
-/* --- Remove page border wrapper padding --- */
-.pal-invoice-content .page-border {
-    padding: 0;
-    border: none;
-}
-
-/* --- Footer disclaimer text --- */
-.pal-invoice-content .small {
-    font-size: 0.78rem;
-    color: var(--muted-text-color);
-}
-
-/* --- overview children: explicit !important to beat Bootstrap's
-   .col-md-* width percentages on the live page --- */
-.pal-invoice-content .overview__addressee,
-.pal-invoice-content .overview__addressee.p-0 {
-    flex: 1 1 55% !important;
-    width: auto !important;
-    max-width: 50% !important;
-    float: none !important;
-    padding: 10px 12px !important;
-    border-right: 1px solid var(--common-border);
-    text-align: left;
-    overflow-wrap: break-word;
-    word-break: break-word;
-    box-sizing: border-box;
-}
-
-.pal-invoice-content .overview__charge,
-.pal-invoice-content .overview__charge.p-0 {
-    flex: 1 1 40% !important;
-    width: auto !important;
-    max-width: 50% !important;
-    float: none !important;
-    padding: 10px 12px !important;
-    display: flex !important;
-    flex-direction: column;
-    justify-content: center;
-    text-align: left;
-    box-sizing: border-box;
-}
 
 /*
  * ====================================================================
