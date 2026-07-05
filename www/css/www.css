@@ -1345,74 +1345,225 @@ td.pal-empty {
     text-align: left;
 }
 
-/* Invoice content rendered in #pal-modal. PA Treasury voucher HTML uses
-   its own class names that don't exist in our stylesheet, so we style
-   by element rather than by class. These rules are scoped tightly under
-   .pal-invoice-content so they don't bleed into the rest of the modal. */
+/* =================================================================
+ * INVOICE CONTENT — PA Treasury voucher HTML styled via their own
+ * class names, scoped under .pal-invoice-content so nothing bleeds
+ * into the rest of the page. No JS extraction needed — the sanitizer
+ * preserves all class attributes so we can target them directly.
+ * ================================================================= */
+
 .pal-invoice-content {
     width: 100%;
     font-size: 0.88rem;
     line-height: 1.5;
-    color: var(--body-text-color);
+    color: var(--card-text-color);
 }
 
-.pal-invoice-content table {
-    border-collapse: collapse;
-    width: 100%;
-    margin: 0.75rem 0;
+/* --- Hide outer modal chrome that PA Treasury embeds ---
+   Their HTML wraps everything in .modal-content / .modal-header /
+   .modal-body which we don't need since we're already inside our
+   own modal. Suppress their header; show only the body content. */
+.pal-invoice-content .modal-header {
+    display: none;
+}
+
+.pal-invoice-content .modal-body {
+    padding: 0;
+}
+
+.pal-invoice-content .modal-content {
+    border: none;
+    box-shadow: none;
+    background: transparent;
+}
+
+/* --- Status banner (callout) --- */
+.pal-invoice-content .callout {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.6rem 1rem;
+    border-radius: var(--common-radius);
+    margin-bottom: 1rem;
     font-size: 0.85rem;
+    font-weight: 500;
 }
 
-.pal-invoice-content th {
-    background-color: var(--table-header-bg, #f4f4f4);
+.pal-invoice-content .callout.paid {
+    background-color: #e8f5e9;
+    color: #2e7d32;
+    border: 1px solid #a5d6a7;
+}
+
+.pal-invoice-content .callout:not(.paid) {
+    background-color: #fff8e1;
+    color: #5d4037;
+    border: 1px solid #ffe082;
+}
+
+/* --- Section headings --- */
+.pal-invoice-content h4.title {
+    font-size: 0.78rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
     color: var(--title-text-color);
-    font-weight: 600;
-    text-align: left;
-    padding: 0.45rem 0.6rem;
-    border-bottom: 2px solid var(--common-border);
+    margin: 0 0 0.75rem 0;
+    padding-bottom: 0.4rem;
+    border-bottom: 2px solid var(--title-text-color);
 }
 
-.pal-invoice-content td {
-    padding: 0.35rem 0.6rem;
+/* --- Payee + amount overview row --- */
+.pal-invoice-content .overview {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0;
+    margin-bottom: 1rem;
+    background: var(--primary-bg-color);
+    border: 1px solid var(--common-border);
+    border-radius: var(--common-radius);
+    overflow: hidden;
+}
+
+.pal-invoice-content .overview__addressee {
+    flex: 1 1 55%;
+    padding: 0.85rem 1rem;
+    border-right: 1px solid var(--common-border);
+}
+
+.pal-invoice-content .overview__charge {
+    flex: 1 1 40%;
+    padding: 0.85rem 1rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.pal-invoice-content .overview__addressee__title,
+.pal-invoice-content .overview__charge__title {
+    font-size: 0.72rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--muted-text-color);
+    margin: 0 0 0.3rem 0;
+}
+
+.pal-invoice-content .overview__addressee__value {
+    font-size: 0.88rem;
+    font-weight: 500;
+    color: var(--card-text-color);
+    line-height: 1.6;
+}
+
+.pal-invoice-content .overview__charge__value {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--title-text-color);
+    line-height: 1.2;
+}
+
+/* --- Metadata grid (invoice-issued label/value pairs) ---
+   PA Treasury uses Bootstrap float columns (.fl, col-md-3).
+   We override with CSS grid for a clean 2-column layout that
+   fits the modal width without relying on their float classes. */
+.pal-invoice-content .pad-left,
+.pal-invoice-content .check-holder-request,
+.pal-invoice-content .check-holder-payment {
+    margin-bottom: 1rem;
+}
+
+.pal-invoice-content .pad-left .col-sm-12 {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0;
+}
+
+.pal-invoice-content .invoice-issued {
+    padding: 0.5rem 0.75rem;
     border-bottom: 1px solid var(--common-border);
-    vertical-align: top;
+    border-right: 1px solid var(--common-border);
 }
 
-.pal-invoice-content tr:nth-child(even) td {
-    background-color: var(--table-row-alt-bg, #fafafa);
+.pal-invoice-content .invoice-issued:nth-child(even) {
+    border-right: none;
 }
 
-.pal-invoice-content p {
-    margin: 0.4rem 0;
-}
-
-.pal-invoice-content h1,
-.pal-invoice-content h2,
-.pal-invoice-content h3 {
+.pal-invoice-content .invoice-issued__title {
+    font-size: 0.70rem;
     font-weight: 600;
-    color: var(--title-text-color);
-    margin: 0.75rem 0 0.35rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--muted-text-color);
+    margin: 0 0 0.15rem 0;
 }
 
-.pal-invoice-content h1 { font-size: 1.1rem; }
-.pal-invoice-content h2 { font-size: 1.0rem; }
-.pal-invoice-content h3 { font-size: 0.95rem; }
-
-.pal-invoice-content a {
-    color: var(--link-color, #0066cc);
-    text-decoration: none;
+.pal-invoice-content .invoice-issued__value {
+    font-size: 0.88rem;
+    font-weight: 500;
+    color: var(--card-text-color);
+    margin: 0;
 }
 
-.pal-invoice-content a:hover {
-    text-decoration: underline;
+/* --- Payment section header row (check number + pay date) --- */
+.pal-invoice-content .invoice-number__title {
+    font-size: 0.70rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--muted-text-color);
+    margin: 0 0 0.15rem 0;
 }
 
-.pal-invoice-content div {
-    margin-bottom: 0.25rem;
+.pal-invoice-content .invoice-number__value {
+    font-size: 0.88rem;
+    font-weight: 500;
+    color: var(--card-text-color);
+    margin: 0;
 }
 
-.pal-invoice-content span {
-    display: inline;
+/* --- Suppress the redundant second Payment section entirely.
+   check-holder-payment repeats payee address and amount already
+   shown in check-holder-request. The small disclaimer footnotes
+   (not a real check image etc.) are also not useful here. --- */
+.pal-invoice-content .check-holder-payment,
+.pal-invoice-content em.small {
+    display: none;
+}
+
+/* --- Bootstrap float helpers PA Treasury uses ---
+   Neutralise them so our grid overrides take effect cleanly. */
+.pal-invoice-content .fl  { float: none !important; }
+.pal-invoice-content .fl-r { float: none !important; }
+.pal-invoice-content .fr  { float: none !important; }
+.pal-invoice-content .p-0 { padding: 0; }
+.pal-invoice-content .col-md-3,
+.pal-invoice-content .col-md-5,
+.pal-invoice-content .col-md-6,
+.pal-invoice-content .col-md-7,
+.pal-invoice-content .col-sm-12,
+.pal-invoice-content .col-6 {
+    width: auto !important;
+    max-width: none !important;
+    flex: none !important;
+}
+
+/* --- Suppress Bootstrap's .row margin that causes horizontal bleed --- */
+.pal-invoice-content .row {
+    margin-left: 0;
+    margin-right: 0;
+}
+
+/* --- Remove page border wrapper padding --- */
+.pal-invoice-content .page-border {
+    padding: 0;
+    border: none;
+}
+
+/* --- Footer disclaimer text --- */
+.pal-invoice-content .small {
+    font-size: 0.78rem;
+    color: var(--muted-text-color);
 }
 
 /*
