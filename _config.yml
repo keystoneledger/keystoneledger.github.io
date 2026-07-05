@@ -10,8 +10,8 @@ defaults:
       site_author: Keystone Ledger Lens
       site_description: Keystone Ledger Lens
       title: Keystone Ledger Lens
-      subtitle: Revealing Budgetary Magic Tricks
-      quip: Fact-checking Pennsylvania's multi-billion-dollar creative writing project.
+      subtitle: Decoding the Ledger. Unpacking the Omnibus.
+      quip: Transparent analysis of Pennsylvania's multi-billion-dollar budget.
       logo_url: https://avatars.githubusercontent.com/u/297656775
       style_css: /www/css/www.css
       site_js: /www/js/dashboard.js
