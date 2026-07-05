@@ -1781,633 +1781,545 @@
   // --------------------------------------------------------------------
 
   async function initPermalink() {
-        "use strict";
+    "use strict";
 
-        // -----------------------------------------------------------------------
-        // DOM references
-        // -----------------------------------------------------------------------
-        const titleEl       = document.getElementById("pal-permalink-title");
-        const backEl        = document.getElementById("pal-permalink-back");
-        const chartWrap     = document.getElementById("pal-permalink-chart-wrap");
-        const chartCanvas   = document.getElementById("pal-permalink-chart");
-        const invoiceWrap   = document.getElementById("pal-permalink-invoice-wrap");
-        const tableWrap     = document.getElementById("pal-permalink-table-wrap");
-        const tableEl       = document.getElementById("pal-permalink-table");
-        const fallbackNote  = document.getElementById("pal-permalink-fallback-note");
-        const emptyEl       = document.getElementById("pal-permalink-empty");
+    const titleEl      = document.getElementById("pal-permalink-title");
+    const subtitleEl   = document.getElementById("pal-permalink-subtitle");
+    const chartWrap    = document.getElementById("pal-permalink-chart-wrap");
+    const chartCanvas  = document.getElementById("pal-permalink-chart");
+    const invoiceWrap  = document.getElementById("pal-permalink-invoice-wrap");
+    const tableWrap    = document.getElementById("pal-permalink-table-wrap");
+    const tableEl      = document.getElementById("pal-permalink-table");
+    const fallbackNote = document.getElementById("pal-permalink-fallback-note");
+    const emptyEl      = document.getElementById("pal-permalink-empty");
 
-        const DATA_ROOT     = "DATA/L1";
-        const L2_PATH       = "DATA/L2/pa_checkbook_summary.json";
+    const DATA_ROOT = "DATA/L1";
+    const L2_PATH   = "DATA/L2/pa_checkbook_summary.json";
+    const PAGE_SIZE = 25;
 
-        const MONTH_NAMES = ["","January","February","March","April","May","June",
-                             "July","August","September","October","November","December"];
+    const MN = ["","January","February","March","April","May","June",
+                "July","August","September","October","November","December"];
 
-        // -----------------------------------------------------------------------
-        // Helpers shared with dashboard.js logic
-        // -----------------------------------------------------------------------
+    const CHART_PALETTE = [
+      "#16365b","#2f7da0","#9dddee","#5b9279","#c98a3e",
+      "#a85b7a","#6b8e23","#7a6ba0","#fa1b3e","#3e8e7e",
+    ];
 
-        function sanitizeForPath(raw) {
-            return (raw || "").trim()
-                .replace(/\s+/g, "_")
-                .replace(/[/\\:*?"<>|']/g, "_")
-                .replace(/_+/g, "_");
+    // ------------------------------------------------------------------
+    // Helpers
+    // ------------------------------------------------------------------
+
+    function sanitizeForPath(raw) {
+      return (raw || "").trim()
+        .replace(/\s+/g, "_")
+        .replace(/[\/\\:*?"<>|']/g, "_")
+        .replace(/_+/g, "_");
+    }
+
+    function monthKey(year, month) {
+      return `${year}-${String(month).padStart(2, "0")}`;
+    }
+
+    function formatAmount(n) {
+      return "$" + parseFloat(n).toLocaleString("en-US",
+        { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    }
+
+    async function fetchJSON(path) {
+      const resp = await fetch(path);
+      if (!resp.ok) throw new Error(`HTTP ${resp.status} fetching ${path}`);
+      return resp.json();
+    }
+
+    async function fetchRecords(path) {
+      try { return await fetchJSON(path); } catch (_) { return []; }
+    }
+
+    async function fetchAllMonths(basePath, monthKeys) {
+      const results = await Promise.all(
+        monthKeys.map(mk => fetchRecords(`${basePath}/${mk}.json`))
+      );
+      return results.flat();
+    }
+
+    function sumByMonth(records) {
+      const totals = new Array(12).fill(0);
+      records.forEach(r => {
+        const d = new Date(r.invoice);
+        if (!isNaN(d)) totals[d.getMonth()] += parseFloat(r.gross) || 0;
+      });
+      return totals;
+    }
+
+    function sumByYearMonth(records) {
+      const map = new Map();
+      records.forEach(r => {
+        const mk = (r.invoice || "").slice(0, 7);
+        if (mk.length === 7) map.set(mk, (map.get(mk) || 0) + (parseFloat(r.gross) || 0));
+      });
+      return [...map.entries()].sort(([a], [b]) => a.localeCompare(b));
+    }
+
+    function sumByKey(records, keyFn, n) {
+      const map = new Map();
+      records.forEach(r => {
+        const k = keyFn(r);
+        map.set(k, (map.get(k) || 0) + (parseFloat(r.gross) || 0));
+      });
+      return [...map.entries()].sort(([,a],[,b]) => b - a).slice(0, n);
+    }
+
+    // ------------------------------------------------------------------
+    // Chart
+    // ------------------------------------------------------------------
+
+    function baseChartOptions(titleText) {
+      return {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { display: false },
+          title: { display: true, text: titleText,
+                   font: { size: 13, weight: "600" } },
+        },
+        scales: {
+          y: { beginAtZero: true,
+               ticks: { callback: v => "$" + Number(v).toLocaleString() } },
+        },
+      };
+    }
+
+    let chartInstance = null;
+
+    function renderChart(config) {
+      if (!window.Chart) { chartWrap.style.display = "none"; return; }
+      if (chartInstance) { chartInstance.destroy(); chartInstance = null; }
+      chartCanvas.style.display = "block";
+      chartInstance = new Chart(chartCanvas.getContext("2d"), config);
+    }
+
+    // ------------------------------------------------------------------
+    // Subtitle
+    // ------------------------------------------------------------------
+
+    function buildExplanation(params) {
+      const { vk, name, acct, desc, year, month } = params;
+      const period = month && year ? `in ${MN[month]} ${year}`
+                   : year          ? `in ${year}`
+                   :                 "(all years)";
+      if (vk)  return `Invoice detail for ${vk}`;
+      if (name === "ACH PAYEE" && desc) return `ACH/Grant payments for description \u201c${desc}\u201d ${period}`;
+      if (name === "ACH PAYEE" && acct) return `ACH/Grant payments for account ${acct} ${period}`;
+      if (name === "WIR PAYEE" && desc) return `Wire transfer payments for description \u201c${desc}\u201d ${period}`;
+      if (name === "WIR PAYEE" && acct) return `Wire transfer payments for account ${acct} ${period}`;
+      if (name === "ACH PAYEE") return `All ACH/Grant disbursements ${period}`;
+      if (name === "WIR PAYEE") return `All wire transfer payments ${period}`;
+      if (name && desc) return `Payments to ${name} for description \u201c${desc}\u201d ${period}`;
+      if (name && acct) return `Payments to ${name} for account ${acct} ${period}`;
+      if (name)  return `All payments made to ${name} ${period}`;
+      if (acct)  return `All payments charged to account ${acct} ${period}`;
+      if (desc)  return `All payments with description \u201c${desc}\u201d ${period}`;
+      if (month && year) return `All payments in ${MN[month]} ${year}`;
+      if (year)  return `All payments in fiscal year ${year}`;
+      return "";
+    }
+
+    // ------------------------------------------------------------------
+    // Table with pagination matching the modal
+    // ------------------------------------------------------------------
+
+    function renderPermalinkTable(records) {
+      const thead       = tableEl.querySelector("thead");
+      const tbody       = tableEl.querySelector("tbody");
+      const paginationEl = document.getElementById("pal-permalink-pagination");
+
+      thead.innerHTML = `<tr>
+        <th>Date</th><th>Payee</th><th>Description</th>
+        <th>Account</th><th>Amount</th>
+      </tr>`;
+
+      if (!records || records.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="5" class="pal-empty">No records found.</td></tr>';
+        if (paginationEl) paginationEl.innerHTML = "";
+        return;
+      }
+
+      const sorted = records.slice()
+        .sort((a, b) => (b.invoice || "").localeCompare(a.invoice || ""));
+
+      let currentPage = 1;
+      const totalPages = Math.ceil(sorted.length / PAGE_SIZE);
+
+      function renderPage() {
+        tbody.innerHTML = "";
+        const start = (currentPage - 1) * PAGE_SIZE;
+        sorted.slice(start, start + PAGE_SIZE).forEach(r => {
+          const tr = document.createElement("tr");
+          tr.innerHTML = `
+            <td>${r.invoice || ""}</td>
+            <td>${r.name || ""}</td>
+            <td>${r.description || ""}</td>
+            <td>${r.alt || ""}</td>
+            <td class="pal-amount-cell">${formatAmount(r.gross)}</td>`;
+          tbody.appendChild(tr);
+        });
+
+        if (!paginationEl) return;
+        paginationEl.innerHTML = "";
+        if (totalPages <= 1) return;
+
+        const makeBtn = (label, page, disabled, active) => {
+          const btn = document.createElement("button");
+          btn.type = "button";
+          btn.textContent = label;
+          btn.disabled = !!disabled;
+          if (active) btn.className = "pal-page-active";
+          btn.addEventListener("click", () => { currentPage = page; renderPage(); });
+          return btn;
+        };
+
+        paginationEl.appendChild(makeBtn("\u2039 Prev", currentPage - 1, currentPage === 1));
+
+        const maxButtons = 7;
+        let startPage = Math.max(1, currentPage - 3);
+        let endPage   = Math.min(totalPages, startPage + maxButtons - 1);
+        startPage     = Math.max(1, endPage - maxButtons + 1);
+        for (let p = startPage; p <= endPage; p++) {
+          paginationEl.appendChild(makeBtn(String(p), p, false, p === currentPage));
         }
 
-        function monthKey(year, month) {
-            return `${year}-${String(month).padStart(2, "0")}`;
-        }
-
-        function formatAmount(n) {
-            return "$" + parseFloat(n).toLocaleString("en-US",
-                { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-        }
-
-        async function fetchJSON(path) {
-            const resp = await fetch(path);
-            if (!resp.ok) throw new Error(`HTTP ${resp.status} fetching ${path}`);
-            return resp.json();
-        }
-
-        async function fetchRecords(path) {
-            try {
-                return await fetchJSON(path);
-            } catch (_) {
-                return [];
-            }
-        }
-
-        async function fetchAllMonths(basePath, monthKeys) {
-            const results = await Promise.all(
-                monthKeys.map(mk => fetchRecords(`${basePath}/${mk}.json`))
-            );
-            return results.flat();
-        }
-
-        function filterRecordsByYear(records, year) {
-            return records.filter(r => (r.invoice || "").startsWith(`${year}-`));
-        }
-
-        function filterRecordsByMonth(records, year, month) {
-            const prefix = monthKey(year, month);
-            return records.filter(r => (r.invoice || "").startsWith(prefix));
-        }
-
-        function sumByMonth(records) {
-            const totals = new Array(12).fill(0);
-            records.forEach(r => {
-                const d = new Date(r.invoice);
-                if (!isNaN(d)) totals[d.getMonth()] += parseFloat(r.gross) || 0;
-            });
-            return totals;
-        }
-
-        function sumByYearMonth(records) {
-            const map = new Map();
-            records.forEach(r => {
-                const mk = (r.invoice || "").slice(0, 7);
-                if (mk.length === 7) map.set(mk, (map.get(mk) || 0) + (parseFloat(r.gross) || 0));
-            });
-            return [...map.entries()].sort(([a], [b]) => a.localeCompare(b));
-        }
-
-        function sumByKey(records, keyFn, n) {
-            const map = new Map();
-            records.forEach(r => {
-                const k = keyFn(r);
-                map.set(k, (map.get(k) || 0) + (parseFloat(r.gross) || 0));
-            });
-            return [...map.entries()]
-                .sort(([, a], [, b]) => b - a)
-                .slice(0, n);
-        }
-
-        // -----------------------------------------------------------------------
-        // Chart rendering (same configs as modal open* functions)
-        // -----------------------------------------------------------------------
-
-        const CHART_PALETTE = [
-            "#16365b","#2f7da0","#9dddee","#5b9279","#c98a3e",
-            "#a85b7a","#6b8e23","#7a6ba0","#fa1b3e","#3e8e7e",
-        ];
-
-        function baseChartOptions(titleText) {
-            return {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: { display: false },
-                    title: { display: true, text: titleText,
-                             font: { size: 13, weight: "600" } },
-                },
-                scales: {
-                    y: { beginAtZero: true,
-                         ticks: { callback: v => "$" + Number(v).toLocaleString() } },
-                },
-            };
-        }
-
-        let chartInstance = null;
-
-        function renderChart(config) {
-            if (!window.Chart) { chartWrap.style.display = "none"; return; }
-            if (chartInstance) { chartInstance.destroy(); chartInstance = null; }
-            chartCanvas.style.display = "block";
-            chartInstance = new Chart(chartCanvas.getContext("2d"), config);
-        }
-
-        // -----------------------------------------------------------------------
-        // Full unpaginated table (no pagination needed on permalink page)
-        // -----------------------------------------------------------------------
-
-        const PAGE_SIZE = 25;
-
-        function buildExplanation(params) {
-            const { vk, name, acct, desc, year, month } = params;
-            const MONTH_NAMES_LONG = ["","January","February","March","April","May",
-                "June","July","August","September","October","November","December"];
-            const period = month && year
-                ? `in ${MONTH_NAMES_LONG[month]} ${year}`
-                : year ? `in ${year}` : "(all years)";
-
-            if (vk)  return `Invoice detail for ${vk}`;
-            if (name === "ACH PAYEE" && desc) return `ACH/Grant payments for description \u201c${desc}\u201d ${period}`;
-            if (name === "ACH PAYEE" && acct) return `ACH/Grant payments for account ${acct} ${period}`;
-            if (name === "WIR PAYEE" && desc) return `Wire transfer payments for description \u201c${desc}\u201d ${period}`;
-            if (name === "WIR PAYEE" && acct) return `Wire transfer payments for account ${acct} ${period}`;
-            if (name === "ACH PAYEE") return `All ACH/Grant disbursements ${period}`;
-            if (name === "WIR PAYEE") return `All wire transfer payments ${period}`;
-            if (name && desc) return `Payments to ${name} for description \u201c${desc}\u201d ${period}`;
-            if (name && acct) return `Payments to ${name} for account ${acct} ${period}`;
-            if (name)  return `All payments made to ${name} ${period}`;
-            if (acct)  return `All payments charged to account ${acct} ${period}`;
-            if (desc)  return `All payments with description \u201c${desc}\u201d ${period}`;
-            if (month && year) return `All payments in ${MONTH_NAMES_LONG[month]} ${year}`;
-            if (year)  return `All payments in fiscal year ${year}`;
-            return "";
-        }
-
-        function renderPermalinkTable(records) {
-            const thead = tableEl.querySelector("thead");
-            const tbody = tableEl.querySelector("tbody");
-            const paginationEl = document.getElementById("pal-permalink-pagination");
-
-            thead.innerHTML = `<tr>
-                <th>Date</th><th>Payee</th><th>Description</th>
-                <th>Account</th><th>Amount</th>
-            </tr>`;
-
-            if (!records || records.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="5" class="pal-empty">No records found.</td></tr>';
-                if (paginationEl) paginationEl.innerHTML = "";
-                return;
-            }
-
-            const sorted = records
-                .slice()
-                .sort((a, b) => (b.invoice || "").localeCompare(a.invoice || ""));
-
-            let currentPage = 1;
-            const totalPages = Math.ceil(sorted.length / PAGE_SIZE);
-
-            function renderPage(page) {
-                currentPage = page;
-                tbody.innerHTML = "";
-                const start = (page - 1) * PAGE_SIZE;
-                sorted.slice(start, start + PAGE_SIZE).forEach(r => {
-                    const tr = document.createElement("tr");
-                    tr.innerHTML = `
-                        <td>${r.invoice || ""}</td>
-                        <td>${r.name || ""}</td>
-                        <td>${r.description || ""}</td>
-                        <td>${r.alt || ""}</td>
-                        <td class="pal-amount-cell">${formatAmount(r.gross)}</td>`;
-                    tbody.appendChild(tr);
-                });
-
-                if (!paginationEl) return;
-                if (totalPages <= 1) { paginationEl.innerHTML = ""; return; }
-
-                paginationEl.innerHTML = "";
-                const info = document.createElement("span");
-                info.className = "pal-page-info";
-                info.textContent = `${sorted.length} records`;
-                paginationEl.appendChild(info);
-
-                const nav = document.createElement("span");
-                nav.className = "pal-page-nav";
-
-                const prev = document.createElement("button");
-                prev.textContent = "\u2039 Prev";
-                prev.className = "pal-page-btn";
-                prev.disabled = currentPage === 1;
-                prev.onclick = () => renderPage(currentPage - 1);
-
-                const pageLabel = document.createElement("span");
-                pageLabel.className = "pal-page-current";
-                pageLabel.textContent = `Page ${currentPage} of ${totalPages}`;
-
-                const next = document.createElement("button");
-                next.textContent = "Next \u203a";
-                next.className = "pal-page-btn";
-                next.disabled = currentPage === totalPages;
-                next.onclick = () => renderPage(currentPage + 1);
-
-                nav.appendChild(prev);
-                nav.appendChild(pageLabel);
-                nav.appendChild(next);
-                paginationEl.appendChild(nav);
-            }
-
-            renderPage(1);
-        }
-
-        // -----------------------------------------------------------------------
-        // Fallback note
-        // -----------------------------------------------------------------------
-
-        function showFallbackNote(requested, showing) {
-            fallbackNote.textContent =
-                `* Data for ${requested} is not available — showing ${showing} instead.`;
-            fallbackNote.style.display = "block";
-        }
-
-        // -----------------------------------------------------------------------
-        // Empty / error state
-        // -----------------------------------------------------------------------
-
-        function showEmpty() {
-            titleEl.textContent = "No data found";
-            chartWrap.style.display = "none";
-            tableWrap.style.display = "none";
-            invoiceWrap.style.display = "none";
-            emptyEl.style.display = "block";
-        }
-
-        // -----------------------------------------------------------------------
-        // View renderers
-        // -----------------------------------------------------------------------
-
-        async function renderYear(year) {
-            titleEl.textContent = `Fiscal Year ${year}`;
-            document.title = `Fiscal Year ${year} — Keystone Ledger Lens`;
-
-            const records = [];
-            for (let m = 1; m <= 12; m++) {
-                const recs = await fetchRecords(
-                    `${DATA_ROOT}/BY_YEAR/${year}/${monthKey(year, m)}.json`);
-                records.push(...recs);
-            }
-
-            if (!records.length) { showEmpty(); return; }
-
-            renderChart({
-                type: "bar",
-                data: {
-                    labels: ["Jan","Feb","Mar","Apr","May","Jun",
-                             "Jul","Aug","Sep","Oct","Nov","Dec"],
-                    datasets: [{
-                        label: `${year} spend by month`,
-                        data: sumByMonth(records),
-                        backgroundColor: "#2f7da0",
-                        borderRadius: 4,
-                    }],
-                },
-                options: baseChartOptions("Spend by month"),
-            });
-            renderPermalinkTable(records);
-        }
-
-        async function renderMonth(year, month) {
-            const label = `${MONTH_NAMES[month]} ${year}`;
-            titleEl.textContent = label;
-            document.title = `${label} — Keystone Ledger Lens`;
-
-            const records = await fetchRecords(
-                `${DATA_ROOT}/BY_YEAR/${year}/${monthKey(year, month)}.json`);
-
-            if (!records.length) { showEmpty(); return; }
-
-            const byPayee = sumByKey(records, r => (r.name || "Unknown").trim(), 8);
-            renderChart({
-                type: "doughnut",
-                data: {
-                    labels: byPayee.map(([k]) => k),
-                    datasets: [{ data: byPayee.map(([, v]) => v),
-                                 backgroundColor: CHART_PALETTE }],
-                },
-                options: {
-                    responsive: true, maintainAspectRatio: false,
-                    plugins: {
-                        legend: { position: "right",
-                                  labels: { boxWidth: 12, font: { size: 11 } } },
-                        title: { display: true, text: "Top payees this month",
-                                 font: { size: 13, weight: "600" } },
-                    },
-                },
-            });
-            renderPermalinkTable(records);
-        }
-
-        /** Fetch records for name/acct/desc with progressive fallback.
-         *  Returns { records, fallbackMsg } where fallbackMsg is null if no
-         *  fallback was needed, or a human-readable string if it was. */
-        async function fetchWithFallback(basePath, l2MonthKeys, year, month) {
-            // Narrow month keys to the requested year if year is specified.
-            const yearKeys = year
-                ? l2MonthKeys.filter(mk => mk.startsWith(`${year}-`))
-                : l2MonthKeys;
-
-            // Narrow further to the specific month if month is specified.
-            const monthKeys = month
-                ? yearKeys.filter(mk => mk === monthKey(year, month))
-                : yearKeys;
-
-            let fallbackMsg = null;
-
-            // Attempt 1: most specific (may be empty if no keys match)
-            if (monthKeys.length) {
-                const records = await fetchAllMonths(basePath, monthKeys);
-                if (records.length) return { records, fallbackMsg };
-            }
-
-            // Attempt 2: drop month, keep year
-            if (month && yearKeys.length) {
-                fallbackMsg = `${MONTH_NAMES[month]} ${year}`;
-                const records = await fetchAllMonths(basePath, yearKeys);
-                if (records.length) {
-                    return {
-                        records,
-                        fallbackMsg: `* Data for ${fallbackMsg} is not available` +
-                                     ` — showing all of ${year} instead.`,
-                    };
-                }
-            }
-
-            // Attempt 3: drop year, use full history
-            if ((month || year) && l2MonthKeys.length) {
-                const attempted = month
-                    ? `${MONTH_NAMES[month]} ${year}`
-                    : `${year}`;
-                const records = await fetchAllMonths(basePath, l2MonthKeys);
-                if (records.length) {
-                    return {
-                        records,
-                        fallbackMsg: `* Data for ${attempted} is not available` +
-                                     ` — showing full history instead.`,
-                    };
-                }
-            }
-
-            return { records: [], fallbackMsg: null };
-        }
-
-        async function renderName(name, year, month, l2) {
-            const title = [name, year ? (month ? `${MONTH_NAMES[month]} ${year}` : year) : null]
-                .filter(Boolean).join(" \u2014 ");
-            titleEl.textContent = title;
-            document.title = `${title} — Keystone Ledger Lens`;
-
-            const entry = l2.by_name && l2.by_name[name];
-            const l2MonthKeys = entry ? Object.keys(entry.months) : [];
-            if (!l2MonthKeys.length) { showEmpty(); return; }
-
-            const basePath = `${DATA_ROOT}/BY_NAME/${sanitizeForPath(name)}`;
-            const { records, fallbackMsg } = await fetchWithFallback(
-                basePath, l2MonthKeys, year, month);
-
-            if (!records.length) { showEmpty(); return; }
-            if (fallbackMsg) { showFallbackNote("", ""); fallbackNote.textContent = fallbackMsg; fallbackNote.style.display = "block"; }
-
-            const series = sumByYearMonth(records);
-            renderChart({
-                type: "line",
-                data: {
-                    labels: series.map(([k]) => k),
-                    datasets: [{
-                        label: `${name} \u2014 spend over time`,
-                        data: series.map(([, v]) => v),
-                        borderColor: "#16365b",
-                        backgroundColor: "rgba(22,54,91,0.08)",
-                        fill: true, tension: 0.25, pointRadius: 3,
-                    }],
-                },
-                options: baseChartOptions("Spend over time"),
-            });
-            renderPermalinkTable(records);
-        }
-
-        async function renderAcct(acct, year, month, l2) {
-            const title = [acct, year ? (month ? `${MONTH_NAMES[month]} ${year}` : year) : null]
-                .filter(Boolean).join(" \u2014 ");
-            titleEl.textContent = title;
-            document.title = `${title} — Keystone Ledger Lens`;
-
-            const entry = l2.by_acct && l2.by_acct[acct];
-            const l2MonthKeys = entry ? Object.keys(entry.months) : [];
-            if (!l2MonthKeys.length) { showEmpty(); return; }
-
-            const basePath = `${DATA_ROOT}/BY_ACCT/${sanitizeForPath(acct)}`;
-            const { records, fallbackMsg } = await fetchWithFallback(
-                basePath, l2MonthKeys, year, month);
-
-            if (!records.length) { showEmpty(); return; }
-            if (fallbackMsg) { fallbackNote.textContent = fallbackMsg; fallbackNote.style.display = "block"; }
-
-            const series = sumByYearMonth(records);
-            renderChart({
-                type: "line",
-                data: {
-                    labels: series.map(([k]) => k),
-                    datasets: [{
-                        label: `${acct} \u2014 spend over time`,
-                        data: series.map(([, v]) => v),
-                        borderColor: "#2f7da0",
-                        backgroundColor: "rgba(47,125,160,0.08)",
-                        fill: true, tension: 0.25, pointRadius: 3,
-                    }],
-                },
-                options: baseChartOptions("Spend over time"),
-            });
-            renderPermalinkTable(records);
-        }
-
-        async function renderDesc(desc, year, month, l2) {
-            const title = [desc, year ? (month ? `${MONTH_NAMES[month]} ${year}` : year) : null]
-                .filter(Boolean).join(" \u2014 ");
-            titleEl.textContent = title;
-            document.title = `${title} — Keystone Ledger Lens`;
-
-            const entry = l2.by_description && l2.by_description[desc];
-            const l2MonthKeys = entry ? Object.keys(entry.months) : [];
-            if (!l2MonthKeys.length) { showEmpty(); return; }
-
-            const basePath = `${DATA_ROOT}/BY_DESCRIPTION/${sanitizeForPath(desc)}`;
-            const { records, fallbackMsg } = await fetchWithFallback(
-                basePath, l2MonthKeys, year, month);
-
-            if (!records.length) { showEmpty(); return; }
-            if (fallbackMsg) { fallbackNote.textContent = fallbackMsg; fallbackNote.style.display = "block"; }
-
-            const series = sumByYearMonth(records);
-            renderChart({
-                type: "line",
-                data: {
-                    labels: series.map(([k]) => k),
-                    datasets: [{
-                        label: `${desc} \u2014 spend over time`,
-                        data: series.map(([, v]) => v),
-                        borderColor: "#6b8e23",
-                        backgroundColor: "rgba(107,142,35,0.08)",
-                        fill: true, tension: 0.25, pointRadius: 3,
-                    }],
-                },
-                options: baseChartOptions("Spend over time"),
-            });
-            renderPermalinkTable(records);
-        }
-
-        async function renderInvoice(vk, name) {
-            titleEl.textContent = name || "Invoice Detail";
-            document.title = `${name || "Invoice"} — Keystone Ledger Lens`;
-            chartWrap.style.display  = "none";
-            tableWrap.style.display  = "none";
-            invoiceWrap.style.display = "block";
-
-            const payeeFolder = sanitizeForPath(name || "");
-            const safeVk      = (vk || "").replace(/[^A-Za-z0-9._-]/g, "_");
-            const url         = `${DATA_ROOT}/BY_INVOICE/${payeeFolder}/${safeVk}.html`;
-
-            invoiceWrap.innerHTML =
-                `<p class="pal-permalink-loading">Loading invoice\u2026</p>`;
-
-            let html;
-            try {
-                const resp = await fetch(url);
-                if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
-                html = await resp.text();
-            } catch (err) {
-                invoiceWrap.innerHTML =
-                    `<p class="pal-readme-error">Invoice not available: ${err.message}.</p>` +
-                    `<a href="/">&#8592; Back to dashboard</a>`;
-                return;
-            }
-
-            const doc = new DOMParser().parseFromString(html, "text/html");
-            doc.querySelectorAll("script,style,iframe,form,input,button")
-               .forEach(el => el.remove());
-            doc.querySelectorAll("*").forEach(el => {
-                [...el.attributes].forEach(attr => {
-                    if (attr.name.startsWith("on")) el.removeAttribute(attr.name);
-                });
-            });
-            doc.querySelectorAll("a").forEach(a => {
-                a.setAttribute("target", "_blank");
-                a.setAttribute("rel", "noopener noreferrer");
-            });
-
-            const container = document.createElement("div");
-            container.className = "pal-invoice-content";
-            container.innerHTML = doc.body ? doc.body.innerHTML : html;
-            invoiceWrap.innerHTML = "";
-            invoiceWrap.appendChild(container);
-        }
-
-        async function renderNameFiltered(name, desc, acct, year, month, l2) {
-            const filterLabel = desc
-                ? `\u201c${desc}\u201d`
-                : `account ${acct}`;
-            const title = `${name} \u2014 ${filterLabel}`;
-            titleEl.textContent = title;
-            document.title = `${title} \u2014 Keystone Ledger Lens`;
-
-            const entry = l2.by_name && l2.by_name[name];
-            const l2MonthKeys = entry ? Object.keys(entry.months) : [];
-            if (!l2MonthKeys.length) { showEmpty(); return; }
-
-            const basePath = `${DATA_ROOT}/BY_NAME/${sanitizeForPath(name)}`;
-            const { records: allRecords, fallbackMsg } =
-                await fetchWithFallback(basePath, l2MonthKeys, year, month);
-
-            // Apply the secondary filter (desc or acct)
-            const records = allRecords.filter(r => {
-                if (desc) return (r.description || "").trim() === desc;
-                if (acct) return (r.alt || "").trim() === acct;
-                return true;
-            });
-
-            if (!records.length) { showEmpty(); return; }
-            if (fallbackMsg) {
-                fallbackNote.textContent = fallbackMsg;
-                fallbackNote.style.display = "block";
-            }
-
-            const series = sumByYearMonth(records);
-            renderChart({
-                type: "line",
-                data: {
-                    labels: series.map(([k]) => k),
-                    datasets: [{
-                        label: `${title} \u2014 spend over time`,
-                        data: series.map(([, v]) => v),
-                        borderColor: "#16365b",
-                        backgroundColor: "rgba(22,54,91,0.08)",
-                        fill: true, tension: 0.25, pointRadius: 3,
-                    }],
-                },
-                options: baseChartOptions("Spend over time"),
-            });
-            renderPermalinkTable(records);
-        }
-
-        // -----------------------------------------------------------------------
-        // Main: parse params, fetch L2, dispatch
-        // -----------------------------------------------------------------------
-
-        const params   = new URLSearchParams(window.location.search);
-        const vk       = params.get("vk")   || "";
-        const name     = params.get("name") || "";
-        const acct     = params.get("acct") || "";
-        const desc     = params.get("desc") || "";
-        const yearStr  = params.get("year")  || "";
-        const monthStr = params.get("month") || "";
-        const year     = yearStr  ? parseInt(yearStr,  10) : null;
-        const month    = monthStr ? parseInt(monthStr, 10) : null;
-
-        // Set subtitle from params
-        const subtitleEl = document.getElementById("pal-permalink-subtitle");
-        if (subtitleEl) {
-            subtitleEl.textContent = buildExplanation({ vk, name, acct, desc, year, month });
-        }
-
-        try {
-            if (vk) {
-                await renderInvoice(vk, name);
-                return;
-            }
-
-            let l2 = {};
-            try { l2 = await fetchJSON(L2_PATH); } catch (_) {}
-
-            // name+desc or name+acct: filter records by the secondary param
-            if (name && (desc || acct)) {
-                await renderNameFiltered(name, desc, acct, year, month, l2);
-                return;
-            }
-
-            if (desc)  { await renderDesc(desc,  year, month, l2); return; }
-            if (acct)  { await renderAcct(acct,  year, month, l2); return; }
-            if (name)  { await renderName(name,  year, month, l2); return; }
-            if (month) { await renderMonth(year, month);           return; }
-            if (year)  { await renderYear(year);                   return; }
-
-            showEmpty();
-
-        } catch (err) {
-            console.error("PALedger permalink error:", err);
-            showEmpty();
-        }
-
+        paginationEl.appendChild(makeBtn("Next \u203a", currentPage + 1, currentPage === totalPages));
+
+        const summary = document.createElement("span");
+        summary.className = "pal-page-summary";
+        summary.textContent = `${sorted.length.toLocaleString()} record${sorted.length === 1 ? "" : "s"}`;
+        paginationEl.appendChild(summary);
+      }
+
+      renderPage();
+    }
+
+    // ------------------------------------------------------------------
+    // Fallback / empty states
+    // ------------------------------------------------------------------
+
+    function showFallbackNote(msg) {
+      if (!fallbackNote) return;
+      fallbackNote.textContent = msg;
+      fallbackNote.style.display = "block";
+    }
+
+    function showEmpty() {
+      if (titleEl) titleEl.textContent = "No data found";
+      if (chartWrap)   chartWrap.style.display  = "none";
+      if (tableWrap)   tableWrap.style.display   = "none";
+      if (invoiceWrap) invoiceWrap.style.display = "none";
+      if (emptyEl)     emptyEl.style.display     = "block";
+    }
+
+    // ------------------------------------------------------------------
+    // Fetch with progressive fallback (month -> year -> all history)
+    // ------------------------------------------------------------------
+
+    async function fetchWithFallback(basePath, l2MonthKeys, year, month) {
+      const yearKeys  = year  ? l2MonthKeys.filter(mk => mk.startsWith(`${year}-`)) : l2MonthKeys;
+      const monthKeys = month ? yearKeys.filter(mk => mk === monthKey(year, month))  : yearKeys;
+
+      if (monthKeys.length) {
+        const records = await fetchAllMonths(basePath, monthKeys);
+        if (records.length) return { records, fallbackMsg: null };
+      }
+
+      if (month && yearKeys.length) {
+        const records = await fetchAllMonths(basePath, yearKeys);
+        if (records.length) return {
+          records,
+          fallbackMsg: `* Data for ${MN[month]} ${year} is not available — showing all of ${year} instead.`,
+        };
+      }
+
+      if ((month || year) && l2MonthKeys.length) {
+        const attempted = month ? `${MN[month]} ${year}` : `${year}`;
+        const records = await fetchAllMonths(basePath, l2MonthKeys);
+        if (records.length) return {
+          records,
+          fallbackMsg: `* Data for ${attempted} is not available — showing full history instead.`,
+        };
+      }
+
+      return { records: [], fallbackMsg: null };
+    }
+
+    // ------------------------------------------------------------------
+    // View renderers
+    // ------------------------------------------------------------------
+
+    async function renderYear(year) {
+      if (titleEl) titleEl.textContent = `Fiscal Year ${year}`;
+      document.title = `Fiscal Year ${year} — Keystone Ledger Lens`;
+
+      const records = [];
+      for (let m = 1; m <= 12; m++) {
+        records.push(...await fetchRecords(
+          `${DATA_ROOT}/BY_YEAR/${year}/${monthKey(year, m)}.json`));
+      }
+      if (!records.length) { showEmpty(); return; }
+
+      renderChart({
+        type: "bar",
+        data: {
+          labels: ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"],
+          datasets: [{
+            label: `${year} spend by month`,
+            data: sumByMonth(records),
+            backgroundColor: "#2f7da0",
+            borderRadius: 4,
+          }],
+        },
+        options: baseChartOptions("Spend by month"),
+      });
+      renderPermalinkTable(records);
+    }
+
+    async function renderMonth(year, month) {
+      const label = `${MN[month]} ${year}`;
+      if (titleEl) titleEl.textContent = label;
+      document.title = `${label} — Keystone Ledger Lens`;
+
+      const records = await fetchRecords(
+        `${DATA_ROOT}/BY_YEAR/${year}/${monthKey(year, month)}.json`);
+      if (!records.length) { showEmpty(); return; }
+
+      const byPayee = sumByKey(records, r => (r.name || "Unknown").trim(), 8);
+      renderChart({
+        type: "doughnut",
+        data: {
+          labels: byPayee.map(([k]) => k),
+          datasets: [{ data: byPayee.map(([,v]) => v), backgroundColor: CHART_PALETTE }],
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { position: "right", labels: { boxWidth: 12, font: { size: 11 } } },
+            title: { display: true, text: "Top payees this month",
+                     font: { size: 13, weight: "600" } },
+          },
+        },
+      });
+      renderPermalinkTable(records);
+    }
+
+    async function renderName(name, year, month, l2) {
+      const title = [name, year ? (month ? `${MN[month]} ${year}` : year) : null]
+        .filter(Boolean).join(" \u2014 ");
+      if (titleEl) titleEl.textContent = title;
+      document.title = `${title} — Keystone Ledger Lens`;
+
+      const entry = l2.by_name && l2.by_name[name];
+      const l2MonthKeys = entry ? Object.keys(entry.months) : [];
+      if (!l2MonthKeys.length) { showEmpty(); return; }
+
+      const { records, fallbackMsg } = await fetchWithFallback(
+        `${DATA_ROOT}/BY_NAME/${sanitizeForPath(name)}`, l2MonthKeys, year, month);
+      if (!records.length) { showEmpty(); return; }
+      if (fallbackMsg) showFallbackNote(fallbackMsg);
+
+      renderChart({
+        type: "line",
+        data: {
+          labels: sumByYearMonth(records).map(([k]) => k),
+          datasets: [{
+            label: `${name} \u2014 spend over time`,
+            data: sumByYearMonth(records).map(([,v]) => v),
+            borderColor: "#16365b", backgroundColor: "rgba(22,54,91,0.08)",
+            fill: true, tension: 0.25, pointRadius: 3,
+          }],
+        },
+        options: baseChartOptions("Spend over time"),
+      });
+      renderPermalinkTable(records);
+    }
+
+    async function renderAcct(acct, year, month, l2) {
+      const title = [acct, year ? (month ? `${MN[month]} ${year}` : year) : null]
+        .filter(Boolean).join(" \u2014 ");
+      if (titleEl) titleEl.textContent = title;
+      document.title = `${title} — Keystone Ledger Lens`;
+
+      const entry = l2.by_acct && l2.by_acct[acct];
+      const l2MonthKeys = entry ? Object.keys(entry.months) : [];
+      if (!l2MonthKeys.length) { showEmpty(); return; }
+
+      const { records, fallbackMsg } = await fetchWithFallback(
+        `${DATA_ROOT}/BY_ACCT/${sanitizeForPath(acct)}`, l2MonthKeys, year, month);
+      if (!records.length) { showEmpty(); return; }
+      if (fallbackMsg) showFallbackNote(fallbackMsg);
+
+      renderChart({
+        type: "line",
+        data: {
+          labels: sumByYearMonth(records).map(([k]) => k),
+          datasets: [{
+            label: `${acct} \u2014 spend over time`,
+            data: sumByYearMonth(records).map(([,v]) => v),
+            borderColor: "#2f7da0", backgroundColor: "rgba(47,125,160,0.08)",
+            fill: true, tension: 0.25, pointRadius: 3,
+          }],
+        },
+        options: baseChartOptions("Spend over time"),
+      });
+      renderPermalinkTable(records);
+    }
+
+    async function renderDesc(desc, year, month, l2) {
+      const title = [desc, year ? (month ? `${MN[month]} ${year}` : year) : null]
+        .filter(Boolean).join(" \u2014 ");
+      if (titleEl) titleEl.textContent = title;
+      document.title = `${title} — Keystone Ledger Lens`;
+
+      const entry = l2.by_description && l2.by_description[desc];
+      const l2MonthKeys = entry ? Object.keys(entry.months) : [];
+      if (!l2MonthKeys.length) { showEmpty(); return; }
+
+      const { records, fallbackMsg } = await fetchWithFallback(
+        `${DATA_ROOT}/BY_DESCRIPTION/${sanitizeForPath(desc)}`, l2MonthKeys, year, month);
+      if (!records.length) { showEmpty(); return; }
+      if (fallbackMsg) showFallbackNote(fallbackMsg);
+
+      renderChart({
+        type: "line",
+        data: {
+          labels: sumByYearMonth(records).map(([k]) => k),
+          datasets: [{
+            label: `${desc} \u2014 spend over time`,
+            data: sumByYearMonth(records).map(([,v]) => v),
+            borderColor: "#6b8e23", backgroundColor: "rgba(107,142,35,0.08)",
+            fill: true, tension: 0.25, pointRadius: 3,
+          }],
+        },
+        options: baseChartOptions("Spend over time"),
+      });
+      renderPermalinkTable(records);
+    }
+
+    async function renderNameFiltered(name, desc, acct, year, month, l2) {
+      const filterLabel = desc ? `\u201c${desc}\u201d` : `account ${acct}`;
+      const title = `${name} \u2014 ${filterLabel}`;
+      if (titleEl) titleEl.textContent = title;
+      document.title = `${title} \u2014 Keystone Ledger Lens`;
+
+      const entry = l2.by_name && l2.by_name[name];
+      const l2MonthKeys = entry ? Object.keys(entry.months) : [];
+      if (!l2MonthKeys.length) { showEmpty(); return; }
+
+      const { records: allRecords, fallbackMsg } = await fetchWithFallback(
+        `${DATA_ROOT}/BY_NAME/${sanitizeForPath(name)}`, l2MonthKeys, year, month);
+
+      const records = allRecords.filter(r =>
+        desc ? (r.description || "").trim() === desc
+             : (r.alt || "").trim() === acct);
+
+      if (!records.length) { showEmpty(); return; }
+      if (fallbackMsg) showFallbackNote(fallbackMsg);
+
+      renderChart({
+        type: "line",
+        data: {
+          labels: sumByYearMonth(records).map(([k]) => k),
+          datasets: [{
+            label: `${title} \u2014 spend over time`,
+            data: sumByYearMonth(records).map(([,v]) => v),
+            borderColor: "#16365b", backgroundColor: "rgba(22,54,91,0.08)",
+            fill: true, tension: 0.25, pointRadius: 3,
+          }],
+        },
+        options: baseChartOptions("Spend over time"),
+      });
+      renderPermalinkTable(records);
+    }
+
+    async function renderInvoice(vk, name) {
+      if (titleEl) titleEl.textContent = name || "Invoice Detail";
+      document.title = `${name || "Invoice"} — Keystone Ledger Lens`;
+      if (chartWrap)   chartWrap.style.display   = "none";
+      if (tableWrap)   tableWrap.style.display    = "none";
+      if (invoiceWrap) invoiceWrap.style.display  = "block";
+
+      const payeeFolder = sanitizeForPath(name || "");
+      const safeVk      = (vk || "").replace(/[^A-Za-z0-9._-]/g, "_");
+      const url         = `${DATA_ROOT}/BY_INVOICE/${payeeFolder}/${safeVk}.html`;
+
+      invoiceWrap.innerHTML = `<p class="pal-permalink-loading">Loading invoice\u2026</p>`;
+
+      let html;
+      try {
+        const resp = await fetch(url);
+        if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+        html = await resp.text();
+      } catch (err) {
+        invoiceWrap.innerHTML =
+          `<p class="pal-readme-error">Invoice not available: ${err.message}.</p>` +
+          `<a href="/">\u2190 Back to dashboard</a>`;
+        return;
+      }
+
+      const doc = new DOMParser().parseFromString(html, "text/html");
+      doc.querySelectorAll("script,style,iframe,form,input,button").forEach(el => el.remove());
+      doc.querySelectorAll("*").forEach(el => {
+        [...el.attributes].forEach(attr => {
+          if (attr.name.startsWith("on")) el.removeAttribute(attr.name);
+        });
+      });
+      doc.querySelectorAll("a").forEach(a => {
+        a.setAttribute("target", "_blank");
+        a.setAttribute("rel", "noopener noreferrer");
+      });
+
+      const container = document.createElement("div");
+      container.className = "pal-invoice-content";
+      container.innerHTML = doc.body ? doc.body.innerHTML : html;
+      invoiceWrap.innerHTML = "";
+      invoiceWrap.appendChild(container);
+    }
+
+    // ------------------------------------------------------------------
+    // Main dispatch
+    // ------------------------------------------------------------------
+
+    const params   = new URLSearchParams(window.location.search);
+    const vk       = params.get("vk")    || "";
+    const name     = params.get("name")  || "";
+    const acct     = params.get("acct")  || "";
+    const desc     = params.get("desc")  || "";
+    const yearStr  = params.get("year")  || "";
+    const monthStr = params.get("month") || "";
+    const year     = yearStr  ? parseInt(yearStr,  10) : null;
+    const month    = monthStr ? parseInt(monthStr, 10) : null;
+
+    if (subtitleEl) subtitleEl.textContent = buildExplanation({ vk, name, acct, desc, year, month });
+
+    try {
+      if (vk)                  { await renderInvoice(vk, name);                     return; }
+
+      let l2 = {};
+      try { l2 = await fetchJSON(L2_PATH); } catch (_) {}
+
+      if (name && (desc || acct)) { await renderNameFiltered(name, desc, acct, year, month, l2); return; }
+      if (desc)                   { await renderDesc(desc,   year, month, l2);       return; }
+      if (acct)                   { await renderAcct(acct,   year, month, l2);       return; }
+      if (name)                   { await renderName(name,   year, month, l2);       return; }
+      if (month && year)          { await renderMonth(year,  month);                 return; }
+      if (year)                   { await renderYear(year);                          return; }
+
+      showEmpty();
+
+    } catch (err) {
+      console.error("PALedger permalink error:", err);
+      showEmpty();
+    }
   }
+
 
   // Expose the public API used by onclick="" handlers in the template.
   window.PALedger = {
