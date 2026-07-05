@@ -159,7 +159,7 @@
         <div class="pal-modal-footer" id="pal-modal-footer">
           <span class="pal-modal-footer-label" id="pal-modal-footer-label">Permalink:</span>
           <a class="pal-modal-footer-url" id="pal-modal-footer-url" href="#" target="_blank"></a>
-          <button class="pal-modal-footer-copy" id="pal-modal-footer-copy" title="Copy link" aria-label="Copy permalink to clipboard">&#128279;</button>
+          <button class="pal-modal-footer-copy" id="pal-modal-footer-copy" title="Copy link" aria-label="Copy permalink to clipboard">&#128203;</button>
         </div>
       </div>`;
     document.body.appendChild(modal);
@@ -1929,7 +1929,7 @@
                 ? `in ${MONTH_NAMES_LONG[month]} ${year}`
                 : year ? `in ${year}` : "(all years)";
 
-            if (vk)  return `Invoice detail for ${name || vk}`;
+            if (vk)  return `Invoice detail for ${vk}`;
             if (name === "ACH PAYEE" && desc) return `ACH/Grant payments for description \u201c${desc}\u201d ${period}`;
             if (name === "ACH PAYEE" && acct) return `ACH/Grant payments for account ${acct} ${period}`;
             if (name === "WIR PAYEE" && desc) return `Wire transfer payments for description \u201c${desc}\u201d ${period}`;

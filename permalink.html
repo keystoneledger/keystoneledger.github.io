@@ -3,8 +3,8 @@ layout: post
 title: Keystone Ledger Lens — Permalink
 ---
 
-{#-
-  permalink.html — Shareable deep-link page for Keystone Ledger Lens.
+<!--
+  permalink.html - Shareable deep-link page for Keystone Ledger Lens.
 
   Reads URL parameters and reconstructs the chart + table (or invoice)
   exactly as shown in the dashboard modal drill-downs. Reuses dashboard.js
@@ -13,23 +13,23 @@ title: Keystone Ledger Lens — Permalink
 
   URL parameter schema (only the keys present determine what is shown):
 
-    ?vk=<voucher_key>&name=<payee_name>        → invoice detail
-    ?desc=<description>[&year=N][&month=N]     → description drill-down
-    ?acct=<account_code>[&year=N][&month=N]    → account drill-down
-    ?name=<payee_name>[&year=N][&month=N]      → payee drill-down
-    ?year=N&month=N                            → month drill-down
-    ?year=N                                    → year drill-down
-    (no recognised params)                     → link back to dashboard
+    ?vk=[voucher_key]&name=[payee_name]        - invoice detail
+    ?desc=[description][&year=N][&month=N]     - description drill-down
+    ?acct=[account_code][&year=N][&month=N]    - account drill-down
+    ?name=[payee_name][&year=N][&month=N]      - payee drill-down
+    ?year=N&month=N                            - month drill-down
+    ?year=N                                    - year drill-down
+    (no recognised params)                     - link back to dashboard
 
   year and month are optional date-range filters on desc/acct/name.
   When provided, only records matching that period are shown. If that
-  returns no data, the page falls back progressively (month → year →
+  returns no data, the page falls back progressively (month to year to
   all history) and notes what was dropped with an asterisk footnote.
 
   Data sources: same DATA/L1 paths as dashboard.js. For desc/acct/name,
   month keys are looked up from DATA/L2/pa_checkbook_summary.json first
-  so the URL doesn't need to carry the full months CSV.
--#}
+  so the URL does not need to carry the full months CSV.
+-->
 
 <div class="pal-permalink-page" id="pal-permalink-page">
 
@@ -76,5 +76,5 @@ title: Keystone Ledger Lens — Permalink
 </div>
 
 <script>
-  document.addEventListener("DOMContentLoaded", () => PALedger.initPermalink());
+  window.addEventListener("load", () => PALedger.initPermalink());
 </script>

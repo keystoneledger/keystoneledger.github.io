@@ -1357,7 +1357,7 @@ td.pal-empty {
     border-top: 1px solid var(--common-border);
     background: var(--card-bg-color);
     flex-wrap: wrap;
-    font-size: 0.82rem;
+    font-size: 0.88rem;
     text-align: left;
 }
 
@@ -1378,7 +1378,7 @@ td.pal-empty {
     flex: 1;
     min-width: 0;
     cursor: pointer;
-    font-size: 0.78rem;
+    font-size: 0.85rem;
 }
 
 .pal-modal-footer-url:hover {
