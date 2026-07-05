@@ -1490,21 +1490,31 @@ td.pal-empty {
 }
 
 /* --- Metadata grid (invoice-issued label/value pairs) ---
-   invoice-issued elements are <div> not <td>, inside a CSS grid.
-   width:100% fills the grid column; max-width:50% is enforced by
-   the grid itself (repeat(2,1fr) = 50% each column). */
+   Bootstrap's .row/.col-* rules apply on the live page and must be
+   explicitly overridden with !important. Without this the grid
+   reverts to Bootstrap's float-based columns which collapse to ~50%. */
 .pal-invoice-content .pad-left,
 .pal-invoice-content .check-holder-request,
 .pal-invoice-content .check-holder-payment {
     margin-bottom: 1rem;
 }
 
+.pal-invoice-content .row {
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    display: block !important;
+}
+
 .pal-invoice-content .pad-left .col-sm-12 {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 0;
-    width: 100%;
-    text-align: left;
+    display: grid !important;
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    float: none !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    text-align: left !important;
 }
 
 .pal-invoice-content .invoice-issued,
@@ -1567,14 +1577,19 @@ td.pal-empty {
     display: none;
 }
 
-/* --- Bootstrap float helpers PA Treasury uses ---
-   Neutralise them so our grid overrides take effect cleanly. */
-.pal-invoice-content .fl  { float: none !important; }
-.pal-invoice-content .fl-r { float: none !important; }
-.pal-invoice-content .fr  { float: none !important; }
-.pal-invoice-content .p-0:not(.invoice-issued):not(.overview__addressee):not(.overview__charge) {
-    padding: 0;
+/* --- Bootstrap float/column helpers PA Treasury uses.
+   Must use !important because Bootstrap loads on the live Jekyll
+   page and its .col-* / .row / .fl rules otherwise win. --- */
+.pal-invoice-content .fl,
+.pal-invoice-content .fl-r,
+.pal-invoice-content .fr {
+    float: none !important;
 }
+
+.pal-invoice-content .p-0:not(.invoice-issued):not(.overview__addressee):not(.overview__charge) {
+    padding: 0 !important;
+}
+
 .pal-invoice-content .col-md-3,
 .pal-invoice-content .col-md-5,
 .pal-invoice-content .col-md-6,
@@ -1584,12 +1599,28 @@ td.pal-empty {
     width: auto !important;
     max-width: none !important;
     flex: none !important;
+    float: none !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
 }
 
-/* --- Suppress Bootstrap's .row margin that causes horizontal bleed --- */
+/* Exception: the grid container must be full-width grid */
+.pal-invoice-content .pad-left .col-sm-12 {
+    display: grid !important;
+    grid-template-columns: repeat(2, 1fr) !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+}
+
+/* --- Suppress Bootstrap's .row negative margins --- */
 .pal-invoice-content .row {
-    margin-left: 0;
-    margin-right: 0;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    display: block !important;
+    float: none !important;
+    width: 100% !important;
 }
 
 /* --- Remove page border wrapper padding --- */
@@ -1602,6 +1633,36 @@ td.pal-empty {
 .pal-invoice-content .small {
     font-size: 0.78rem;
     color: var(--muted-text-color);
+}
+
+/* --- overview children: explicit !important to beat Bootstrap's
+   .col-md-* width percentages on the live page --- */
+.pal-invoice-content .overview__addressee,
+.pal-invoice-content .overview__addressee.p-0 {
+    flex: 1 1 55% !important;
+    width: auto !important;
+    max-width: 50% !important;
+    float: none !important;
+    padding: 10px 12px !important;
+    border-right: 1px solid var(--common-border);
+    text-align: left;
+    overflow-wrap: break-word;
+    word-break: break-word;
+    box-sizing: border-box;
+}
+
+.pal-invoice-content .overview__charge,
+.pal-invoice-content .overview__charge.p-0 {
+    flex: 1 1 40% !important;
+    width: auto !important;
+    max-width: 50% !important;
+    float: none !important;
+    padding: 10px 12px !important;
+    display: flex !important;
+    flex-direction: column;
+    justify-content: center;
+    text-align: left;
+    box-sizing: border-box;
 }
 
 /*
