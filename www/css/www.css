@@ -1400,67 +1400,24 @@ td.pal-empty {
 }
 
 /* Payee + amount overview row */
-.pal-invoice-content .overview {
-    display: flex !important;
-    flex-wrap: wrap;
-    margin-bottom: 1rem;
-    background: var(--primary-bg-color);
-    border: 1px solid var(--common-border);
-    border-radius: var(--common-radius);
-    overflow: hidden;
-    width: 100%;
-}
-.pal-invoice-content .overview__addressee {
-    flex: 1 1 50% !important;
-    max-width: 50% !important;
-    padding: 10px 12px !important;
-    border-right: 1px solid var(--common-border);
-    text-align: left;
-    overflow-wrap: break-word;
-    box-sizing: border-box;
-    float: none !important;
-    width: auto !important;
-}
-.pal-invoice-content .overview__charge {
-    flex: 1 1 50% !important;
-    max-width: 50% !important;
-    padding: 10px 12px !important;
-    text-align: left;
-    box-sizing: border-box;
-    float: none !important;
-    width: auto !important;
-}
-.pal-invoice-content .overview__addressee__title,
-.pal-invoice-content .overview__charge__title {
-    font-size: 0.72rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    color: var(--muted-text-color);
-    margin: 0 0 0.3rem 0;
-}
-.pal-invoice-content .overview__addressee__value {
-    font-size: 0.88rem;
-    font-weight: 500;
-    color: var(--card-text-color);
-    line-height: 1.6;
-}
-.pal-invoice-content .overview__charge__value {
-    font-size: 1.5rem;
-    font-weight: 700;
-    color: var(--title-text-color);
-    line-height: 1.2;
-}
+/* overview rules moved to Step 4 below */
 
-/* Suppress redundant second Payment section and disclaimers */
-.pal-invoice-content .check-holder-payment,
+/* Suppress disclaimers only */
 .pal-invoice-content em.small {
     display: none !important;
 }
 
+/* check-holder-payment visible but separated from check-holder-request */
+.pal-invoice-content .check-holder-payment {
+    display: block !important;
+    margin-top: 2rem !important;
+    padding-top: 1.5rem !important;
+    border-top: 1px solid var(--common-border);
+}
+
 /* Step 1: Neutralise ALL Bootstrap/float layout helpers.
-   General col-* reset — applies to every col-* inside .pal-invoice-content
-   EXCEPT the grid container, which is overridden in Step 2 below. */
+   Excludes .overview, .overview__addressee, .overview__charge since
+   those need flex layout and are handled explicitly in Step 4 below. */
 .pal-invoice-content .row {
     display: block !important;
     margin-left: 0 !important;
@@ -1491,10 +1448,7 @@ td.pal-empty {
     padding-right: 0 !important;
 }
 
-/* Step 2: Grid container override.
-   MUST appear after the general col-sm-12 reset above in the file
-   so it wins on source order. Compound selectors cover every class
-   combination PA Treasury puts on this element. */
+/* Step 2: Grid container override — after Step 1 so it wins */
 .pal-invoice-content .pad-left .col-sm-12,
 .pal-invoice-content .pad-left .col-sm-12.fl,
 .pal-invoice-content .pad-left .col-sm-12.p-0,
@@ -1509,9 +1463,7 @@ td.pal-empty {
     padding-right: 0 !important;
 }
 
-/* Step 3: Grid cell padding override.
-   invoice-issued also has .p-0 which sets padding:0 in Step 1.
-   This must come after Step 1 to restore 10px padding. */
+/* Step 3: Grid cell padding — after .p-0 reset in Step 1 */
 .pal-invoice-content .invoice-issued {
     padding: 10px 12px !important;
     border-bottom: 1px solid var(--common-border);
@@ -1535,6 +1487,73 @@ td.pal-empty {
     font-weight: 500;
     color: var(--card-text-color);
     margin: 0;
+}
+
+
+/* Step 4: Overview two-column flex layout.
+   MUST come after Step 1 because .overview, .overview__addressee and
+   .overview__charge all carry col-sm-12 which Step 1 sets to
+   display:block. These rules restore flex/two-column layout. */
+.pal-invoice-content .overview,
+.pal-invoice-content .col-sm-12.overview {
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    flex-direction: row !important;
+    margin-bottom: 1rem;
+    background: var(--primary-bg-color);
+    border: 1px solid var(--common-border);
+    border-radius: var(--common-radius);
+    overflow: hidden;
+    width: 100% !important;
+    max-width: 100% !important;
+    padding: 0 !important;
+}
+.pal-invoice-content .overview__addressee,
+.pal-invoice-content .overview .col-md-7,
+.pal-invoice-content .overview .col-sm-12.overview__addressee {
+    display: block !important;
+    flex: 1 1 55% !important;
+    max-width: 55% !important;
+    width: auto !important;
+    padding: 10px 12px !important;
+    border-right: 1px solid var(--common-border);
+    text-align: left;
+    overflow-wrap: break-word;
+    box-sizing: border-box;
+    float: none !important;
+}
+.pal-invoice-content .overview__charge,
+.pal-invoice-content .overview .col-md-5,
+.pal-invoice-content .overview .col-sm-12.overview__charge {
+    display: block !important;
+    flex: 1 1 45% !important;
+    max-width: 45% !important;
+    width: auto !important;
+    padding: 10px 12px !important;
+    text-align: left;
+    box-sizing: border-box;
+    float: none !important;
+}
+.pal-invoice-content .overview__addressee__title,
+.pal-invoice-content .overview__charge__title {
+    font-size: 0.72rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--muted-text-color);
+    margin: 0 0 0.3rem 0;
+}
+.pal-invoice-content .overview__addressee__value {
+    font-size: 0.88rem;
+    font-weight: 500;
+    color: var(--card-text-color);
+    line-height: 1.6;
+}
+.pal-invoice-content .overview__charge__value {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--title-text-color);
+    line-height: 1.2;
 }
 
 /* Payment section */
