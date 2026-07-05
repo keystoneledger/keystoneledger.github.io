@@ -1346,6 +1346,152 @@ td.pal-empty {
 }
 
 /* =================================================================
+ * MODAL FOOTER — mirrors .pal-modal-header, sticky at bottom
+ * ================================================================= */
+
+.pal-modal-footer {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 1rem 1.5rem;
+    border-top: 1px solid var(--common-border);
+    background: var(--card-bg-color);
+    flex-wrap: wrap;
+    font-size: 0.82rem;
+    text-align: left;
+}
+
+.pal-modal-footer-label {
+    color: var(--muted-text-color);
+    font-weight: 600;
+    white-space: nowrap;
+    min-width: 5rem;
+    transition: color 0.2s;
+}
+
+.pal-modal-footer-url {
+    color: var(--title-text-color);
+    text-decoration: none;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    flex: 1;
+    min-width: 0;
+    cursor: pointer;
+    font-size: 0.78rem;
+}
+
+.pal-modal-footer-url:hover {
+    text-decoration: underline;
+}
+
+.pal-modal-footer-copy {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 1rem;
+    padding: 0 0.25rem;
+    color: var(--muted-text-color);
+    flex-shrink: 0;
+    line-height: 1;
+}
+
+.pal-modal-footer-copy:hover {
+    color: var(--title-text-color);
+}
+
+/* =================================================================
+ * PERMALINK PAGE
+ * ================================================================= */
+
+.pal-permalink-page {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 1.5rem 1rem 3rem;
+}
+
+.pal-permalink-header {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 2px solid var(--common-border);
+}
+
+.pal-permalink-title {
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: var(--title-text-color);
+    margin: 0 0 0.2rem 0;
+}
+
+.pal-permalink-subtitle {
+    font-size: 0.9rem;
+    color: var(--muted-text-color);
+    margin: 0;
+}
+
+.pal-permalink-back {
+    font-size: 0.85rem;
+    color: var(--muted-text-color);
+    text-decoration: none;
+}
+
+.pal-permalink-back:hover {
+    color: var(--title-text-color);
+    text-decoration: underline;
+}
+
+.pal-permalink-chart-wrap {
+    position: relative;
+    height: 320px;
+    margin-bottom: 2rem;
+    background: var(--card-bg-color);
+    border: 1px solid var(--common-border);
+    border-radius: var(--common-radius);
+    padding: 1rem;
+    box-sizing: border-box;
+}
+
+.pal-permalink-invoice-wrap {
+    margin-bottom: 2rem;
+}
+
+.pal-permalink-table-wrap {
+    overflow-x: auto;
+}
+
+.pal-permalink-fallback-note {
+    margin-top: 1rem;
+    font-size: 0.82rem;
+    color: var(--muted-text-color);
+    font-style: italic;
+}
+
+.pal-permalink-empty {
+    text-align: center;
+    padding: 3rem 1rem;
+    color: var(--muted-text-color);
+}
+
+.pal-permalink-empty a {
+    display: inline-block;
+    margin-top: 0.75rem;
+    color: var(--title-text-color);
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.pal-permalink-loading {
+    color: var(--muted-text-color);
+    font-style: italic;
+    padding: 1rem 0;
+}
+
+/* =================================================================
  * INVOICE CONTENT — PA Treasury voucher HTML styled via their own
  * class names, scoped under .pal-invoice-content.
  * ================================================================= */

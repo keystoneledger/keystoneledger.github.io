@@ -159,6 +159,7 @@
         <div class="pal-modal-footer" id="pal-modal-footer">
           <span class="pal-modal-footer-label" id="pal-modal-footer-label">Permalink:</span>
           <a class="pal-modal-footer-url" id="pal-modal-footer-url" href="#" target="_blank"></a>
+          <button class="pal-modal-footer-copy" id="pal-modal-footer-copy" title="Copy link" aria-label="Copy permalink to clipboard">&#128279;</button>
         </div>
       </div>`;
     document.body.appendChild(modal);
@@ -530,20 +531,39 @@
    *  drill-down itself. */
   function buildPermalinkUrl(params) {
     const p = new URLSearchParams();
-    if (params.vk)         { p.set("vk",    params.vk);
-                             p.set("name",  params.invoiceName || ""); }
-    else if (params.desc)  { p.set("desc",  params.desc);
-                             if (params.year)  p.set("year",  params.year);
-                             if (params.month) p.set("month", params.month); }
-    else if (params.acct)  { p.set("acct",  params.acct);
-                             if (params.year)  p.set("year",  params.year);
-                             if (params.month) p.set("month", params.month); }
-    else if (params.name)  { p.set("name",  params.name);
-                             if (params.year)  p.set("year",  params.year);
-                             if (params.month) p.set("month", params.month); }
-    else if (params.month) { p.set("year",  params.year);
-                             p.set("month", params.month); }
-    else if (params.year)  { p.set("year",  params.year); }
+    if (params.vk) {
+      p.set("vk",   params.vk);
+      p.set("name", params.invoiceName || "");
+    } else if (params.desc && params.name) {
+      // ACH/WIR breakdown detail: filter by description within a named payee
+      p.set("name", params.name);
+      p.set("desc", params.desc);
+      if (params.year)  p.set("year",  params.year);
+      if (params.month) p.set("month", params.month);
+    } else if (params.acct && params.name) {
+      // ACH/WIR breakdown detail: filter by account within a named payee
+      p.set("name", params.name);
+      p.set("acct", params.acct);
+      if (params.year)  p.set("year",  params.year);
+      if (params.month) p.set("month", params.month);
+    } else if (params.desc) {
+      p.set("desc",  params.desc);
+      if (params.year)  p.set("year",  params.year);
+      if (params.month) p.set("month", params.month);
+    } else if (params.acct) {
+      p.set("acct",  params.acct);
+      if (params.year)  p.set("year",  params.year);
+      if (params.month) p.set("month", params.month);
+    } else if (params.name) {
+      p.set("name",  params.name);
+      if (params.year)  p.set("year",  params.year);
+      if (params.month) p.set("month", params.month);
+    } else if (params.month) {
+      p.set("year",  params.year);
+      p.set("month", params.month);
+    } else if (params.year) {
+      p.set("year",  params.year);
+    }
     return `${PERMALINK_BASE}?${p.toString()}`;
   }
 
@@ -553,22 +573,35 @@
     const footer  = document.getElementById("pal-modal-footer");
     const label   = document.getElementById("pal-modal-footer-label");
     const urlEl   = document.getElementById("pal-modal-footer-url");
+    const copyBtn = document.getElementById("pal-modal-footer-copy");
     if (!footer || !urlEl) return;
 
     const url = buildPermalinkUrl(params);
     urlEl.href        = url;
     urlEl.textContent = url;
+    // Link opens in new tab via target=_blank on the <a> element.
+    // No onclick on the link itself — let it navigate normally.
 
-    // Click copies to clipboard; falls back gracefully if API unavailable.
-    urlEl.onclick = (e) => {
-      e.preventDefault();
+    function doCopy() {
       if (navigator.clipboard) {
         navigator.clipboard.writeText(url).then(() => {
           label.textContent = "Copied \u2713";
           setTimeout(() => { label.textContent = "Permalink:"; }, 2000);
         });
+      } else {
+        const ta = document.createElement("textarea");
+        ta.value = url;
+        ta.style.cssText = "position:fixed;opacity:0";
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand("copy");
+        document.body.removeChild(ta);
+        label.textContent = "Copied \u2713";
+        setTimeout(() => { label.textContent = "Permalink:"; }, 2000);
       }
-    };
+    }
+
+    if (copyBtn) copyBtn.onclick = doCopy;
   }
 
   async function openYear(year) {
@@ -978,6 +1011,9 @@
     });
 
     renderTable(records, standardColumns());
+    setModalFooter(filterField === "description"
+      ? { name: "ACH PAYEE", desc: filterValue }
+      : { name: "ACH PAYEE", acct: filterValue });
   }
 
   /** Fetches ACH PAYEE's complete record history once (using the same
@@ -1097,6 +1133,9 @@
     });
 
     renderTable(records, standardColumns());
+    setModalFooter(filterField === "description"
+      ? { name: "WIR PAYEE", desc: filterValue }
+      : { name: "WIR PAYEE", acct: filterValue });
   }
 
   /** WIR PAYEE equivalent of initAchBreakdown() -- one fetch of WIR
@@ -1880,22 +1919,61 @@
         // Full unpaginated table (no pagination needed on permalink page)
         // -----------------------------------------------------------------------
 
+        const PAGE_SIZE = 25;
+
+        function buildExplanation(params) {
+            const { vk, name, acct, desc, year, month } = params;
+            const MONTH_NAMES_LONG = ["","January","February","March","April","May",
+                "June","July","August","September","October","November","December"];
+            const period = month && year
+                ? `in ${MONTH_NAMES_LONG[month]} ${year}`
+                : year ? `in ${year}` : "(all years)";
+
+            if (vk)  return `Invoice detail for ${name || vk}`;
+            if (name === "ACH PAYEE" && desc) return `ACH/Grant payments for description \u201c${desc}\u201d ${period}`;
+            if (name === "ACH PAYEE" && acct) return `ACH/Grant payments for account ${acct} ${period}`;
+            if (name === "WIR PAYEE" && desc) return `Wire transfer payments for description \u201c${desc}\u201d ${period}`;
+            if (name === "WIR PAYEE" && acct) return `Wire transfer payments for account ${acct} ${period}`;
+            if (name === "ACH PAYEE") return `All ACH/Grant disbursements ${period}`;
+            if (name === "WIR PAYEE") return `All wire transfer payments ${period}`;
+            if (name && desc) return `Payments to ${name} for description \u201c${desc}\u201d ${period}`;
+            if (name && acct) return `Payments to ${name} for account ${acct} ${period}`;
+            if (name)  return `All payments made to ${name} ${period}`;
+            if (acct)  return `All payments charged to account ${acct} ${period}`;
+            if (desc)  return `All payments with description \u201c${desc}\u201d ${period}`;
+            if (month && year) return `All payments in ${MONTH_NAMES_LONG[month]} ${year}`;
+            if (year)  return `All payments in fiscal year ${year}`;
+            return "";
+        }
+
         function renderPermalinkTable(records) {
             const thead = tableEl.querySelector("thead");
             const tbody = tableEl.querySelector("tbody");
+            const paginationEl = document.getElementById("pal-permalink-pagination");
+
             thead.innerHTML = `<tr>
                 <th>Date</th><th>Payee</th><th>Description</th>
                 <th>Account</th><th>Amount</th>
             </tr>`;
-            tbody.innerHTML = "";
+
             if (!records || records.length === 0) {
                 tbody.innerHTML = '<tr><td colspan="5" class="pal-empty">No records found.</td></tr>';
+                if (paginationEl) paginationEl.innerHTML = "";
                 return;
             }
-            records
+
+            const sorted = records
                 .slice()
-                .sort((a, b) => (b.invoice || "").localeCompare(a.invoice || ""))
-                .forEach(r => {
+                .sort((a, b) => (b.invoice || "").localeCompare(a.invoice || ""));
+
+            let currentPage = 1;
+            const totalPages = Math.ceil(sorted.length / PAGE_SIZE);
+
+            function renderPage(page) {
+                currentPage = page;
+                tbody.innerHTML = "";
+                const start = (page - 1) * PAGE_SIZE;
+                sorted.slice(start, start + PAGE_SIZE).forEach(r => {
                     const tr = document.createElement("tr");
                     tr.innerHTML = `
                         <td>${r.invoice || ""}</td>
@@ -1905,6 +1983,42 @@
                         <td class="pal-amount-cell">${formatAmount(r.gross)}</td>`;
                     tbody.appendChild(tr);
                 });
+
+                if (!paginationEl) return;
+                if (totalPages <= 1) { paginationEl.innerHTML = ""; return; }
+
+                paginationEl.innerHTML = "";
+                const info = document.createElement("span");
+                info.className = "pal-page-info";
+                info.textContent = `${sorted.length} records`;
+                paginationEl.appendChild(info);
+
+                const nav = document.createElement("span");
+                nav.className = "pal-page-nav";
+
+                const prev = document.createElement("button");
+                prev.textContent = "\u2039 Prev";
+                prev.className = "pal-page-btn";
+                prev.disabled = currentPage === 1;
+                prev.onclick = () => renderPage(currentPage - 1);
+
+                const pageLabel = document.createElement("span");
+                pageLabel.className = "pal-page-current";
+                pageLabel.textContent = `Page ${currentPage} of ${totalPages}`;
+
+                const next = document.createElement("button");
+                next.textContent = "Next \u203a";
+                next.className = "pal-page-btn";
+                next.disabled = currentPage === totalPages;
+                next.onclick = () => renderPage(currentPage + 1);
+
+                nav.appendChild(prev);
+                nav.appendChild(pageLabel);
+                nav.appendChild(next);
+                paginationEl.appendChild(nav);
+            }
+
+            renderPage(1);
         }
 
         // -----------------------------------------------------------------------
@@ -2198,6 +2312,53 @@
             invoiceWrap.appendChild(container);
         }
 
+        async function renderNameFiltered(name, desc, acct, year, month, l2) {
+            const filterLabel = desc
+                ? `\u201c${desc}\u201d`
+                : `account ${acct}`;
+            const title = `${name} \u2014 ${filterLabel}`;
+            titleEl.textContent = title;
+            document.title = `${title} \u2014 Keystone Ledger Lens`;
+
+            const entry = l2.by_name && l2.by_name[name];
+            const l2MonthKeys = entry ? Object.keys(entry.months) : [];
+            if (!l2MonthKeys.length) { showEmpty(); return; }
+
+            const basePath = `${DATA_ROOT}/BY_NAME/${sanitizeForPath(name)}`;
+            const { records: allRecords, fallbackMsg } =
+                await fetchWithFallback(basePath, l2MonthKeys, year, month);
+
+            // Apply the secondary filter (desc or acct)
+            const records = allRecords.filter(r => {
+                if (desc) return (r.description || "").trim() === desc;
+                if (acct) return (r.alt || "").trim() === acct;
+                return true;
+            });
+
+            if (!records.length) { showEmpty(); return; }
+            if (fallbackMsg) {
+                fallbackNote.textContent = fallbackMsg;
+                fallbackNote.style.display = "block";
+            }
+
+            const series = sumByYearMonth(records);
+            renderChart({
+                type: "line",
+                data: {
+                    labels: series.map(([k]) => k),
+                    datasets: [{
+                        label: `${title} \u2014 spend over time`,
+                        data: series.map(([, v]) => v),
+                        borderColor: "#16365b",
+                        backgroundColor: "rgba(22,54,91,0.08)",
+                        fill: true, tension: 0.25, pointRadius: 3,
+                    }],
+                },
+                options: baseChartOptions("Spend over time"),
+            });
+            renderPermalinkTable(records);
+        }
+
         // -----------------------------------------------------------------------
         // Main: parse params, fetch L2, dispatch
         // -----------------------------------------------------------------------
@@ -2212,24 +2373,33 @@
         const year     = yearStr  ? parseInt(yearStr,  10) : null;
         const month    = monthStr ? parseInt(monthStr, 10) : null;
 
+        // Set subtitle from params
+        const subtitleEl = document.getElementById("pal-permalink-subtitle");
+        if (subtitleEl) {
+            subtitleEl.textContent = buildExplanation({ vk, name, acct, desc, year, month });
+        }
+
         try {
-            // Invoice needs no L2 lookup.
             if (vk) {
                 await renderInvoice(vk, name);
                 return;
             }
 
-            // All other types need L2 for month-key lookup.
             let l2 = {};
             try { l2 = await fetchJSON(L2_PATH); } catch (_) {}
 
-            if (desc)  { await renderDesc(desc,   year, month, l2); return; }
-            if (acct)  { await renderAcct(acct,   year, month, l2); return; }
-            if (name)  { await renderName(name,   year, month, l2); return; }
-            if (month) { await renderMonth(year,  month);           return; }
-            if (year)  { await renderYear(year);                    return; }
+            // name+desc or name+acct: filter records by the secondary param
+            if (name && (desc || acct)) {
+                await renderNameFiltered(name, desc, acct, year, month, l2);
+                return;
+            }
 
-            // No recognisable params.
+            if (desc)  { await renderDesc(desc,  year, month, l2); return; }
+            if (acct)  { await renderAcct(acct,  year, month, l2); return; }
+            if (name)  { await renderName(name,  year, month, l2); return; }
+            if (month) { await renderMonth(year, month);           return; }
+            if (year)  { await renderYear(year);                   return; }
+
             showEmpty();
 
         } catch (err) {

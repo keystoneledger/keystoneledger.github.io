@@ -1,9 +1,9 @@
 ---
 layout: post
-title: Keystone Ledger Lens
+title: Keystone Ledger Lens — Permalink
 ---
 
-{{- /*
+{#-
   permalink.html — Shareable deep-link page for Keystone Ledger Lens.
 
   Reads URL parameters and reconstructs the chart + table (or invoice)
@@ -29,12 +29,15 @@ title: Keystone Ledger Lens
   Data sources: same DATA/L1 paths as dashboard.js. For desc/acct/name,
   month keys are looked up from DATA/L2/pa_checkbook_summary.json first
   so the URL doesn't need to carry the full months CSV.
-*/ -}}
+-#}
 
 <div class="pal-permalink-page" id="pal-permalink-page">
 
     <div class="pal-permalink-header" id="pal-permalink-header">
-        <h2 class="pal-permalink-title" id="pal-permalink-title">Loading&hellip;</h2>
+        <div>
+            <h2 class="pal-permalink-title" id="pal-permalink-title">Loading&hellip;</h2>
+            <p class="pal-permalink-subtitle" id="pal-permalink-subtitle"></p>
+        </div>
         <a class="pal-permalink-back" href="/">&#8592; Back to dashboard</a>
     </div>
 
@@ -55,7 +58,7 @@ title: Keystone Ledger Lens
                 <thead></thead>
                 <tbody></tbody>
             </table>
-            <!-- No pagination: permalink shows full unpaginated data -->
+            <div class="pal-pagination" id="pal-permalink-pagination"></div>
         </div>
 
         <!-- Fallback note when granularity was reduced -->
