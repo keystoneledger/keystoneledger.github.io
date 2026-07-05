@@ -1414,6 +1414,16 @@ td.pal-empty {
     max-width: 50%;
     overflow-wrap: break-word;
     word-wrap: break-word;
+    word-break: break-word;
+    text-align: left;
+    white-space: normal;
+}
+
+/* The title's parent col div also needs width constrained and
+   float neutralised so max-width on the h4 takes effect. */
+.pal-invoice-content .check-holder-request .col-md-6 {
+    max-width: 50%;
+    float: none !important;
     text-align: left;
 }
 
@@ -1427,20 +1437,32 @@ td.pal-empty {
     border: 1px solid var(--common-border);
     border-radius: var(--common-radius);
     overflow: hidden;
+    width: 100%;
+    text-align: left;
 }
 
-.pal-invoice-content .overview__addressee {
+.pal-invoice-content .overview__addressee,
+.pal-invoice-content .overview__addressee.p-0 {
     flex: 1 1 55%;
-    padding: 0.85rem 1rem;
+    padding: 10px 12px !important;
     border-right: 1px solid var(--common-border);
+    text-align: left;
+    overflow-wrap: break-word;
+    word-break: break-word;
+    max-width: 50%;
+    box-sizing: border-box;
 }
 
-.pal-invoice-content .overview__charge {
+.pal-invoice-content .overview__charge,
+.pal-invoice-content .overview__charge.p-0 {
     flex: 1 1 40%;
-    padding: 0.85rem 1rem;
+    padding: 10px 12px !important;
     display: flex;
     flex-direction: column;
     justify-content: center;
+    text-align: left;
+    max-width: 50%;
+    box-sizing: border-box;
 }
 
 .pal-invoice-content .overview__addressee__title,
@@ -1468,9 +1490,9 @@ td.pal-empty {
 }
 
 /* --- Metadata grid (invoice-issued label/value pairs) ---
-   PA Treasury uses Bootstrap float columns (.fl, col-md-3).
-   We override with CSS grid for a clean 2-column layout that
-   fits the modal width without relying on their float classes. */
+   invoice-issued elements are <div> not <td>, inside a CSS grid.
+   width:100% fills the grid column; max-width:50% is enforced by
+   the grid itself (repeat(2,1fr) = 50% each column). */
 .pal-invoice-content .pad-left,
 .pal-invoice-content .check-holder-request,
 .pal-invoice-content .check-holder-payment {
@@ -1485,14 +1507,18 @@ td.pal-empty {
     text-align: left;
 }
 
-.pal-invoice-content .invoice-issued {
-    padding: 10px 12px;
+.pal-invoice-content .invoice-issued,
+.pal-invoice-content .invoice-issued.p-0 {
+    padding: 10px 12px !important;
     border-bottom: 1px solid var(--common-border);
     border-right: 1px solid var(--common-border);
-    max-width: 50%;
+    width: 100%;
+    max-width: 100%;
     overflow-wrap: break-word;
     word-wrap: break-word;
+    word-break: break-word;
     text-align: left;
+    box-sizing: border-box;
 }
 
 .pal-invoice-content .invoice-issued:nth-child(even) {
@@ -1546,7 +1572,9 @@ td.pal-empty {
 .pal-invoice-content .fl  { float: none !important; }
 .pal-invoice-content .fl-r { float: none !important; }
 .pal-invoice-content .fr  { float: none !important; }
-.pal-invoice-content .p-0 { padding: 0; }
+.pal-invoice-content .p-0:not(.invoice-issued):not(.overview__addressee):not(.overview__charge) {
+    padding: 0;
+}
 .pal-invoice-content .col-md-3,
 .pal-invoice-content .col-md-5,
 .pal-invoice-content .col-md-6,
