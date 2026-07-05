@@ -915,22 +915,35 @@ tags:
                     <!-- WIR MOST RECENT PAYMENTS
                          Populated by renderWirRecentPayments() called at
                          the end of initWirBreakdown() -- zero extra fetch,
-                         data comes from wirRecordsCache. Clicking a payee
-                         fetches DATA/L1/BY_INVOICE/<PAYEE>/<VK>.html and
-                         displays the pre-sanitized content in #pal-modal. -->
-                    <div class="card pal-wir-recent-card">
-                        <div class="card-body">
-                            <div class="pal-wir-title">Most Recent Payments</div>
-                            <p class="pal-hint">All payments on the most recent WIR Payee date.</p>
-                            <table class="pal-table" id="pal-wir-recent-table">
-                                <thead>
-                                    <tr><th>Payee</th><th>Amount</th></tr>
-                                </thead>
-                                <tbody>
-                                    <tr><td colspan="2" class="pal-empty">Loading&hellip;</td></tr>
-                                </tbody>
-                            </table>
-                        </div>
+                         Individual payment records for the most recent date
+                         come from data.most_recent_payments in L2, computed
+                         in the same rolling-window pass in report_pa_checkbook.py.
+                         Clicking a payee fetches DATA/L1/BY_INVOICE/<PAYEE>/<VK>.html
+                         and displays the pre-sanitized content in #pal-modal. -->
+                    <div class="sidebar-table">
+                        <div class="label">Most Recent Payments &mdash; {{ data.most_recent_payments.date }}</div>
+                        <table class="table table-hover pal-table" id="pal-wir-recent-table">
+                            <thead>
+                                <tr><th>Payee</th><th>Amount</th></tr>
+                            </thead>
+                            <tbody>
+                                {% for payment in data.most_recent_payments.payments %}
+                                <tr>
+                                    <td>
+                                        {% if payment.vk %}
+                                        <span class="pal-link"
+                                              onclick="PALedger.openWirInvoiceModal('{{ payment.vk }}', '{{ payment.name | replace("'", "\\'") }}')">
+                                            {{ payment.name }}
+                                        </span>
+                                        {% else %}
+                                        {{ payment.name }}
+                                        {% endif %}
+                                    </td>
+                                    <td class="pal-amount-cell">{{ usd(payment.amount) }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
                     </div>
 
                 </div>

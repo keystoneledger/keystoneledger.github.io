@@ -1064,60 +1064,6 @@
       (label) => openWirBreakdownDetail("description", label), "No WIR PAYEE records found.");
     renderSlimLegendRows(acctTbody, byAccount, "pal-wir-account-chart",
       (label) => openWirBreakdownDetail("alt", label), "No WIR PAYEE records found.");
-
-    // Populate the most-recent-payments table from the same records --
-    // no additional fetch, wirRecordsCache is already populated above.
-    renderWirRecentPayments(records);
-  }
-
-  /** Finds the most recent invoice date in `records`, then renders one
-   *  table row per record sharing that date into #pal-wir-recent-table.
-   *  Clicking a payee name calls openWirInvoiceModal(vk, payeeName). */
-  function renderWirRecentPayments(records) {
-    const tbody = document.querySelector("#pal-wir-recent-table tbody");
-    if (!tbody) return;
-
-    if (!records || records.length === 0) {
-      tbody.innerHTML = '<tr><td colspan="2" class="pal-empty">No WIR PAYEE records found.</td></tr>';
-      return;
-    }
-
-    // ISO date strings sort correctly without Date parsing.
-    let maxDate = "";
-    records.forEach((r) => {
-      const d = (r.invoice || "").trim();
-      if (d > maxDate) maxDate = d;
-    });
-
-    const recent = records.filter((r) => (r.invoice || "").trim() === maxDate);
-
-    tbody.innerHTML = "";
-    recent.forEach((r) => {
-      const vk      = r["0"] || "";
-      const name    = (r.name || "Unknown").trim();
-      const amount  = "$" + formatAmount(parseAmount(r.gross));
-
-      const tr      = document.createElement("tr");
-      const nameTd  = document.createElement("td");
-      const amtTd   = document.createElement("td");
-
-      amtTd.className = "pal-amount-cell";
-      amtTd.textContent = amount;
-
-      if (vk) {
-        const link = document.createElement("span");
-        link.className = "pal-link";
-        link.textContent = name;
-        link.addEventListener("click", () => openWirInvoiceModal(vk, name));
-        nameTd.appendChild(link);
-      } else {
-        nameTd.textContent = name;
-      }
-
-      tr.appendChild(nameTd);
-      tr.appendChild(amtTd);
-      tbody.appendChild(tr);
-    });
   }
 
   /** Fetches DATA/L1/BY_INVOICE/<sanitized-payee>/<vk>.html -- the
@@ -1179,7 +1125,7 @@
       a.setAttribute("rel", "noopener noreferrer");
     });
 
-    container.className = "pal-invoice-content pal-readme-body";
+    container.className = "pal-invoice-content";
     container.innerHTML = doc.body ? doc.body.innerHTML : html;
   }
 

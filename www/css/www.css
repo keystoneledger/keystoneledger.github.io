@@ -1345,12 +1345,74 @@ td.pal-empty {
     text-align: left;
 }
 
-/* Invoice content rendered in #pal-modal reuses the .pal-readme-body
-   typography (scoped heading/table/link styles) since both display
-   fetched HTML in the same modal context. .pal-invoice-content is the
-   cleanup hook removed by openModal() when the next drill-down opens. */
+/* Invoice content rendered in #pal-modal. PA Treasury voucher HTML uses
+   its own class names that don't exist in our stylesheet, so we style
+   by element rather than by class. These rules are scoped tightly under
+   .pal-invoice-content so they don't bleed into the rest of the modal. */
 .pal-invoice-content {
     width: 100%;
+    font-size: 0.88rem;
+    line-height: 1.5;
+    color: var(--body-text-color);
+}
+
+.pal-invoice-content table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 0.75rem 0;
+    font-size: 0.85rem;
+}
+
+.pal-invoice-content th {
+    background-color: var(--table-header-bg, #f4f4f4);
+    color: var(--title-text-color);
+    font-weight: 600;
+    text-align: left;
+    padding: 0.45rem 0.6rem;
+    border-bottom: 2px solid var(--common-border);
+}
+
+.pal-invoice-content td {
+    padding: 0.35rem 0.6rem;
+    border-bottom: 1px solid var(--common-border);
+    vertical-align: top;
+}
+
+.pal-invoice-content tr:nth-child(even) td {
+    background-color: var(--table-row-alt-bg, #fafafa);
+}
+
+.pal-invoice-content p {
+    margin: 0.4rem 0;
+}
+
+.pal-invoice-content h1,
+.pal-invoice-content h2,
+.pal-invoice-content h3 {
+    font-weight: 600;
+    color: var(--title-text-color);
+    margin: 0.75rem 0 0.35rem;
+}
+
+.pal-invoice-content h1 { font-size: 1.1rem; }
+.pal-invoice-content h2 { font-size: 1.0rem; }
+.pal-invoice-content h3 { font-size: 0.95rem; }
+
+.pal-invoice-content a {
+    color: var(--link-color, #0066cc);
+    text-decoration: none;
+}
+
+.pal-invoice-content a:hover {
+    text-decoration: underline;
+}
+
+.pal-invoice-content div {
+    margin-bottom: 0.25rem;
+}
+
+.pal-invoice-content span {
+    display: inline;
 }
 
 /*
