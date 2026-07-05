@@ -912,6 +912,27 @@ tags:
                     </div>
                     </div>
 
+                    <!-- WIR MOST RECENT PAYMENTS
+                         Populated by renderWirRecentPayments() called at
+                         the end of initWirBreakdown() -- zero extra fetch,
+                         data comes from wirRecordsCache. Clicking a payee
+                         fetches DATA/L1/BY_INVOICE/<PAYEE>/<VK>.html and
+                         displays the pre-sanitized content in #pal-modal. -->
+                    <div class="card pal-wir-recent-card">
+                        <div class="card-body">
+                            <div class="pal-wir-title">Most Recent Payments</div>
+                            <p class="pal-hint">All payments on the most recent WIR Payee date.</p>
+                            <table class="pal-table" id="pal-wir-recent-table">
+                                <thead>
+                                    <tr><th>Payee</th><th>Amount</th></tr>
+                                </thead>
+                                <tbody>
+                                    <tr><td colspan="2" class="pal-empty">Loading&hellip;</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
                 </div>
                 <!-- END SIDEBAR CONTENT 33% WIDE -->
 

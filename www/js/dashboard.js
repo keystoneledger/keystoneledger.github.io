@@ -189,7 +189,7 @@
 
     const tableWrap = modal.querySelector(".pal-modal-table-wrap");
     if (tableWrap) {
-      const readmeContent = tableWrap.querySelector(".pal-readme-body, .pal-readme-loading, .pal-readme-error");
+      const readmeContent = tableWrap.querySelector(".pal-readme-body, .pal-readme-loading, .pal-readme-error, .pal-invoice-content");
       if (readmeContent) readmeContent.remove();
     }
 
@@ -1064,6 +1064,123 @@
       (label) => openWirBreakdownDetail("description", label), "No WIR PAYEE records found.");
     renderSlimLegendRows(acctTbody, byAccount, "pal-wir-account-chart",
       (label) => openWirBreakdownDetail("alt", label), "No WIR PAYEE records found.");
+
+    // Populate the most-recent-payments table from the same records --
+    // no additional fetch, wirRecordsCache is already populated above.
+    renderWirRecentPayments(records);
+  }
+
+  /** Finds the most recent invoice date in `records`, then renders one
+   *  table row per record sharing that date into #pal-wir-recent-table.
+   *  Clicking a payee name calls openWirInvoiceModal(vk, payeeName). */
+  function renderWirRecentPayments(records) {
+    const tbody = document.querySelector("#pal-wir-recent-table tbody");
+    if (!tbody) return;
+
+    if (!records || records.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="2" class="pal-empty">No WIR PAYEE records found.</td></tr>';
+      return;
+    }
+
+    // ISO date strings sort correctly without Date parsing.
+    let maxDate = "";
+    records.forEach((r) => {
+      const d = (r.invoice || "").trim();
+      if (d > maxDate) maxDate = d;
+    });
+
+    const recent = records.filter((r) => (r.invoice || "").trim() === maxDate);
+
+    tbody.innerHTML = "";
+    recent.forEach((r) => {
+      const vk      = r["0"] || "";
+      const name    = (r.name || "Unknown").trim();
+      const amount  = "$" + formatAmount(parseAmount(r.gross));
+
+      const tr      = document.createElement("tr");
+      const nameTd  = document.createElement("td");
+      const amtTd   = document.createElement("td");
+
+      amtTd.className = "pal-amount-cell";
+      amtTd.textContent = amount;
+
+      if (vk) {
+        const link = document.createElement("span");
+        link.className = "pal-link";
+        link.textContent = name;
+        link.addEventListener("click", () => openWirInvoiceModal(vk, name));
+        nameTd.appendChild(link);
+      } else {
+        nameTd.textContent = name;
+      }
+
+      tr.appendChild(nameTd);
+      tr.appendChild(amtTd);
+      tbody.appendChild(tr);
+    });
+  }
+
+  /** Fetches DATA/L1/BY_INVOICE/<sanitized-payee>/<vk>.html -- the
+   *  pre-sanitized invoice file written by parse_pa_checkbook.py --
+   *  and displays its content in #pal-modal. The file has already been
+   *  sanitized server-side by BeautifulSoup before being committed to
+   *  the repo, so no client-side sanitization pass is needed here.
+   *  An additional lightweight strip of any surviving on* handlers and
+   *  <script> tags is applied as a defence-in-depth measure before
+   *  injecting into innerHTML. */
+  async function openWirInvoiceModal(vk, payeeName) {
+    openModal(payeeName || "Invoice Detail");
+
+    const chartWrap = document.querySelector("#pal-modal .pal-modal-chart-wrap");
+    if (chartWrap) chartWrap.style.display = "none";
+
+    const tableEl      = document.getElementById("pal-modal-table");
+    const paginationEl = document.getElementById("pal-modal-pagination");
+    if (tableEl)      tableEl.style.display      = "none";
+    if (paginationEl) paginationEl.style.display = "none";
+
+    const tableWrap = document.querySelector("#pal-modal .pal-modal-table-wrap");
+    if (!tableWrap) return;
+
+    const container = document.createElement("div");
+    container.className = "pal-invoice-content pal-readme-loading";
+    container.textContent = "Loading invoice\u2026";
+    tableWrap.appendChild(container);
+
+    const payeeFolder = sanitizeForPath((payeeName || "").trim());
+    const safeVk      = (vk || "").replace(/[^A-Za-z0-9._-]/g, "_");
+    const url         = `${DATA_ROOT}/BY_INVOICE/${payeeFolder}/${safeVk}.html`;
+
+    let html;
+    try {
+      const resp = await fetch(url);
+      if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+      html = await resp.text();
+    } catch (err) {
+      container.className = "pal-invoice-content pal-readme-error";
+      container.textContent = `Invoice not available: ${err.message}. ` +
+        "The invoice file may not have been fetched yet -- run the parse script to acquire recent invoices.";
+      return;
+    }
+
+    // Defence-in-depth: strip any <script> tags and on* attributes that
+    // might have survived the server-side BeautifulSoup sanitization pass
+    // (e.g. due to a future parser differential). The file is already
+    // sanitized before being committed, so this is a secondary check only.
+    const doc = new DOMParser().parseFromString(html, "text/html");
+    doc.querySelectorAll("script,style,iframe,form,input,button").forEach(el => el.remove());
+    doc.querySelectorAll("*").forEach(el => {
+      [...el.attributes].forEach(attr => {
+        if (attr.name.startsWith("on")) el.removeAttribute(attr.name);
+      });
+    });
+    doc.querySelectorAll("a").forEach(a => {
+      a.setAttribute("target", "_blank");
+      a.setAttribute("rel", "noopener noreferrer");
+    });
+
+    container.className = "pal-invoice-content pal-readme-body";
+    container.innerHTML = doc.body ? doc.body.innerHTML : html;
   }
 
   // --------------------------------------------------------------------
@@ -1607,5 +1724,6 @@
     initAchBreakdown,
     initWirBreakdown,
     initDescriptionBreakdowns,
+    openWirInvoiceModal,
   };
 })();

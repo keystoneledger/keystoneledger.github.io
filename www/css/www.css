@@ -1340,6 +1340,19 @@ td.pal-empty {
     padding: 0.3rem 0.4rem;
 }
 
+.pal-wir-recent-card {
+    margin-top: 1rem;
+    text-align: left;
+}
+
+/* Invoice content rendered in #pal-modal reuses the .pal-readme-body
+   typography (scoped heading/table/link styles) since both display
+   fetched HTML in the same modal context. .pal-invoice-content is the
+   cleanup hook removed by openModal() when the next drill-down opens. */
+.pal-invoice-content {
+    width: 100%;
+}
+
 /*
  * ====================================================================
  * MOBILE BREAKPOINTS -- intentionally placed at the very end of this
