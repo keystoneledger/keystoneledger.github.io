@@ -1411,6 +1411,10 @@ td.pal-empty {
     margin: 0 0 0.75rem 0;
     padding-bottom: 0.4rem;
     border-bottom: 2px solid var(--title-text-color);
+    max-width: 50%;
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+    text-align: left;
 }
 
 /* --- Payee + amount overview row --- */
@@ -1477,12 +1481,18 @@ td.pal-empty {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     gap: 0;
+    width: 100%;
+    text-align: left;
 }
 
 .pal-invoice-content .invoice-issued {
-    padding: 0.5rem 0.75rem;
+    padding: 10px 12px;
     border-bottom: 1px solid var(--common-border);
     border-right: 1px solid var(--common-border);
+    max-width: 50%;
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+    text-align: left;
 }
 
 .pal-invoice-content .invoice-issued:nth-child(even) {
