@@ -1512,8 +1512,8 @@ td.pal-empty {
 .pal-invoice-content .overview .col-md-7,
 .pal-invoice-content .overview .col-sm-12.overview__addressee {
     display: block !important;
-    flex: 1 1 55% !important;
-    max-width: 55% !important;
+    flex: 1 1 50% !important;
+    max-width: 50% !important;
     width: auto !important;
     padding: 10px 12px !important;
     border-right: 1px solid var(--common-border);
@@ -1526,8 +1526,8 @@ td.pal-empty {
 .pal-invoice-content .overview .col-md-5,
 .pal-invoice-content .overview .col-sm-12.overview__charge {
     display: block !important;
-    flex: 1 1 45% !important;
-    max-width: 45% !important;
+    flex: 1 1 50% !important;
+    max-width: 50% !important;
     width: auto !important;
     padding: 10px 12px !important;
     text-align: left;
