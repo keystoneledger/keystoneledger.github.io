@@ -1,5 +1,77 @@
 ---
-layout: page
+layout: post
+title: Keystone Ledger Lens — Permalink
 ---
 
-# Permalink
+{{- /*
+  permalink.html — Shareable deep-link page for Keystone Ledger Lens.
+
+  Reads URL parameters and reconstructs the chart + table (or invoice)
+  exactly as shown in the dashboard modal drill-downs. Reuses dashboard.js
+  and www.css via the layout template; all rendering functions and data
+  paths are identical to the dashboard.
+
+  URL parameter schema (only the keys present determine what is shown):
+
+    ?vk=<voucher_key>&name=<payee_name>        → invoice detail
+    ?desc=<description>[&year=N][&month=N]     → description drill-down
+    ?acct=<account_code>[&year=N][&month=N]    → account drill-down
+    ?name=<payee_name>[&year=N][&month=N]      → payee drill-down
+    ?year=N&month=N                            → month drill-down
+    ?year=N                                    → year drill-down
+    (no recognised params)                     → link back to dashboard
+
+  year and month are optional date-range filters on desc/acct/name.
+  When provided, only records matching that period are shown. If that
+  returns no data, the page falls back progressively (month → year →
+  all history) and notes what was dropped with an asterisk footnote.
+
+  Data sources: same DATA/L1 paths as dashboard.js. For desc/acct/name,
+  month keys are looked up from DATA/L2/pa_checkbook_summary.json first
+  so the URL doesn't need to carry the full months CSV.
+*/ -}}
+
+<div class="pal-permalink-page" id="pal-permalink-page">
+
+    <div class="pal-permalink-header" id="pal-permalink-header">
+        <h2 class="pal-permalink-title" id="pal-permalink-title">Loading&hellip;</h2>
+        <a class="pal-permalink-back" href="/">&#8592; Back to dashboard</a>
+    </div>
+
+    <div class="pal-permalink-content" id="pal-permalink-content">
+
+        <!-- Chart area — hidden for invoice type -->
+        <div class="pal-permalink-chart-wrap" id="pal-permalink-chart-wrap">
+            <canvas id="pal-permalink-chart" height="300"></canvas>
+        </div>
+
+        <!-- Invoice content area — hidden for chart/table types -->
+        <div class="pal-permalink-invoice-wrap" id="pal-permalink-invoice-wrap" style="display:none;">
+        </div>
+
+        <!-- Table area — hidden for invoice type -->
+        <div class="pal-permalink-table-wrap" id="pal-permalink-table-wrap">
+            <table class="pal-table" id="pal-permalink-table">
+                <thead></thead>
+                <tbody></tbody>
+            </table>
+            <!-- No pagination: permalink shows full unpaginated data -->
+        </div>
+
+        <!-- Fallback note when granularity was reduced -->
+        <p class="pal-permalink-fallback-note" id="pal-permalink-fallback-note"
+           style="display:none;"></p>
+
+        <!-- No data / unrecognised params state -->
+        <div class="pal-permalink-empty" id="pal-permalink-empty" style="display:none;">
+            <p>No data found for this permalink.</p>
+            <a href="/">&#8592; View the full dashboard</a>
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+  document.addEventListener("DOMContentLoaded", () => PALedger.initPermalink());
+</script>
