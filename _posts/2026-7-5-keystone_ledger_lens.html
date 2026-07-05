@@ -552,7 +552,7 @@ tags:
                                         <div class="pal-stacked-divider"></div>
                                         <div class="pal-stacked-item">
                                             <div class="label">Data As Of</div>
-                                            <div class="value pal-asof">2026-07-05T03:18:04Z</div>
+                                            <div class="value pal-asof">2026-07-05T04:18:42Z</div>
                                         </div>
                                     </div>
                                 </div>
@@ -2639,22 +2639,369 @@ tags:
                     <!-- WIR MOST RECENT PAYMENTS
                          Populated by renderWirRecentPayments() called at
                          the end of initWirBreakdown() -- zero extra fetch,
-                         data comes from wirRecordsCache. Clicking a payee
-                         fetches DATA/L1/BY_INVOICE/<PAYEE>/<VK>.html and
-                         displays the pre-sanitized content in #pal-modal. -->
-                    <div class="card pal-wir-recent-card">
-                        <div class="card-body">
-                            <div class="pal-wir-title">Most Recent Payments</div>
-                            <p class="pal-hint">All payments on the most recent WIR Payee date.</p>
-                            <table class="pal-table" id="pal-wir-recent-table">
-                                <thead>
-                                    <tr><th>Payee</th><th>Amount</th></tr>
-                                </thead>
-                                <tbody>
-                                    <tr><td colspan="2" class="pal-empty">Loading&hellip;</td></tr>
-                                </tbody>
-                            </table>
-                        </div>
+                         Individual payment records for the most recent date
+                         come from data.most_recent_payments in L2, computed
+                         in the same rolling-window pass in report_pa_checkbook.py.
+                         Clicking a payee fetches DATA/L1/BY_INVOICE/<PAYEE>/<VK>.html
+                         and displays the pre-sanitized content in #pal-modal. -->
+                    <div class="sidebar-table">
+                        <div class="label">Most Recent Payments &mdash; 2026-07-02</div>
+                        <table class="table table-hover pal-table" id="pal-wir-recent-table">
+                            <thead>
+                                <tr><th>Payee</th><th>Amount</th></tr>
+                            </thead>
+                            <tbody>
+                                
+                                <tr>
+                                    <td>
+                                        
+                                        <span class="pal-link"
+                                              onclick="PALedger.openWirInvoiceModal('48741', 'AFSCME COUNCIL 13')">
+                                            AFSCME COUNCIL 13
+                                        </span>
+                                        
+                                    </td>
+                                    <td class="pal-amount-cell">$6,270.37</td>
+                                </tr>
+                                
+                                <tr>
+                                    <td>
+                                        
+                                        <span class="pal-link"
+                                              onclick="PALedger.openWirInvoiceModal('48742', 'AFSCME PEOPLE')">
+                                            AFSCME PEOPLE
+                                        </span>
+                                        
+                                    </td>
+                                    <td class="pal-amount-cell">$90.00</td>
+                                </tr>
+                                
+                                <tr>
+                                    <td>
+                                        
+                                        <span class="pal-link"
+                                              onclick="PALedger.openWirInvoiceModal('48743', 'AMERICAN GENERAL LIFE INS CO')">
+                                            AMERICAN GENERAL LIFE INS CO
+                                        </span>
+                                        
+                                    </td>
+                                    <td class="pal-amount-cell">$90.00</td>
+                                </tr>
+                                
+                                <tr>
+                                    <td>
+                                        
+                                        <span class="pal-link"
+                                              onclick="PALedger.openWirInvoiceModal('48762', 'CHK PAYEE')">
+                                            CHK PAYEE
+                                        </span>
+                                        
+                                    </td>
+                                    <td class="pal-amount-cell">$14.00</td>
+                                </tr>
+                                
+                                <tr>
+                                    <td>
+                                        
+                                        <span class="pal-link"
+                                              onclick="PALedger.openWirInvoiceModal('48763', 'CHK PAYEE')">
+                                            CHK PAYEE
+                                        </span>
+                                        
+                                    </td>
+                                    <td class="pal-amount-cell">$14.00</td>
+                                </tr>
+                                
+                                <tr>
+                                    <td>
+                                        
+                                        <span class="pal-link"
+                                              onclick="PALedger.openWirInvoiceModal('48764', 'CHK PAYEE')">
+                                            CHK PAYEE
+                                        </span>
+                                        
+                                    </td>
+                                    <td class="pal-amount-cell">$14.00</td>
+                                </tr>
+                                
+                                <tr>
+                                    <td>
+                                        
+                                        <span class="pal-link"
+                                              onclick="PALedger.openWirInvoiceModal('48750', 'City of Philadelphia')">
+                                            City of Philadelphia
+                                        </span>
+                                        
+                                    </td>
+                                    <td class="pal-amount-cell">$3,334.21</td>
+                                </tr>
+                                
+                                <tr>
+                                    <td>
+                                        
+                                        <span class="pal-link"
+                                              onclick="PALedger.openWirInvoiceModal('48761', 'COLLECTOR OF TAXES')">
+                                            COLLECTOR OF TAXES
+                                        </span>
+                                        
+                                    </td>
+                                    <td class="pal-amount-cell">$576.00</td>
+                                </tr>
+                                
+                                <tr>
+                                    <td>
+                                        
+                                        <span class="pal-link"
+                                              onclick="PALedger.openWirInvoiceModal('48745', 'CORESTREAM')">
+                                            CORESTREAM
+                                        </span>
+                                        
+                                    </td>
+                                    <td class="pal-amount-cell">$1,887.84</td>
+                                </tr>
+                                
+                                <tr>
+                                    <td>
+                                        
+                                        <span class="pal-link"
+                                              onclick="PALedger.openWirInvoiceModal('48749', 'Cumberland County Tax Bureau')">
+                                            Cumberland County Tax Bureau
+                                        </span>
+                                        
+                                    </td>
+                                    <td class="pal-amount-cell">$279.07</td>
+                                </tr>
+                                
+                                <tr>
+                                    <td>
+                                        
+                                        <span class="pal-link"
+                                              onclick="PALedger.openWirInvoiceModal('48760', 'Cumberland County Tax Bureau')">
+                                            Cumberland County Tax Bureau
+                                        </span>
+                                        
+                                    </td>
+                                    <td class="pal-amount-cell">$14.00</td>
+                                </tr>
+                                
+                                <tr>
+                                    <td>
+                                        
+                                        <span class="pal-link"
+                                              onclick="PALedger.openWirInvoiceModal('48759', 'Dorothy Mertz, Tax Collector')">
+                                            Dorothy Mertz, Tax Collector
+                                        </span>
+                                        
+                                    </td>
+                                    <td class="pal-amount-cell">$14.00</td>
+                                </tr>
+                                
+                                <tr>
+                                    <td>
+                                        
+                                        <span class="pal-link"
+                                              onclick="PALedger.openWirInvoiceModal('48754', 'HAB EIT')">
+                                            HAB EIT
+                                        </span>
+                                        
+                                    </td>
+                                    <td class="pal-amount-cell">$3,979.07</td>
+                                </tr>
+                                
+                                <tr>
+                                    <td>
+                                        
+                                        <span class="pal-link"
+                                              onclick="PALedger.openWirInvoiceModal('48755', 'HAB EIT')">
+                                            HAB EIT
+                                        </span>
+                                        
+                                    </td>
+                                    <td class="pal-amount-cell">$449.96</td>
+                                </tr>
+                                
+                                <tr>
+                                    <td>
+                                        
+                                        <span class="pal-link"
+                                              onclick="PALedger.openWirInvoiceModal('48756', 'HAB EIT')">
+                                            HAB EIT
+                                        </span>
+                                        
+                                    </td>
+                                    <td class="pal-amount-cell">$170.94</td>
+                                </tr>
+                                
+                                <tr>
+                                    <td>
+                                        
+                                        <span class="pal-link"
+                                              onclick="PALedger.openWirInvoiceModal('48757', 'HAB EIT')">
+                                            HAB EIT
+                                        </span>
+                                        
+                                    </td>
+                                    <td class="pal-amount-cell">$161.14</td>
+                                </tr>
+                                
+                                <tr>
+                                    <td>
+                                        
+                                        <span class="pal-link"
+                                              onclick="PALedger.openWirInvoiceModal('48758', 'HAB EIT')">
+                                            HAB EIT
+                                        </span>
+                                        
+                                    </td>
+                                    <td class="pal-amount-cell">$161.84</td>
+                                </tr>
+                                
+                                <tr>
+                                    <td>
+                                        
+                                        <span class="pal-link"
+                                              onclick="PALedger.openWirInvoiceModal('48751', 'KEYSTONE COLLECTIONS GROUP')">
+                                            KEYSTONE COLLECTIONS GROUP
+                                        </span>
+                                        
+                                    </td>
+                                    <td class="pal-amount-cell">$107,340.84</td>
+                                </tr>
+                                
+                                <tr>
+                                    <td>
+                                        
+                                        <span class="pal-link"
+                                              onclick="PALedger.openWirInvoiceModal('48752', 'KEYSTONE COLLECTIONS GROUP')">
+                                            KEYSTONE COLLECTIONS GROUP
+                                        </span>
+                                        
+                                    </td>
+                                    <td class="pal-amount-cell">$283.50</td>
+                                </tr>
+                                
+                                <tr>
+                                    <td>
+                                        
+                                        <span class="pal-link"
+                                              onclick="PALedger.openWirInvoiceModal('48753', 'KEYSTONE COLLECTIONS GROUP')">
+                                            KEYSTONE COLLECTIONS GROUP
+                                        </span>
+                                        
+                                    </td>
+                                    <td class="pal-amount-cell">$309.19</td>
+                                </tr>
+                                
+                                <tr>
+                                    <td>
+                                        
+                                        <span class="pal-link"
+                                              onclick="PALedger.openWirInvoiceModal('48765', 'KEYSTONE COLLECTIONS GROUP')">
+                                            KEYSTONE COLLECTIONS GROUP
+                                        </span>
+                                        
+                                    </td>
+                                    <td class="pal-amount-cell">$13,092.00</td>
+                                </tr>
+                                
+                                <tr>
+                                    <td>
+                                        
+                                        <span class="pal-link"
+                                              onclick="PALedger.openWirInvoiceModal('48766', 'KEYSTONE COLLECTIONS GROUP')">
+                                            KEYSTONE COLLECTIONS GROUP
+                                        </span>
+                                        
+                                    </td>
+                                    <td class="pal-amount-cell">$14.00</td>
+                                </tr>
+                                
+                                <tr>
+                                    <td>
+                                        
+                                        <span class="pal-link"
+                                              onclick="PALedger.openWirInvoiceModal('48735', 'METROPOLITAN LIFE INSURANCE CO CBS')">
+                                            METROPOLITAN LIFE INSURANCE CO CBS
+                                        </span>
+                                        
+                                    </td>
+                                    <td class="pal-amount-cell">$1,995.17</td>
+                                </tr>
+                                
+                                <tr>
+                                    <td>
+                                        
+                                        <span class="pal-link"
+                                              onclick="PALedger.openWirInvoiceModal('48748', 'PA UC FUND')">
+                                            PA UC FUND
+                                        </span>
+                                        
+                                    </td>
+                                    <td class="pal-amount-cell">$4,923.47</td>
+                                </tr>
+                                
+                                <tr>
+                                    <td>
+                                        
+                                        <span class="pal-link"
+                                              onclick="PALedger.openWirInvoiceModal('48767', 'PEBTF ACTIVE')">
+                                            PEBTF ACTIVE
+                                        </span>
+                                        
+                                    </td>
+                                    <td class="pal-amount-cell">$514,144.71</td>
+                                </tr>
+                                
+                                <tr>
+                                    <td>
+                                        
+                                        <span class="pal-link"
+                                              onclick="PALedger.openWirInvoiceModal('48769', 'PEBTF ACTIVE')">
+                                            PEBTF ACTIVE
+                                        </span>
+                                        
+                                    </td>
+                                    <td class="pal-amount-cell">$75.00</td>
+                                </tr>
+                                
+                                <tr>
+                                    <td>
+                                        
+                                        <span class="pal-link"
+                                              onclick="PALedger.openWirInvoiceModal('48768', 'PEBTF ANNUITANT')">
+                                            PEBTF ANNUITANT
+                                        </span>
+                                        
+                                    </td>
+                                    <td class="pal-amount-cell">$149,856.00</td>
+                                </tr>
+                                
+                                <tr>
+                                    <td>
+                                        
+                                        <span class="pal-link"
+                                              onclick="PALedger.openWirInvoiceModal('48736', 'PRUDENTIAL')">
+                                            PRUDENTIAL
+                                        </span>
+                                        
+                                    </td>
+                                    <td class="pal-amount-cell">$2,171.38</td>
+                                </tr>
+                                
+                                <tr>
+                                    <td>
+                                        
+                                        <span class="pal-link"
+                                              onclick="PALedger.openWirInvoiceModal('48770', 'TRUSTMARK VOLUNTARY BENEFIT SOLUTIONS INTRUSTMARK VOLUNTARY BENEFIT SOLUTIONS  I')">
+                                            TRUSTMARK VOLUNTARY BENEFIT SOLUTIONS INTRUSTMARK VOLUNTARY BENEFIT SOLUTIONS  I
+                                        </span>
+                                        
+                                    </td>
+                                    <td class="pal-amount-cell">$761.42</td>
+                                </tr>
+                                
+                            </tbody>
+                        </table>
                     </div>
 
                 </div>
