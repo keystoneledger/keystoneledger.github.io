@@ -610,7 +610,7 @@ tags:
                                             <tr>
                                                 <td>
                                                     <span class="pal-link"
-                                                          onclick="PALedger.openName('ACH PAYEE', '{{ ach_year_months[year_key] | join(',') }}')">
+                                                          onclick="PALedger.openName('ACH PAYEE', '{{ ach_year_months[year_key] | join(',') }}', '{{ year_key }}')">
                                                         {{ year_key }}
                                                     </span>
                                                 </td>
@@ -932,7 +932,7 @@ tags:
                                     <td>
                                         {% if payment.vk %}
                                         <span class="pal-link"
-                                              onclick="PALedger.openWirInvoiceModal('{{ payment.vk }}', '{{ payment.name | replace("'", "\\'") }}')">
+                                              onclick="PALedger.openInvoiceModal('{{ payment.vk }}', '{{ payment.name | replace("'", "\\'") }}')">
                                             {{ payment.name }}
                                         </span>
                                         {% else %}

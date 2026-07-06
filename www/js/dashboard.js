@@ -735,7 +735,7 @@
     });
 
     renderTable(records, standardColumns());
-    setModalFooter({ name: rawName });
+    setModalFooter({ name: rawName, year: yearLabel ? parseInt(yearLabel, 10) : null });
   }
 
   /** Account code click: line chart of spend over time + table of all
@@ -771,7 +771,7 @@
     });
 
     renderTable(records, standardColumns());
-    setModalFooter({ acct: alt });
+    setModalFooter({ acct: alt, year: yearLabel ? parseInt(yearLabel, 10) : null });
   }
 
   /** Description click: line chart of spend over time + table of all
