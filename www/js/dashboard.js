@@ -2029,15 +2029,44 @@
 
       function renderPage() {
         tbody.innerHTML = "";
+        const colCount = 5;
         const start = (currentPage - 1) * PAGE_SIZE;
         sorted.slice(start, start + PAGE_SIZE).forEach(r => {
           const tr = document.createElement("tr");
-          tr.innerHTML = `
-            <td>${r.invoice || ""}</td>
-            <td>${r.name || ""}</td>
-            <td>${r.description || ""}</td>
-            <td>${r.alt || ""}</td>
-            <td class="pal-amount-cell">${formatAmount(r.gross)}</td>`;
+
+          const dateTd = document.createElement("td");
+          dateTd.textContent = r.invoice || "";
+
+          const nameTd = document.createElement("td");
+          const vk = r["0"] || "";
+          const name = (r.name || "").trim();
+          if (vk) {
+            const link = document.createElement("span");
+            link.className = "pal-link pal-invoice-trigger";
+            link.textContent = name;
+            link.title = "Click to view invoice";
+            link.addEventListener("click", () =>
+              toggleInvoiceRow(tr, vk, name, colCount));
+            nameTd.appendChild(link);
+          } else {
+            nameTd.textContent = name;
+          }
+
+          const descTd = document.createElement("td");
+          descTd.textContent = r.description || "";
+
+          const acctTd = document.createElement("td");
+          acctTd.textContent = r.alt || "";
+
+          const amtTd = document.createElement("td");
+          amtTd.className = "pal-amount-cell";
+          amtTd.textContent = formatAmount(r.gross);
+
+          tr.appendChild(dateTd);
+          tr.appendChild(nameTd);
+          tr.appendChild(descTd);
+          tr.appendChild(acctTd);
+          tr.appendChild(amtTd);
           tbody.appendChild(tr);
         });
 
