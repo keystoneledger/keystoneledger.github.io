@@ -159,7 +159,7 @@
         <div class="pal-modal-footer" id="pal-modal-footer">
           <span class="pal-modal-footer-label" id="pal-modal-footer-label">Permalink:</span>
           <a class="pal-modal-footer-url" id="pal-modal-footer-url" href="#" target="_blank"></a>
-          <button class="pal-modal-footer-copy" id="pal-modal-footer-copy" title="Copy link" aria-label="Copy permalink to clipboard">&#128203;</button>
+          <button class="pal-modal-footer-copy" id="pal-modal-footer-copy" title="Copy link" aria-label="Copy permalink to clipboard"><img src="../img/icons/copy_navy.png" alt="Copy"></button>
         </div>
       </div>`;
     document.body.appendChild(modal);
