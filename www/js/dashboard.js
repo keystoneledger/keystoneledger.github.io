@@ -322,7 +322,11 @@
           columns.forEach((col) => {
             const td = document.createElement("td");
             const raw = col.value ? col.value(record) : record[col.key];
-            td.textContent = col.format ? col.format(raw, record) : raw;
+            if (col.render) {
+              col.render(td, raw, record, tr, columns.length);
+            } else {
+              td.textContent = col.format ? col.format(raw, record) : raw;
+            }
             if (col.className) td.className = col.className;
             tr.appendChild(td);
           });
@@ -385,6 +389,21 @@
         key: "name", label: "Payee", sortable: true,
         sortValue: (r) => (r.name || "").trim().toLowerCase(),
         format: (v) => (v || "").trim(),
+        render: (td, raw, record, tr, colCount) => {
+          const vk = record["0"] || "";
+          const name = (raw || "").trim();
+          if (vk) {
+            const link = document.createElement("span");
+            link.className = "pal-link pal-invoice-trigger";
+            link.textContent = name;
+            link.title = "Click to view invoice";
+            link.addEventListener("click", () =>
+              toggleInvoiceRow(tr, vk, name, colCount));
+            td.appendChild(link);
+          } else {
+            td.textContent = name;
+          }
+        },
       },
       {
         key: "gross", label: "Amount", sortable: true, className: "pal-amount-cell",
@@ -1179,6 +1198,87 @@
       (label) => openWirBreakdownDetail("alt", label), "No WIR PAYEE records found.");
   }
 
+  /** Fetches and sanitizes the L1 invoice HTML for a given VK + payee name.
+   *  Returns the sanitized HTML string, or throws on fetch failure.
+   *  Used by both openInvoiceModal and the inline expandable row. */
+  async function fetchInvoiceHtml(vk, payeeName) {
+    const payeeFolder = sanitizeForPath((payeeName || "").trim());
+    const safeVk      = (vk || "").replace(/[^A-Za-z0-9._-]/g, "_");
+    const url         = `${DATA_ROOT}/BY_INVOICE/${payeeFolder}/${safeVk}.html`;
+
+    const resp = await fetch(url);
+    if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+    const html = await resp.text();
+
+    const doc = new DOMParser().parseFromString(html, "text/html");
+    doc.querySelectorAll("script,style,iframe,form,input,button").forEach(el => el.remove());
+    doc.querySelectorAll("*").forEach(el => {
+      [...el.attributes].forEach(attr => {
+        if (attr.name.startsWith("on")) el.removeAttribute(attr.name);
+      });
+    });
+    doc.querySelectorAll("a").forEach(a => {
+      a.setAttribute("target", "_blank");
+      a.setAttribute("rel", "noopener noreferrer");
+    });
+
+    return doc.body ? doc.body.innerHTML : html;
+  }
+
+  /** Toggle an expandable invoice row below `parentTr`.
+   *  If the row is already open, collapse it. Otherwise fetch the invoice
+   *  from L1 and inject it into a new <tr> spanning all columns. */
+  async function toggleInvoiceRow(parentTr, vk, payeeName, colCount) {
+    // Check if an expanded row already exists immediately after parentTr.
+    const existing = parentTr.nextElementSibling;
+    if (existing && existing.classList.contains("pal-invoice-row")) {
+      existing.remove();
+      parentTr.classList.remove("pal-invoice-row-open");
+      return;
+    }
+
+    parentTr.classList.add("pal-invoice-row-open");
+
+    const expandTr = document.createElement("tr");
+    expandTr.className = "pal-invoice-row";
+
+    const td = document.createElement("td");
+    td.colSpan = colCount;
+    td.className = "pal-invoice-row-cell";
+
+    // Loading state
+    const container = document.createElement("div");
+    container.className = "pal-invoice-content pal-readme-loading";
+    container.textContent = "Loading invoice\u2026";
+
+    // X close button
+    const closeBtn = document.createElement("button");
+    closeBtn.className = "pal-invoice-row-close";
+    closeBtn.textContent = "\u00d7";
+    closeBtn.setAttribute("aria-label", "Close");
+    closeBtn.addEventListener("click", () => {
+      expandTr.remove();
+      parentTr.classList.remove("pal-invoice-row-open");
+    });
+
+    td.appendChild(closeBtn);
+    td.appendChild(container);
+    expandTr.appendChild(td);
+
+    // Insert immediately after parentTr
+    parentTr.insertAdjacentElement("afterend", expandTr);
+
+    try {
+      const html = await fetchInvoiceHtml(vk, payeeName);
+      container.className = "pal-invoice-content";
+      container.innerHTML = html;
+    } catch (err) {
+      container.className = "pal-invoice-content pal-readme-error";
+      container.textContent = `Invoice not available: ${err.message}. ` +
+        "The invoice file may not have been fetched yet \u2014 run the parse script to acquire recent invoices.";
+    }
+  }
+
   /** Fetches DATA/L1/BY_INVOICE/<sanitized-payee>/<vk>.html -- the
    *  pre-sanitized invoice file written by parse_pa_checkbook.py --
    *  and displays its content in #pal-modal. The file has already been
@@ -1187,7 +1287,7 @@
    *  An additional lightweight strip of any surviving on* handlers and
    *  <script> tags is applied as a defence-in-depth measure before
    *  injecting into innerHTML. */
-  async function openWirInvoiceModal(vk, payeeName) {
+  async function openInvoiceModal(vk, payeeName) {
     openModal(payeeName || "Invoice Detail");
 
     const chartWrap = document.querySelector("#pal-modal .pal-modal-chart-wrap");
@@ -1206,15 +1306,10 @@
     container.textContent = "Loading invoice\u2026";
     tableWrap.appendChild(container);
 
-    const payeeFolder = sanitizeForPath((payeeName || "").trim());
-    const safeVk      = (vk || "").replace(/[^A-Za-z0-9._-]/g, "_");
-    const url         = `${DATA_ROOT}/BY_INVOICE/${payeeFolder}/${safeVk}.html`;
-
-    let html;
     try {
-      const resp = await fetch(url);
-      if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
-      html = await resp.text();
+      const html = await fetchInvoiceHtml(vk, payeeName);
+      container.className = "pal-invoice-content";
+      container.innerHTML = html;
     } catch (err) {
       container.className = "pal-invoice-content pal-readme-error";
       container.textContent = `Invoice not available: ${err.message}. ` +
@@ -1222,24 +1317,6 @@
       return;
     }
 
-    // Defence-in-depth: strip any <script> tags and on* attributes that
-    // might have survived the server-side BeautifulSoup sanitization pass
-    // (e.g. due to a future parser differential). The file is already
-    // sanitized before being committed, so this is a secondary check only.
-    const doc = new DOMParser().parseFromString(html, "text/html");
-    doc.querySelectorAll("script,style,iframe,form,input,button").forEach(el => el.remove());
-    doc.querySelectorAll("*").forEach(el => {
-      [...el.attributes].forEach(attr => {
-        if (attr.name.startsWith("on")) el.removeAttribute(attr.name);
-      });
-    });
-    doc.querySelectorAll("a").forEach(a => {
-      a.setAttribute("target", "_blank");
-      a.setAttribute("rel", "noopener noreferrer");
-    });
-
-    container.className = "pal-invoice-content";
-    container.innerHTML = doc.body ? doc.body.innerHTML : html;
     setModalFooter({ vk, invoiceName: payeeName });
   }
 
@@ -2246,41 +2323,20 @@
       if (tableWrap)   tableWrap.style.display    = "none";
       if (invoiceWrap) invoiceWrap.style.display  = "block";
 
-      const payeeFolder = sanitizeForPath(name || "");
-      const safeVk      = (vk || "").replace(/[^A-Za-z0-9._-]/g, "_");
-      const url         = `${DATA_ROOT}/BY_INVOICE/${payeeFolder}/${safeVk}.html`;
-
       invoiceWrap.innerHTML = `<p class="pal-permalink-loading">Loading invoice\u2026</p>`;
 
-      let html;
       try {
-        const resp = await fetch(url);
-        if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
-        html = await resp.text();
+        const html = await fetchInvoiceHtml(vk, name);
+        const container = document.createElement("div");
+        container.className = "pal-invoice-content";
+        container.innerHTML = html;
+        invoiceWrap.innerHTML = "";
+        invoiceWrap.appendChild(container);
       } catch (err) {
         invoiceWrap.innerHTML =
           `<p class="pal-readme-error">Invoice not available: ${err.message}.</p>` +
           `<a href="/">\u2190 Back to dashboard</a>`;
-        return;
       }
-
-      const doc = new DOMParser().parseFromString(html, "text/html");
-      doc.querySelectorAll("script,style,iframe,form,input,button").forEach(el => el.remove());
-      doc.querySelectorAll("*").forEach(el => {
-        [...el.attributes].forEach(attr => {
-          if (attr.name.startsWith("on")) el.removeAttribute(attr.name);
-        });
-      });
-      doc.querySelectorAll("a").forEach(a => {
-        a.setAttribute("target", "_blank");
-        a.setAttribute("rel", "noopener noreferrer");
-      });
-
-      const container = document.createElement("div");
-      container.className = "pal-invoice-content";
-      container.innerHTML = doc.body ? doc.body.innerHTML : html;
-      invoiceWrap.innerHTML = "";
-      invoiceWrap.appendChild(container);
     }
 
     // ------------------------------------------------------------------
@@ -2334,7 +2390,9 @@
     initAchBreakdown,
     initWirBreakdown,
     initDescriptionBreakdowns,
-    openWirInvoiceModal,
+    openInvoiceModal,
+    fetchInvoiceHtml,
+    toggleInvoiceRow,
     initPermalink,
   };
 })();

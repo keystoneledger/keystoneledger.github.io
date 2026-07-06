@@ -1346,6 +1346,56 @@ td.pal-empty {
 }
 
 /* =================================================================
+ * EXPANDABLE INVOICE ROWS
+ * ================================================================= */
+
+.pal-invoice-trigger {
+    cursor: pointer;
+    text-decoration: underline dotted;
+}
+
+.pal-invoice-trigger:hover {
+    text-decoration: underline;
+}
+
+tr.pal-invoice-row-open td {
+    background-color: var(--primary-bg-color);
+}
+
+tr.pal-invoice-row {
+    background-color: var(--card-bg-color);
+}
+
+td.pal-invoice-row-cell {
+    padding: 0 !important;
+    border-bottom: 2px solid var(--title-text-color);
+}
+
+.pal-invoice-row-close {
+    display: block;
+    margin-left: auto;
+    margin-right: 0.75rem;
+    margin-top: 0.5rem;
+    background: none;
+    border: 1px solid var(--common-border);
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 1rem;
+    line-height: 1;
+    padding: 0.1rem 0.5rem;
+    color: var(--muted-text-color);
+}
+
+.pal-invoice-row-close:hover {
+    color: var(--title-text-color);
+    border-color: var(--title-text-color);
+}
+
+td.pal-invoice-row-cell .pal-invoice-content {
+    padding: 0.75rem 1rem 1rem;
+}
+
+/* =================================================================
  * MODAL FOOTER — mirrors .pal-modal-header, sticky at bottom
  * ================================================================= */
 
