@@ -706,7 +706,7 @@
    *  showing all-history (the sidebar's Top Payees) or just one year
    *  (the pie legend), even though the underlying data scope differs.
    *  Omit it (or pass null/undefined) for all-history call sites. */
-  async function openName(rawName, monthKeysCsv, yearLabel) {
+  async function openName(rawName, monthKeysCsv, yearLabel, descFilter) {
     const title = yearLabel ? `${rawName} \u2014 ${yearLabel}` : rawName;
     openModal(title);
     setModalChart(null);
@@ -735,14 +735,14 @@
     });
 
     renderTable(records, standardColumns());
-    setModalFooter({ name: rawName, year: yearLabel ? parseInt(yearLabel, 10) : null });
+    setModalFooter({ name: rawName, year: yearLabel ? parseInt(yearLabel, 10) : null, desc: descFilter || null });
   }
 
   /** Account code click: line chart of spend over time + table of all
    *  its records. monthKeysCsv: see openName's note on why this is a
    *  comma-joined string rather than an array. yearLabel: see openName's
    *  note -- same optional year-qualification, for the same reason. */
-  async function openAcct(alt, monthKeysCsv, yearLabel) {
+  async function openAcct(alt, monthKeysCsv, yearLabel, descFilter) {
     const title = yearLabel ? `Account ${alt} \u2014 ${yearLabel}` : `Account ${alt}`;
     openModal(title);
     setModalChart(null);
@@ -771,7 +771,7 @@
     });
 
     renderTable(records, standardColumns());
-    setModalFooter({ acct: alt, year: yearLabel ? parseInt(yearLabel, 10) : null });
+    setModalFooter({ acct: alt, year: yearLabel ? parseInt(yearLabel, 10) : null, desc: descFilter || null });
   }
 
   /** Description click: line chart of spend over time + table of all
@@ -1364,7 +1364,7 @@
           // and fetchAllMonths returned zero records (modal appeared blank).
           (name) => {
             const payeeObj = item.payees.find((p) => p.name === name);
-            openName(name, payeeObj ? payeeObj.monthKeys : "");
+            openName(name, payeeObj ? payeeObj.monthKeys : "", null, item.description);
           },
           palette
         );
