@@ -159,6 +159,12 @@ h4 {
     background-position: right bottom;
     */
 }
+
+.footer img {
+    width: 170px;
+    height: auto;
+}
+
 .footer .bottom-left {}
 .footer .bottom-center {}
 .footer .bottom-right {}
