@@ -152,10 +152,12 @@ h4 {
 
 .footer {
     min-height: 100px;
+    /*
     background-image: url("../img/branding/powered_by_nimble.png");
     background-size:   225px;
     background-repeat: no-repeat;
     background-position: right bottom;
+    */
 }
 .footer .bottom-left {}
 .footer .bottom-center {}
