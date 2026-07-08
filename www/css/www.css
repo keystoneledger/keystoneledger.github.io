@@ -160,7 +160,7 @@ h4 {
     */
 }
 
-.footer img {
+.footer img.powered_by {
     display: inline;
     margin-top: 100px;
     margin-right: 100px;
