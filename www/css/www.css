@@ -161,7 +161,9 @@ h4 {
 }
 
 .footer img {
+    display: inline-flex;
     margin-top: 100px;
+    margin-right: 50px;
     width: 300px;
     height: auto;
 }
