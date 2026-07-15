@@ -1272,6 +1272,23 @@
       const html = await fetchInvoiceHtml(vk, payeeName);
       container.className = "pal-invoice-content";
       container.innerHTML = html;
+
+      // Turn the "Vendor Invoice #" value into a link that opens
+      // the full invoice in #pal-modal.
+      container.querySelectorAll(".invoice-issued__title").forEach((titleEl) => {
+        if ((titleEl.textContent || "").trim() === "Vendor Invoice #") {
+          const valueEl = titleEl.nextElementSibling;
+          if (valueEl && valueEl.textContent.trim()) {
+            const link = document.createElement("span");
+            link.className = "pal-link";
+            link.textContent = valueEl.textContent.trim();
+            link.title = "Open invoice in modal";
+            link.addEventListener("click", () => openInvoiceModal(vk, payeeName));
+            valueEl.textContent = "";
+            valueEl.appendChild(link);
+          }
+        }
+      });
     } catch (err) {
       container.className = "pal-invoice-content pal-readme-error";
       container.textContent = `Invoice not available: ${err.message}. ` +

@@ -496,9 +496,8 @@ tags:
                         <div class="col-md-12">
                             <div class="year-post">
                                 <h2 class="year-title">
-                                    <span class="pal-link" onclick="PALedger.openYear({{ report_year }})">
-                                        Fiscal Year {{ report_year }}
-                                    </span>
+                                    Fiscal Year {{ report_year }}
+                                    <span class="pal-open-link" onclick="PALedger.openYear({{ report_year }})">open &#x2197;</span>
                                 </h2>
                                 <h4 class="year-subtitle">
                                     <span class="pal-blue-amount">{{ usd(current_year.amount if current_year else "0.00") }}</span> through {{ report_date_label }}
@@ -542,9 +541,8 @@ tags:
                                                 {%- set bar_pct = ((year_data.amount | float) / prior_years_max * 100) if prior_years_max > 0 else 0 -%}
                                                 <tr>
                                                     <td>
-                                                        <span class="pal-link" onclick="PALedger.openYear({{ year_key }})">
-                                                            {{ year_key }}
-                                                        </span>
+                                                        {{ year_key }}
+                                                        <span class="pal-open-link" onclick="PALedger.openYear({{ year_key }})">open &#x2197;</span>
                                                     </td>
                                                     <td class="pal-amount-cell">{{ usd(year_data.amount) }}</td>
                                                     <td class="{{ 'pal-positive' if year_data.yoy_change_pct is defined and year_data.yoy_change_pct >= 0 else 'pal-negative' if year_data.yoy_change_pct is defined else '' }}">
@@ -762,10 +760,9 @@ tags:
                                         <div class="card pal-pie-card pal-desc-card">
                                             <div class="card-body">
                                                 <div class="pal-desc-card-title">
-                                                    <span class="pal-link"
-                                                          onclick="PALedger.openDescription('{{ description | replace("'", "\\'") }}', '{{ entry.months.keys() | join(',') }}')">
-                                                        {{ description }}
-                                                    </span>
+                                                    {{ description }}
+                                                    <span class="pal-open-link"
+                                                          onclick="PALedger.openDescription('{{ description | replace("'", "\\'") }}', '{{ entry.months.keys() | join(',') }}')">open &#x2197;</span>
                                                 </div>
                                                 <div class="label">Top {{ payee_count if payee_count < 10 else 10 }} Payees</div>
                                                 <div class="pal-pie-card-wrap">
