@@ -1,7 +1,7 @@
 {
-  "fetched_at": "2026-08-20T21:04:43Z",
+  "fetched_at": "2026-08-20T22:04:46Z",
   "source_url": "https://www.patreasury.gov/transparency/table/employee-grid-data-voucher-search.php?PayeeName=&InvoiceID=&InvoiceDateStart=&InvoiceDateEnd=&GrossAmtStart=&GrossAmtEnd=&DeptNum=&PaymentId=",
   "record_count": 29397,
   "raw_file": "pa_checkbook_raw.json",
-  "raw_sha256": "35b2999760a0ef32bed3482de78db4cd48979222dee478f848ea7edc6d190b79"
+  "raw_sha256": "93e92d524658309ae9ec65e357052ebbef84492ec2d387f363f08978b8958dd0"
 }
